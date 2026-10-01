@@ -1,0 +1,153 @@
+name: Build and publish TimeX apps
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Version tag for the new downloadable release (for example v1.0.1)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-info:
+    runs-on: ubuntu-latest
+    outputs:
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Select release version
+        id: release
+        shell: bash
+        env:
+          INPUT_RELEASE_TAG: ${{ inputs.release_tag }}
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/* ]]; then
+            tag_name="${GITHUB_REF_NAME}"
+          else
+            tag_name="$INPUT_RELEASE_TAG"
+          fi
+          if [[ ! "$tag_name" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][[:alnum:].-]+)?$ ]]; then
+            echo "Enter a valid release version, such as v1.0.1." >&2
+            exit 1
+          fi
+          echo "tag_name=${tag_name}" >> "$GITHUB_OUTPUT"
+
+  build-windows:
+    runs-on: windows-latest
+    needs: release-info
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Build Windows installer and portable app
+        run: npm run build:windows
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+      - name: Upload Windows downloads
+        uses: actions/upload-artifact@v4
+        with:
+          name: timex-windows
+          path: release-output/windows/*.exe
+          if-no-files-found: error
+          retention-days: 14
+
+  build-android:
+    runs-on: ubuntu-latest
+    needs: release-info
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Install dependencies
+        run: npm ci
+      - name: Build Android app
+        env:
+          VITE_BASE_PATH: ./
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+        run: npm run build:native
+      - name: Enable Gradle wrapper
+        working-directory: android
+        run: chmod +x gradlew
+      - name: Build installable Android APK
+        working-directory: android
+        env:
+          TIMEX_VERSION_CODE: ${{ github.run_number }}
+          TIMEX_VERSION_NAME: ${{ needs.release-info.outputs.tag_name }}
+        run: ./gradlew --no-daemon assembleDebug "-PtimexVersionCode=$TIMEX_VERSION_CODE" "-PtimexVersionName=$TIMEX_VERSION_NAME"
+      - name: Prepare GitHub download
+        run: |
+          mkdir -p release-output/android
+          cp android/app/build/outputs/apk/debug/app-debug.apk release-output/android/TimeX-Android.apk
+      - name: Upload Android download
+        uses: actions/upload-artifact@v4
+        with:
+          name: timex-android
+          path: release-output/android/TimeX-Android.apk
+          if-no-files-found: error
+          retention-days: 14
+
+  publish:
+    runs-on: ubuntu-latest
+    needs:
+      - release-info
+      - build-windows
+      - build-android
+    steps:
+      - name: Download platform installers
+        uses: actions/download-artifact@v4
+        with:
+          pattern: timex-*
+          path: release-output
+          merge-multiple: true
+      - name: Publish GitHub Release downloads
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.release-info.outputs.tag_name }}
+          target_commitish: ${{ github.sha }}
+          name: TimeX ${{ needs.release-info.outputs.tag_name }}
+          body: |
+            Download TimeX for Windows or Android:
+
+            - **Windows installer:** `TimeX-nsis-x64.exe`
+            - **Windows portable:** `TimeX-Portable-x64.exe`
+            - **Android app:** `TimeX-Android.apk`
+
+            The Android APK is signed with a temporary runner debug certificate. To install a newer release over an earlier one, uninstall the earlier APK first. Uninstalling also erases that installation's local app data.
+
+            Windows and Android may display a warning because these direct-download builds are not distributed through their app stores.
+          generate_release_notes: true
+          fail_on_unmatched_files: true
+          files: |
+            release-output/TimeX-nsis-x64.exe
+            release-output/TimeX-Portable-x64.exe
+            release-output/TimeX-Android.apk

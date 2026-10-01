@@ -1,0 +1,2 @@
+[functions.timex-assistant]
+verify_jwt = true

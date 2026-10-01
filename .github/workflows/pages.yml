@@ -30,6 +30,10 @@ jobs:
         run: npm ci
       - name: Build website
         run: npm run build
+        env:
+          VITE_BASE_PATH: /TimeX/
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
       - name: Upload website
         uses: actions/upload-pages-artifact@v3
         with:

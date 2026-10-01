@@ -5,6 +5,11 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
+const releasesUrl = "https://github.com/MrX16963/TimeX/releases/latest";
+const windowsInstallerUrl = `${releasesUrl}/download/TimeX-nsis-x64.exe`;
+const windowsPortableUrl = `${releasesUrl}/download/TimeX-Portable-x64.exe`;
+const androidApkUrl = `${releasesUrl}/download/TimeX-Android.apk`;
+
 function isStandalone(): boolean {
   return (
     window.matchMedia("(display-mode: standalone)").matches ||
@@ -202,28 +207,34 @@ export default function LandingPage() {
           <div className="download-glow" />
           <div className="download-copy">
             <span className="site-kicker">A little more room in your day</span>
-            <h2>Make time for what matters.</h2>
-            <p>Install TimeX on Windows or Android and bring your calm workspace along. It is free, private, and ready when you are.</p>
+            <h2>Get TimeX for your device.</h2>
+            <p>Download the full Windows or Android app directly from GitHub Releases. Keep your workspace with you, even when you are offline.</p>
             {installError && <p className="download-error" role="alert">Your browser could not open the install prompt. Use its menu to install TimeX instead.</p>}
           </div>
           <div className="download-options">
             <article className="download-card">
               <span className="download-device-icon" aria-hidden="true">▱</span>
-              <div><h3>For Windows</h3><p>Install from Chrome or Edge</p></div>
-              <button type="button" onClick={() => void installTimeX()} aria-label={installed ? "Open TimeX on Windows" : "Install TimeX on Windows"}>{installed ? "↗" : "↓"}</button>
+              <div><h3>Windows installer</h3><p>Full setup · 64-bit</p></div>
+              <a href={windowsInstallerUrl} aria-label="Download the TimeX Windows installer from GitHub Releases">↓</a>
             </article>
             <article className="download-card">
               <span className="download-device-icon android-icon" aria-hidden="true">▯</span>
-              <div><h3>For Android</h3><p>Install from Chrome</p></div>
-              <button type="button" onClick={() => void installTimeX()} aria-label={installed ? "Open TimeX on Android" : "Install TimeX on Android"}>{installed ? "↗" : "↓"}</button>
+              <div><h3>Android app</h3><p>APK · Install on your device</p></div>
+              <a href={androidApkUrl} aria-label="Download the TimeX Android app from GitHub Releases">↓</a>
             </article>
-            <span className="download-footnote">Secure browser install · No APK or EXE download · Always free</span>
+            <article className="download-card">
+              <span className="download-device-icon" aria-hidden="true">↗</span>
+              <div><h3>Windows portable</h3><p>Run without installing</p></div>
+              <a href={windowsPortableUrl} aria-label="Download the portable TimeX Windows app from GitHub Releases">↓</a>
+            </article>
+            <a className="release-history-link" href={releasesUrl} target="_blank" rel="noreferrer">View all versions on GitHub Releases ↗</a>
+            <span className="download-footnote">Windows 64-bit · Android APK · Official GitHub releases · Free</span>
           </div>
         </section>
 
         <section className="site-privacy-note">
           <span className="privacy-mark" aria-hidden="true">⌑</span>
-          <div><strong>Your day is yours.</strong><p>Your tasks, notes, and plans stay in your browser on this device. TimeX does not require an account or send your personal data to a server.</p></div>
+          <div><strong>Your day is yours.</strong><p>Use TimeX without an account and keep data on your device. Sign in to sync your private workspace; chat messages are sent to the configured AI provider.</p></div>
           <a href={appHref}>Take a look around <span aria-hidden="true">↗</span></a>
         </section>
       </main>
@@ -261,10 +272,11 @@ export default function LandingPage() {
             <h2 id="install-guide-heading">Install TimeX on your device</h2>
             <p>TimeX installs securely from your browser and opens like a regular app. Your data stays in your browser on this device.</p>
             <div className="install-instructions">
-              <article><span>▱</span><div><strong>Windows</strong><p>In Chrome or Edge, select the install icon in the address bar, or choose “Install TimeX” from the browser menu.</p></div></article>
-              <article><span>▯</span><div><strong>Android</strong><p>In Chrome, open the menu and choose “Install app” or “Add to Home screen.”</p></div></article>
-              <article><span>⌑</span><div><strong>iPhone &amp; iPad</strong><p>In Safari, tap Share, then choose “Add to Home Screen.”</p></div></article>
+              <article><span>▱</span><div><strong>Windows</strong><p>Download the setup file for a full installation, or choose the portable version to run TimeX without installing it.</p></div></article>
+              <article><span>▯</span><div><strong>Android</strong><p>Download the APK, open it on your device, and allow installation when Android asks for confirmation.</p></div></article>
+              <article><span>↓</span><div><strong>All versions</strong><p>Browse every published TimeX version on the project's GitHub Releases page.</p></div></article>
             </div>
+            <a className="release-guide-link" href={releasesUrl} target="_blank" rel="noreferrer">Open TimeX releases on GitHub ↗</a>
             <button className="site-primary-button modal-done" type="button" onClick={() => setShowInstallGuide(false)}>Got it</button>
           </section>
         </div>

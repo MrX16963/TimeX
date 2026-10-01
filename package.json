@@ -1,23 +1,92 @@
 {
   "name": "timex",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
+  "description": "A thoughtful time-management app for your day.",
+  "author": "MrX OSA",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "test": "vitest run"
+    "test": "vitest run",
+    "build:native": "npm run build && cap sync android && node scripts/sync-android-icons.mjs",
+    "build:windows": "node scripts/build-windows.mjs",
+    "release": "electron-builder --win nsis portable --x64"
   },
+  "main": "desktop/main.cjs",
   "dependencies": {
+    "@capacitor/app": "^8.0.0",
+    "@capacitor/android": "^8.5.2",
+    "@capacitor/browser": "^8.0.0",
+    "@capacitor/core": "^8.5.2",
+    "@supabase/supabase-js": "^2.117.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.2",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
+    "electron": "^44.5.1",
+    "electron-builder": "^26.15.3",
     "typescript": "^5.7.2",
     "vite": "^6.0.1",
     "vitest": "^5.0.3"
+  },
+  "build": {
+    "appId": "com.mrxosa.timex",
+    "productName": "TimeX",
+    "directories": {
+      "output": "release-output/windows"
+    },
+    "files": [
+      "desktop/main.cjs",
+      "desktop/preload.cjs",
+      "package.json"
+    ],
+    "protocols": [
+      {
+        "name": "TimeX sign in",
+        "schemes": ["timex"]
+      }
+    ],
+    "extraResources": [
+      {
+        "from": "dist",
+        "to": "app"
+      }
+    ],
+    "win": {
+      "icon": "public/icons/timex.ico",
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "TimeX-${target}-x64.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true
+    },
+    "portable": {
+      "artifactName": "TimeX-Portable-x64.exe"
+    }
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   }
 }

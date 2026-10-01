@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type FormEvent } from "react";
 import { App as NativeApp } from "@capacitor/app";
 import { Browser } from "@capacitor/browser";
 import { Capacitor } from "@capacitor/core";
@@ -16,6 +16,7 @@ import {
   buildPlanSteps,
   DEFAULT_DATA,
   getQuadrant,
+  layoutCalendarTasks,
   readAppData,
   type AppData,
   type Language,
@@ -24,11 +25,41 @@ import {
   type Task,
   type Theme,
 } from "./lib";
+import {
+  type ReminderPermission,
+  requestReminderPermission,
+  scheduleBrowserReminders,
+  syncNativeReminders,
+} from "./reminders";
 
 const englishCopy = {
     appName: "TimeX",
     tagline: "Make room for what matters.",
     today: "Today",
+    calendar: "Schedule",
+    calendarIntro: "A clear view of your day, one hour at a time.",
+    todayButton: "Today",
+    previousDay: "Previous day",
+    nextDay: "Next day",
+    calendarTasks: "Scheduled tasks",
+    calendarEmpty: "Nothing planned for this day.",
+    calendarEmptySub: "Add a task with a time to see it on your daily schedule.",
+    scheduledTaskPlaceholder: "What needs a place in your day?",
+    addScheduledTask: "Add to schedule",
+    scheduledDate: "Date",
+    startTime: "Starts",
+    endTime: "Ends",
+    reminder: "Reminder",
+    noReminder: "No reminder",
+    reminderBefore: "{minutes} min before",
+    reminderPermissionDenied: "Task saved, but notifications are blocked. Allow notifications in your device settings.",
+    reminderUnsupported: "Task saved. Notifications are unavailable in this browser.",
+    reminderScheduleFailed: "Could not schedule this reminder. Check your notification settings.",
+    timeRangeInvalid: "Choose an end time later than the start time.",
+    scheduleTask: "Add date, time & reminder",
+    unscheduledCount: "{count} tasks have no scheduled time.",
+    taskReminder: "Task reminder",
+    reminderBackgroundHint: "Android reminders can arrive while the app is closed. Browsers need TimeX to stay open.",
     matrix: "Priority matrix",
     notes: "Notes",
     planner: "Plan a goal",
@@ -87,10 +118,14 @@ const englishCopy = {
     pastPlans: "Your plans",
     noPlans: "Your plans will appear here when you create one.",
     theme: "Change theme",
-    themeLight: "Soft light",
-    themeMidnight: "Midnight",
-    themeSage: "Quiet sage",
-    themeLavender: "Lavender",
+    themeLight: "Comfort · pearl",
+    themeMidnight: "Arctic · blue",
+    themeSage: "Forest · emerald",
+    themeLavender: "Amethyst · violet",
+    themeCustom: "My accent",
+    themeSelection: "Choose your colors",
+    themeCustomColor: "Choose a favorite color",
+    themePaletteHint: "A black canvas with a gentle silver glow.",
     language: "Language",
     switchLanguage: "العربية",
     storageWarning: "This browser could not save your changes. Check your storage settings and try again.",
@@ -149,6 +184,30 @@ const arabicCopy = {
     appName: "TimeX",
     tagline: "اترك مساحة لما يهمك.",
     today: "اليوم",
+    calendar: "الجدول",
+    calendarIntro: "نظرة واضحة على يومك، ساعةً بساعة.",
+    todayButton: "اليوم",
+    previousDay: "اليوم السابق",
+    nextDay: "اليوم التالي",
+    calendarTasks: "المهام المجدولة",
+    calendarEmpty: "لا توجد مهام مخططة لهذا اليوم.",
+    calendarEmptySub: "أضف مهمة وحدّد وقتها لتظهر في جدولك اليومي.",
+    scheduledTaskPlaceholder: "ما المهمة التي تريد إدراجها في يومك؟",
+    addScheduledTask: "أضف إلى الجدول",
+    scheduledDate: "التاريخ",
+    startTime: "البدء",
+    endTime: "الانتهاء",
+    reminder: "التذكير",
+    noReminder: "دون تذكير",
+    reminderBefore: "قبل {minutes} دقيقة",
+    reminderPermissionDenied: "حُفظت المهمة، لكن الإشعارات محظورة. اسمح بها من إعدادات جهازك.",
+    reminderUnsupported: "حُفظت المهمة. الإشعارات غير متاحة في هذا المتصفح.",
+    reminderScheduleFailed: "تعذّر ضبط التذكير. تحقق من إعدادات الإشعارات.",
+    timeRangeInvalid: "اختر وقت انتهاء بعد وقت البدء.",
+    scheduleTask: "إضافة تاريخ ووقت وتذكير",
+    unscheduledCount: "لديك {count} مهام دون وقت محدد.",
+    taskReminder: "تذكير بمهمة",
+    reminderBackgroundHint: "تعمل تذكيرات أندرويد حتى عند إغلاق التطبيق. يحتاج المتصفح إلى بقاء TimeX مفتوحًا.",
     matrix: "مصفوفة الأولويات",
     notes: "ملاحظاتي",
     planner: "خطّط لهدف",
@@ -207,10 +266,14 @@ const arabicCopy = {
     pastPlans: "خططي",
     noPlans: "ستظهر خططك هنا بعد إنشاء أول خطة.",
     theme: "تغيير المظهر",
-    themeLight: "ضوء هادئ",
-    themeMidnight: "منتصف الليل",
-    themeSage: "أخضر هادئ",
-    themeLavender: "لافندر",
+    themeLight: "الوضع المريح",
+    themeMidnight: "قطبي · أزرق",
+    themeSage: "غابة · زمردي",
+    themeLavender: "جمشت · بنفسجي",
+    themeCustom: "لوني المفضّل",
+    themeSelection: "اختر ألوانك",
+    themeCustomColor: "اختر لونك المفضّل",
+    themePaletteHint: "خلفية سوداء يتخلّلها وهج فضي هادئ.",
     language: "اللغة",
     switchLanguage: "English",
     storageWarning: "تعذّر على هذا المتصفح حفظ التغييرات. تحقق من إعدادات التخزين ثم حاول مجددًا.",
@@ -271,7 +334,7 @@ const copy = {
 } satisfies Record<Language, Record<string, string>>;
 
 type CopyKey = keyof typeof copy.en;
-type Page = "today" | "matrix" | "notes" | "planner" | "assistant";
+type Page = "today" | "calendar" | "matrix" | "notes" | "planner" | "assistant";
 type AuthMode = "sign-in" | "sign-up";
 
 type InstallPromptEvent = Event & {
@@ -279,12 +342,43 @@ type InstallPromptEvent = Event & {
   userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
 };
 
-const themeOrder: Theme[] = ["light", "midnight", "sage", "lavender"];
+type TaskSchedule = Required<
+  Pick<Task, "scheduledDate" | "startTime" | "endTime" | "reminderMinutes">
+>;
+
+const themeOrder: Exclude<Theme, "custom">[] = ["light", "midnight", "sage", "lavender"];
 
 function makeId(): string {
   return typeof crypto.randomUUID === "function"
     ? crypto.randomUUID()
     : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+function getContrastTextColor(hex: string): string {
+  const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
+  const luminance = channels
+    .map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
+    .reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
+  return (luminance + 0.05) / 0.05 >= 1.05 / (luminance + 0.05) ? "#08090b" : "#ffffff";
+}
+
+function getLocalDateKey(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function shiftDate(dateKey: string, amount: number): string {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const date = new Date(year, month - 1, day, 12);
+  date.setDate(date.getDate() + amount);
+  return getLocalDateKey(date);
+}
+
+function dateFromKey(dateKey: string): Date {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  return new Date(year, month - 1, day, 12);
 }
 
 function loadData(): AppData {
@@ -317,10 +411,21 @@ function getDisplayName(user: User | null): string {
 
 function App() {
   const [data, setData] = useState<AppData>(loadData);
+  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [calendarDate, setCalendarDate] = useState(() => getLocalDateKey(new Date()));
+  const [calendarTaskTitle, setCalendarTaskTitle] = useState("");
+  const [calendarStartTime, setCalendarStartTime] = useState("09:00");
+  const [calendarEndTime, setCalendarEndTime] = useState("10:00");
+  const [calendarReminder, setCalendarReminder] = useState<number | null>(10);
   const [page, setPage] = useState<Page>("today");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskImportant, setTaskImportant] = useState(false);
   const [taskUrgent, setTaskUrgent] = useState(false);
+  const [taskScheduleOpen, setTaskScheduleOpen] = useState(false);
+  const [taskScheduledDate, setTaskScheduledDate] = useState(() => getLocalDateKey(new Date()));
+  const [taskStartTime, setTaskStartTime] = useState("09:00");
+  const [taskEndTime, setTaskEndTime] = useState("10:00");
+  const [taskReminder, setTaskReminder] = useState<number | null>(10);
   const [matrixTaskTitle, setMatrixTaskTitle] = useState("");
   const [goal, setGoal] = useState("");
   const [running, setRunning] = useState(false);
@@ -354,6 +459,8 @@ function App() {
   );
   const [showInstallHelp, setShowInstallHelp] = useState(false);
   const installCloseRef = useRef<HTMLButtonElement>(null);
+  const themeButtonRef = useRef<HTMLButtonElement>(null);
+  const themePickerRef = useRef<HTMLElement>(null);
   const lang = data.language;
   const isArabic = lang === "ar";
   const t = (key: CopyKey) => copy[lang][key];
@@ -369,6 +476,30 @@ function App() {
     document.documentElement.lang = lang;
     document.documentElement.dir = isArabic ? "rtl" : "ltr";
   }, [isArabic, lang]);
+
+  useEffect(() => {
+    if (!showThemePicker) return;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== "Escape") return;
+      setShowThemePicker(false);
+      themeButtonRef.current?.focus();
+    };
+    const closeOnOutsideClick = (event: PointerEvent) => {
+      if (!(event.target instanceof Node)) return;
+      if (
+        !themePickerRef.current?.contains(event.target) &&
+        !themeButtonRef.current?.contains(event.target)
+      ) {
+        setShowThemePicker(false);
+      }
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    window.addEventListener("pointerdown", closeOnOutsideClick);
+    return () => {
+      window.removeEventListener("keydown", closeOnEscape);
+      window.removeEventListener("pointerdown", closeOnOutsideClick);
+    };
+  }, [showThemePicker]);
 
   useEffect(() => {
     const client = supabase;
@@ -621,11 +752,41 @@ function App() {
     if (secondsLeft === 0) setRunning(false);
   }, [secondsLeft]);
 
+  useEffect(() => {
+    if (Capacitor.isNativePlatform()) {
+      void syncNativeReminders(data.tasks, lang).catch((error: unknown) => {
+        console.error("TimeX could not sync native task reminders.", error);
+        notify(copy[lang].reminderScheduleFailed);
+      });
+      return;
+    }
+
+    if (typeof Notification === "undefined" || Notification.permission !== "granted") return;
+    return scheduleBrowserReminders(data.tasks, lang, (taskId) => {
+      setData((current) => ({
+        ...current,
+        tasks: current.tasks.map((task) =>
+          task.id === taskId ? { ...task, reminderSentAt: Date.now() } : task,
+        ),
+      }));
+    });
+  }, [data.tasks, lang]);
+
   const openTasks = useMemo(
     () => data.tasks.filter((task) => !task.completed),
     [data.tasks],
   );
   const completedCount = data.tasks.filter((task) => task.completed).length;
+  const calendarTasks = data.tasks.filter((task) => task.scheduledDate === calendarDate);
+  const calendarLayout = layoutCalendarTasks(calendarTasks);
+  const unscheduledCount = openTasks.filter((task) => !task.scheduledDate).length;
+  const selectedCalendarDate = dateFromKey(calendarDate);
+  const calendarDateLabel = new Intl.DateTimeFormat(lang, {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(selectedCalendarDate);
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const seconds = String(secondsLeft % 60).padStart(2, "0");
 
@@ -634,7 +795,12 @@ function App() {
     window.setTimeout(() => setToast(""), 2800);
   }
 
-  function addTask(title: string, important = false, urgent = false) {
+  function addTask(
+    title: string,
+    important = false,
+    urgent = false,
+    schedule?: TaskSchedule,
+  ) {
     const trimmed = title.trim();
     if (!trimmed) return;
     const task: Task = {
@@ -644,17 +810,80 @@ function App() {
       urgent,
       completed: false,
       createdAt: Date.now(),
+      ...schedule,
     };
     setData((current) => ({ ...current, tasks: [task, ...current.tasks] }));
     notify(t("taskAdded"));
   }
 
-  function submitTask(event: FormEvent<HTMLFormElement>) {
+  async function checkReminderPermission(): Promise<ReminderPermission> {
+    try {
+      return await requestReminderPermission();
+    } catch (error) {
+      console.error("TimeX could not request notification permission.", error);
+      return "denied";
+    }
+  }
+
+  async function submitTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    addTask(taskTitle, taskImportant, taskUrgent);
+    const schedule = taskScheduleOpen
+      ? {
+          scheduledDate: taskScheduledDate,
+          startTime: taskStartTime,
+          endTime: taskEndTime,
+          reminderMinutes: taskReminder,
+        }
+      : undefined;
+    if (schedule && schedule.endTime <= schedule.startTime) {
+      notify(t("timeRangeInvalid"));
+      return;
+    }
+    const permission = schedule?.reminderMinutes != null
+      ? await checkReminderPermission()
+      : null;
+    addTask(taskTitle, taskImportant, taskUrgent, schedule);
     setTaskTitle("");
     setTaskImportant(false);
     setTaskUrgent(false);
+    if (permission && permission !== "granted") {
+      notify(t(permission === "unsupported" ? "reminderUnsupported" : "reminderPermissionDenied"));
+    }
+  }
+
+  async function submitCalendarTask(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (calendarEndTime <= calendarStartTime) {
+      notify(t("timeRangeInvalid"));
+      return;
+    }
+    const permission = calendarReminder !== null
+      ? await checkReminderPermission()
+      : null;
+    addTask(calendarTaskTitle, false, false, {
+      scheduledDate: calendarDate,
+      startTime: calendarStartTime,
+      endTime: calendarEndTime,
+      reminderMinutes: calendarReminder,
+    });
+    setCalendarTaskTitle("");
+    if (permission && permission !== "granted") {
+      notify(t(permission === "unsupported" ? "reminderUnsupported" : "reminderPermissionDenied"));
+    }
+  }
+
+  function setCalendarDay(amount: number) {
+    setCalendarDate((current) => shiftDate(current, amount));
+  }
+
+  function formatCalendarTime(time: string): string {
+    const [hour, minute] = time.split(":").map(Number);
+    return new Intl.DateTimeFormat(lang, { hour: "numeric", minute: "2-digit" })
+      .format(new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth(), selectedCalendarDate.getDate(), hour, minute));
+  }
+
+  function formatHour(hour: number): string {
+    return formatCalendarTime(`${String(hour).padStart(2, "0")}:00`);
   }
 
   function toggleTask(taskId: string) {
@@ -725,14 +954,6 @@ function App() {
     }));
     setData((current) => ({ ...current, tasks: [...tasks, ...current.tasks] }));
     notify(t("planAdded"));
-  }
-
-  function cycleTheme() {
-    const currentIndex = themeOrder.indexOf(data.theme);
-    setData((current) => ({
-      ...current,
-      theme: themeOrder[(currentIndex + 1) % themeOrder.length],
-    }));
   }
 
   async function installApp() {
@@ -953,6 +1174,7 @@ function App() {
 
   const navItems: { id: Page; icon: string; label: CopyKey }[] = [
     { id: "today", icon: "⌂", label: "today" },
+    { id: "calendar", icon: "◷", label: "calendar" },
     { id: "matrix", icon: "▦", label: "matrix" },
     { id: "planner", icon: "✳", label: "planner" },
     { id: "notes", icon: "▤", label: "notes" },
@@ -973,6 +1195,15 @@ function App() {
         </button>
         <span className="task-copy">
           <span className="task-title">{task.title}</span>
+          {task.scheduledDate && task.startTime && task.endTime && (
+            <span className="task-scheduled-tag">
+              <span aria-hidden="true">◷</span>
+              {task.scheduledDate !== getLocalDateKey(new Date()) && (
+                <span>{new Intl.DateTimeFormat(lang, { month: "short", day: "numeric" }).format(dateFromKey(task.scheduledDate))}</span>
+              )}
+              {formatCalendarTime(task.startTime)}–{formatCalendarTime(task.endTime)}
+            </span>
+          )}
           <span className={`priority-tag priority-${quadrant}`}>
             {task.important && task.urgent
               ? `${t("important")} · ${t("urgent")}`
@@ -996,7 +1227,13 @@ function App() {
   }
 
   return (
-    <div className={`app-shell theme-${data.theme}`}>
+    <div
+      className={`app-shell theme-${data.theme}`}
+      style={{
+        "--user-accent": data.accentColor,
+        "--user-accent-ink": getContrastTextColor(data.accentColor),
+      } as CSSProperties}
+    >
       <aside className="sidebar">
         <a className="brand" href="#today" onClick={() => setPage("today")}>
           <span className="brand-mark">t.</span>
@@ -1058,16 +1295,71 @@ function App() {
               <span aria-hidden="true">{user ? "●" : "♙"}</span>
               <span className="desktop-only">{userName || t("signIn")}</span>
             </button>
-            <button
-              className="subtle-button theme-button"
-              type="button"
-              onClick={cycleTheme}
-              aria-label={`${t("theme")}: ${t(themeKey(data.theme))}`}
-              title={`${t("theme")}: ${t(themeKey(data.theme))}`}
-            >
-              <span aria-hidden="true">◐</span>
-              <span className="desktop-only">{t(themeKey(data.theme))}</span>
-            </button>
+            <div className="theme-control">
+              <button
+                ref={themeButtonRef}
+                className="subtle-button theme-button"
+                type="button"
+                onClick={() => setShowThemePicker((visible) => !visible)}
+                aria-label={t("themeSelection")}
+                aria-haspopup="true"
+                aria-expanded={showThemePicker}
+                aria-controls="theme-picker"
+                title={t("themeSelection")}
+              >
+                <span aria-hidden="true">◐</span>
+                <span className="desktop-only">{t(themeKey(data.theme))}</span>
+              </button>
+              {showThemePicker && (
+                <section
+                  ref={themePickerRef}
+                  className="theme-picker"
+                  id="theme-picker"
+                  role="group"
+                  aria-label={t("themeSelection")}
+                >
+                  <p className="theme-picker-heading">{t("themeSelection")}</p>
+                  <div className="theme-options">
+                    {themeOrder.map((theme) => (
+                      <button
+                        className={`theme-option${data.theme === theme ? " selected" : ""}`}
+                        key={theme}
+                        type="button"
+                        aria-pressed={data.theme === theme}
+                        onClick={() => setData((current) => ({ ...current, theme }))}
+                      >
+                        <span className={`theme-swatch theme-swatch-${theme}`} aria-hidden="true" />
+                        <span>{t(themeKey(theme))}</span>
+                        {data.theme === theme && <span className="theme-option-check" aria-hidden="true">✓</span>}
+                      </button>
+                    ))}
+                  </div>
+                  <label className="theme-custom-picker">
+                    <span className="theme-custom-label">
+                      <span
+                        className="theme-swatch theme-swatch-custom"
+                        style={{ backgroundColor: data.accentColor }}
+                        aria-hidden="true"
+                      />
+                      <span>{t("themeCustomColor")}</span>
+                    </span>
+                    <input
+                      type="color"
+                      value={data.accentColor}
+                      aria-label={t("themeCustomColor")}
+                      onChange={(event) =>
+                        setData((current) => ({
+                          ...current,
+                          theme: "custom",
+                          accentColor: event.target.value,
+                        }))
+                      }
+                    />
+                  </label>
+                  <p className="theme-picker-hint">{t("themePaletteHint")}</p>
+                </section>
+              )}
+            </div>
             {!appInstalled && (
               <button
                 className="subtle-button install-button"
@@ -1160,6 +1452,62 @@ function App() {
                       <span>{t("add")}</span>
                     </button>
                   </form>
+                  <button
+                    className="task-schedule-toggle"
+                    type="button"
+                    aria-expanded={taskScheduleOpen}
+                    aria-controls="task-schedule-fields"
+                    onClick={() => setTaskScheduleOpen((open) => !open)}
+                  >
+                    <span aria-hidden="true">◷</span>{t("scheduleTask")}
+                  </button>
+                  {taskScheduleOpen && (
+                    <div className="schedule-fields" id="task-schedule-fields">
+                      <label>
+                        <span>{t("scheduledDate")}</span>
+                        <input
+                          type="date"
+                          value={taskScheduledDate}
+                          onChange={(event) => setTaskScheduledDate(event.target.value)}
+                          required
+                        />
+                      </label>
+                      <label>
+                        <span>{t("startTime")}</span>
+                        <input
+                          type="time"
+                          value={taskStartTime}
+                          onChange={(event) => setTaskStartTime(event.target.value)}
+                          required
+                        />
+                      </label>
+                      <label>
+                        <span>{t("endTime")}</span>
+                        <input
+                          type="time"
+                          value={taskEndTime}
+                          onChange={(event) => setTaskEndTime(event.target.value)}
+                          required
+                        />
+                      </label>
+                      <label>
+                        <span>{t("reminder")}</span>
+                        <select
+                          value={taskReminder ?? "none"}
+                          onChange={(event) =>
+                            setTaskReminder(event.target.value === "none" ? null : Number(event.target.value))
+                          }
+                        >
+                          <option value="none">{t("noReminder")}</option>
+                          {[5, 10, 15, 30].map((reminder) => (
+                            <option value={reminder} key={reminder}>
+                              {t("reminderBefore").replace("{minutes}", String(reminder))}
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                    </div>
+                  )}
                   <div className="task-options">
                     <label className="check-label">
                       <input
@@ -1247,6 +1595,205 @@ function App() {
                 </section>
               </div>
             </>
+          )}
+
+          {page === "calendar" && (
+            <section className="content-page calendar-page">
+              <header className="page-heading calendar-page-heading">
+                <div>
+                  <span className="eyebrow">{t("calendar")}</span>
+                  <h1>{calendarDateLabel}</h1>
+                  <p>{t("calendarIntro")}</p>
+                </div>
+                <div className="calendar-day-switcher" aria-label={t("calendar")}>
+                  <button
+                    className="calendar-nav-button"
+                    type="button"
+                    aria-label={t("previousDay")}
+                    onClick={() => setCalendarDay(-1)}
+                  >
+                    ‹
+                  </button>
+                  <button
+                    className="calendar-today-button"
+                    type="button"
+                    onClick={() => setCalendarDate(getLocalDateKey(new Date()))}
+                  >
+                    {t("todayButton")}
+                  </button>
+                  <button
+                    className="calendar-nav-button"
+                    type="button"
+                    aria-label={t("nextDay")}
+                    onClick={() => setCalendarDay(1)}
+                  >
+                    ›
+                  </button>
+                </div>
+              </header>
+
+              <section className="panel calendar-add-panel">
+                <div className="calendar-add-heading">
+                  <div>
+                    <span className="calendar-add-icon" aria-hidden="true">＋</span>
+                    <h2>{t("addScheduledTask")}</h2>
+                  </div>
+                  <span>{calendarDateLabel}</span>
+                </div>
+                <form className="calendar-add-form" onSubmit={submitCalendarTask}>
+                  <label className="visually-hidden" htmlFor="calendar-task-title">
+                    {t("scheduledTaskPlaceholder")}
+                  </label>
+                  <input
+                    id="calendar-task-title"
+                    value={calendarTaskTitle}
+                    onChange={(event) => setCalendarTaskTitle(event.target.value)}
+                    placeholder={t("scheduledTaskPlaceholder")}
+                    maxLength={160}
+                    required
+                  />
+                  <div className="calendar-add-times">
+                    <label>
+                      <span>{t("startTime")}</span>
+                      <input
+                        type="time"
+                        value={calendarStartTime}
+                        onChange={(event) => setCalendarStartTime(event.target.value)}
+                        required
+                      />
+                    </label>
+                    <label>
+                      <span>{t("endTime")}</span>
+                      <input
+                        type="time"
+                        value={calendarEndTime}
+                        onChange={(event) => setCalendarEndTime(event.target.value)}
+                        required
+                      />
+                    </label>
+                    <label>
+                      <span>{t("reminder")}</span>
+                      <select
+                        value={calendarReminder ?? "none"}
+                        onChange={(event) =>
+                          setCalendarReminder(event.target.value === "none" ? null : Number(event.target.value))
+                        }
+                      >
+                        <option value="none">{t("noReminder")}</option>
+                        {[5, 10, 15, 30].map((reminder) => (
+                          <option value={reminder} key={reminder}>
+                            {t("reminderBefore").replace("{minutes}", String(reminder))}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <button
+                      className="primary-button calendar-add-button"
+                      type="submit"
+                      disabled={!calendarTaskTitle.trim()}
+                    >
+                      <span aria-hidden="true">＋</span>{t("addScheduledTask")}
+                    </button>
+                  </div>
+                </form>
+                {unscheduledCount > 0 && (
+                  <p className="calendar-unscheduled-note">
+                    {t("unscheduledCount").replace("{count}", String(unscheduledCount))}
+                  </p>
+                )}
+                <p className="calendar-unscheduled-note">{t("reminderBackgroundHint")}</p>
+              </section>
+
+              <section className="panel calendar-panel">
+                <header className="calendar-panel-heading">
+                  <div>
+                    <h2>{t("calendarTasks")}</h2>
+                    <p>{calendarDateLabel}</p>
+                  </div>
+                  <span className="heading-count">
+                    {calendarTasks.length.toString().padStart(2, "0")}
+                  </span>
+                </header>
+                <div className="calendar-scroll">
+                  {calendarTasks.length > 0 ? (
+                    <div className="calendar-time-grid">
+                      <div className="calendar-hours" aria-hidden="true">
+                        {Array.from({ length: 24 }, (_, hour) => (
+                          <span key={hour}>{formatHour(hour)}</span>
+                        ))}
+                      </div>
+                      <div className="calendar-day-track">
+                        {Array.from({ length: 24 }, (_, hour) => (
+                          <span
+                            className="calendar-hour-line"
+                            key={hour}
+                            style={{ top: `${hour * 64}px` }}
+                            aria-hidden="true"
+                          />
+                        ))}
+                        {calendarLayout.map(({ task, column, columns, startMinutes, durationMinutes }) => {
+                          const quadrant = getQuadrant(task);
+                          const columnWidth = 100 / columns;
+                          return (
+                            <article
+                              className={`calendar-event${task.completed ? " calendar-event-complete" : ""}`}
+                              key={task.id}
+                              style={{
+                                top: `${startMinutes * (64 / 60)}px`,
+                                height: `${Math.max(32, durationMinutes * (64 / 60))}px`,
+                                insetInlineStart: `calc(${column * columnWidth}% + 5px)`,
+                                width: `calc(${columnWidth}% - 10px)`,
+                              }}
+                            >
+                              <button
+                                className={`calendar-event-check${task.completed ? " checked" : ""}`}
+                                type="button"
+                                aria-label={task.completed ? t("markOpen") : t("markDone")}
+                                onClick={() => toggleTask(task.id)}
+                              >
+                                {task.completed ? "✓" : ""}
+                              </button>
+                              <div className="calendar-event-copy">
+                                <strong>{task.title}</strong>
+                                <span>{formatCalendarTime(task.startTime)} – {formatCalendarTime(task.endTime)}</span>
+                                {task.reminderMinutes != null && (
+                                  <span className="calendar-event-reminder">
+                                    ◉ {t("reminderBefore").replace("{minutes}", String(task.reminderMinutes))}
+                                  </span>
+                                )}
+                                <span className={`priority-tag priority-${quadrant}`}>
+                                  {task.important && task.urgent
+                                    ? `${t("important")} · ${t("urgent")}`
+                                    : task.important
+                                      ? t("important")
+                                      : task.urgent
+                                        ? t("urgent")
+                                        : t("unprioritized")}
+                                </span>
+                              </div>
+                              <button
+                                className="icon-button calendar-event-delete"
+                                type="button"
+                                aria-label={t("deleteTask")}
+                                onClick={() => deleteTask(task.id)}
+                              >
+                                ×
+                              </button>
+                            </article>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="empty-state calendar-empty">
+                      <span className="empty-spark" aria-hidden="true">◷</span>
+                      <strong>{t("calendarEmpty")}</strong>
+                      <p>{t("calendarEmptySub")}</p>
+                    </div>
+                  )}
+                </div>
+              </section>
+            </section>
           )}
 
           {page === "matrix" && (
@@ -1771,6 +2318,7 @@ const themeLabels: Record<Theme, CopyKey> = {
   midnight: "themeMidnight",
   sage: "themeSage",
   lavender: "themeLavender",
+  custom: "themeCustom",
 };
 
 function themeKey(theme: Theme): CopyKey {

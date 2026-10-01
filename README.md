@@ -15,32 +15,38 @@ Use `npm run build` for a production build and `npm test` for focused unit tests
 
 - Arabic (default) and English interface, including right-to-left layout support.
 - Add, complete, and remove tasks; completion awards 10 points.
+- A day-by-day, 24-hour calendar: schedule tasks with start/end times and set 5-, 10-, 15-, or 30-minute reminders.
 - Prioritize tasks by importance and urgency with the four-quadrant Eisenhower matrix.
 - 25-minute Pomodoro focus timer with start, pause, and reset controls.
 - Create and edit personal notes and save guided plans as task lists.
-- Four color themes: light, midnight, sage, and lavender.
+- Four dark palettes: noir-and-pearl, arctic blue, forest emerald, and amethyst violet.
+- A black-and-silver gradient visual style, four coordinated accent palettes, and a custom color picker; theme and accent preferences save with the user's workspace.
 - Without a connected account, tasks, notes, plans, points, language, and theme are stored in browser/app storage on that device.
 - Optional email, Google, and Facebook sign-in, an isolated private cloud workspace per account, and saved assistant conversation history.
 - An authenticated AI conversation that can discuss goals, create plans, and save notes when a server-side AI provider is configured.
 - Installable as a progressive web app (PWA) on supported browsers, with an offline app shell after the first visit.
 - Downloadable native Windows and Android apps from GitHub Releases.
 
+Scheduled tasks and reminders are saved with the user's workspace. Android uses native local notifications, which can fire while TimeX is closed after notification permission is granted. Web browsers and the Windows app schedule reminders while TimeX is open; browser notifications require a supported browser and permission.
+
 ## Accounts, database, and chat
 
-Account and AI features are intentionally unavailable until the owner configures a Supabase project and an AI provider. The app never pretends to create an account or answer with an AI when these services are missing. Until configuration is complete, the device-local planner remains available.
+The Supabase project URL for this app is `https://idsrpsleoogqpaculctf.supabase.co`. Email/social accounts and private cloud workspaces require its public anon/publishable key; Gemini assistant replies additionally require a server-side Google AI API key. The app never pretends to create an account or answer with AI while those settings are missing. Until setup is complete, the device-local planner remains available.
 
 To activate accounts and per-user cloud storage:
 
-1. Create a Supabase project and run `supabase/migrations/20261001100000_user_accounts_and_assistant.sql` in its SQL Editor, or link the project and run `npx supabase db push`.
-2. Add your Supabase project URL and public anon/publishable key as `.env.local` values using `.env.example`. Add the same two values as GitHub **Actions variables** named `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` to enable sign-in in the website and packaged apps. The anon key is designed to be public; never put the Supabase service-role key in the frontend or these variables.
+1. In the Supabase SQL Editor for project `idsrpsleoogqpaculctf`, run `supabase/migrations/20261001100000_user_accounts_and_assistant.sql` to create the private workspace, profile, chat tables, and row-level security policies.
+2. In Supabase **Project Settings → API Keys**, copy the public anon/publishable key. Add it as a GitHub **Actions variable** named `VITE_SUPABASE_ANON_KEY` (Repository → Settings → Secrets and variables → Actions → Variables). `VITE_SUPABASE_URL` is already set to this project's URL. For local development, copy `.env.example` to `.env.local` and fill in the public key. This public client key is intended for frontend use with RLS; never use the Supabase service-role/secret key in the app or GitHub variables.
 3. In Supabase Authentication, enable Email and whichever Google and Facebook providers you want to offer. Register each provider's OAuth credentials with Supabase. Allow the website redirect `https://mrx16963.github.io/TimeX/app.html` and the native app redirects `com.mrxosa.timex://login-callback` and `timex://login-callback` in Supabase's redirect URL settings. Configure email confirmations and password rules to match your needs.
-4. Deploy the authenticated assistant Edge Function with `npx supabase functions deploy timex-assistant`. Set its server-side AI credentials with `npx supabase secrets set OPENAI_API_KEY=...`; optionally set `OPENAI_MODEL`. Store AI and social provider secrets only in their intended provider/Supabase secret settings, never in frontend build variables or committed files.
+4. Deploy the database migration and Edge Function from an authenticated Supabase CLI session (`npx supabase login`, `npx supabase link --project-ref idsrpsleoogqpaculctf`, `npx supabase db push`, then `npx supabase functions deploy timex-assistant`). In **Supabase → Edge Functions → Secrets**, set `GEMINI_API_KEY` to a key from Google AI Studio. The function uses `gemini-2.5-flash` by default; optionally set `GEMINI_MODEL`. Keep the Gemini key only in Supabase server-side secrets—never in GitHub Actions variables or frontend builds.
 
 `profiles`, `user_workspaces`, and `assistant_messages` enforce per-user access with Supabase Auth row-level security. Users see only their own saved workspace and conversations. The AI provider receives the recent chat context when the signed-in user sends a message; the key stays on the server. The assistant supports normal discussion plus validated note and plan actions that are saved to the signed-in user's workspace.
 
-Email sign-in, Google/Facebook OAuth, cross-device cloud saving, and live AI chat all depend on the external Supabase project settings above. Google/Facebook login also requires OAuth credentials from those providers. AI chat additionally requires an OpenAI API key stored in Supabase secrets. The app's guided five-step planner works locally without those services.
+Email sign-in, Google/Facebook OAuth, cross-device cloud saving, and live AI chat depend on completing the Supabase setup above. Google/Facebook login also requires OAuth credentials from those providers. AI chat requires a Google Gemini API key stored in Supabase secrets. The app's guided five-step planner works locally without those services.
 
 ## Limitations
+
+TimeX does not currently publish a signed native iOS `.ipa`; install the website as a Home Screen app from Safari instead. This does not require an App Store account, but iOS background reminders and native-app capabilities are not available through the PWA. Gemini chat and cross-device accounts remain unavailable until the Supabase setup above is completed. Browser and Windows reminders require TimeX to remain open; Android reminder delivery depends on notification permission and device alarm settings.
 
 ## Website and browser-installable app
 

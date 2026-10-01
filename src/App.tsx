@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import {
   buildPlanSteps,
   DEFAULT_DATA,
@@ -89,6 +89,13 @@ const englishCopy = {
     deletePlan: "Delete plan",
     close: "Close",
     saveNoteHint: "Notes save automatically",
+    installApp: "Install app",
+    installTitle: "Take TimeX with you",
+    installHelp: "Install TimeX from your browser menu to use it like an app. Your saved tasks and notes stay on this device.",
+    installDesktop: "On a computer, choose “Install app” or “Install TimeX” from the browser menu or address bar.",
+    installAndroid: "On Android, open the browser menu and choose “Install app” or “Add to Home screen.”",
+    installApple: "On iPhone or iPad, open this page in Safari, tap Share, then choose “Add to Home Screen.”",
+    installFailed: "The browser could not start installation. Try the install option in its menu instead.",
 };
 
 const arabicCopy = {
@@ -168,6 +175,13 @@ const arabicCopy = {
     deletePlan: "حذف الخطة",
     close: "إغلاق",
     saveNoteHint: "تُحفظ الملاحظات تلقائيًا",
+    installApp: "تثبيت التطبيق",
+    installTitle: "TimeX معك أينما ذهبت",
+    installHelp: "ثبّت TimeX من قائمة المتصفح لاستخدامه كتطبيق. تبقى مهامك وملاحظاتك المحفوظة على هذا الجهاز.",
+    installDesktop: "على الكمبيوتر، اختر «تثبيت التطبيق» أو «تثبيت TimeX» من قائمة المتصفح أو شريط العنوان.",
+    installAndroid: "على أندرويد، افتح قائمة المتصفح واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».",
+    installApple: "على iPhone أو iPad، افتح الصفحة في Safari، واضغط «مشاركة»، ثم «إضافة إلى الشاشة الرئيسية».",
+    installFailed: "تعذّر بدء التثبيت. جرّب خيار التثبيت من قائمة المتصفح.",
 } satisfies Record<keyof typeof englishCopy, string>;
 
 const copy = {
@@ -177,6 +191,11 @@ const copy = {
 
 type CopyKey = keyof typeof copy.en;
 type Page = "today" | "matrix" | "notes" | "planner";
+
+type InstallPromptEvent = Event & {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+};
 
 const themeOrder: Theme[] = ["light", "midnight", "sage", "lavender"];
 
@@ -206,6 +225,13 @@ function App() {
   const [secondsLeft, setSecondsLeft] = useState(25 * 60);
   const [toast, setToast] = useState("");
   const [storageFailed, setStorageFailed] = useState(false);
+  const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
+  const [appInstalled, setAppInstalled] = useState(() =>
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (navigator as Navigator & { standalone?: boolean }).standalone === true,
+  );
+  const [showInstallHelp, setShowInstallHelp] = useState(false);
+  const installCloseRef = useRef<HTMLButtonElement>(null);
   const lang = data.language;
   const isArabic = lang === "ar";
   const t = (key: CopyKey) => copy[lang][key];
@@ -214,6 +240,28 @@ function App() {
     document.documentElement.lang = lang;
     document.documentElement.dir = isArabic ? "rtl" : "ltr";
   }, [isArabic, lang]);
+
+  useEffect(() => {
+    const handleInstallAvailable = (event: Event) => {
+      event.preventDefault();
+      setInstallPrompt(event as InstallPromptEvent);
+    };
+    const handleInstalled = () => {
+      setAppInstalled(true);
+      setInstallPrompt(null);
+      setShowInstallHelp(false);
+    };
+    window.addEventListener("beforeinstallprompt", handleInstallAvailable);
+    window.addEventListener("appinstalled", handleInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleInstallAvailable);
+      window.removeEventListener("appinstalled", handleInstalled);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (showInstallHelp) installCloseRef.current?.focus();
+  }, [showInstallHelp]);
 
   useEffect(() => {
     try {
@@ -350,6 +398,23 @@ function App() {
     }));
   }
 
+  async function installApp() {
+    if (!installPrompt) {
+      setShowInstallHelp(true);
+      return;
+    }
+    try {
+      await installPrompt.prompt();
+      const choice = await installPrompt.userChoice;
+      setInstallPrompt(null);
+      if (choice.outcome === "accepted") setAppInstalled(true);
+    } catch (error) {
+      console.error("TimeX installation prompt failed.", error);
+      setInstallPrompt(null);
+      notify(t("installFailed"));
+    }
+  }
+
   const navItems: { id: Page; icon: string; label: CopyKey }[] = [
     { id: "today", icon: "⌂", label: "today" },
     { id: "matrix", icon: "▦", label: "matrix" },
@@ -453,6 +518,18 @@ function App() {
               <span aria-hidden="true">◐</span>
               <span className="desktop-only">{t(themeKey(data.theme))}</span>
             </button>
+            {!appInstalled && (
+              <button
+                className="subtle-button install-button"
+                type="button"
+                onClick={() => void installApp()}
+                aria-label={t("installApp")}
+                title={t("installApp")}
+              >
+                <span aria-hidden="true">⇩</span>
+                <span className="desktop-only">{t("installApp")}</span>
+              </button>
+            )}
             <button
               className="language-button"
               type="button"
@@ -821,6 +898,7 @@ function App() {
             </section>
           )}
         </div>
+        <footer className="app-footer">Created by MrX OSA</footer>
       </main>
 
       <nav className="mobile-nav" aria-label={t("appName")}>
@@ -837,6 +915,50 @@ function App() {
           </button>
         ))}
       </nav>
+
+      {showInstallHelp && (
+        <div
+          className="install-modal-backdrop"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setShowInstallHelp(false);
+          }}
+        >
+          <section
+            className="install-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="install-modal-title"
+            onKeyDown={(event) => {
+              if (event.key === "Escape") setShowInstallHelp(false);
+            }}
+          >
+            <button
+              ref={installCloseRef}
+              className="icon-button install-modal-close"
+              type="button"
+              aria-label={t("close")}
+              onClick={() => setShowInstallHelp(false)}
+            >
+              ×
+            </button>
+            <span className="install-modal-icon" aria-hidden="true">t.</span>
+            <h2 id="install-modal-title">{t("installTitle")}</h2>
+            <p>{t("installHelp")}</p>
+            <ul>
+              <li>{t("installDesktop")}</li>
+              <li>{t("installAndroid")}</li>
+              <li>{t("installApple")}</li>
+            </ul>
+            <button
+              className="primary-button install-modal-done"
+              type="button"
+              onClick={() => setShowInstallHelp(false)}
+            >
+              {t("close")}
+            </button>
+          </section>
+        </div>
+      )}
 
       {storageFailed && (
         <div className="storage-alert" role="alert">

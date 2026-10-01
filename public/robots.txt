@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mrx16963.github.io/TimeX/sitemap.xml

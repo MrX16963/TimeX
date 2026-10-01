@@ -23,7 +23,8 @@ Use `npm run build` for a production build and `npm test` for focused unit tests
 - A black-and-silver gradient visual style, four coordinated accent palettes, and a custom color picker; theme and accent preferences save with the user's workspace.
 - Without a connected account, tasks, notes, plans, points, language, and theme are stored in browser/app storage on that device.
 - Optional email, Google, and Facebook sign-in, an isolated private cloud workspace per account, and saved assistant conversation history.
-- MrX, a free local planning helper that can make a starter plan, add tasks, save notes, and suggest a priority without an account, API key, or AI-service request. It uses explicit planning rules rather than a trained language model. If signed in, the conversation transcript still syncs to Supabase.
+- MrX can run the open Qwen2 0.5B instruction model locally in browsers that support WebGPU. The roughly 278 MB model is downloaded only after the user chooses **Download free AI model**, cached on that device, and used without sending prompts or task data to an AI provider. Explicit task/note/plan actions are saved locally.
+- A built-in rule-based MrX planner remains available with no model download, account, or internet. It is a fallback, not a trained AI model. Optional Gemini chat is available for signed-in accounts only when the Supabase Edge Function is configured.
 - Optional authenticated Gemini chat for signed-in accounts when an owner configures the Supabase Edge Function and its server-side API key.
 - Installable as a progressive web app (PWA) on supported browsers, with an offline app shell after the first visit.
 - Downloadable native Windows and Android apps from GitHub Releases.
@@ -32,7 +33,7 @@ Scheduled tasks and reminders are saved with the user's workspace. Android uses 
 
 ## Accounts, database, and chat
 
-The Supabase project URL for this app is `https://idsrpsleoogqpaculctf.supabase.co`. Email/social accounts and private cloud workspaces require its public anon/publishable key. Supabase Auth receives and manages email/password credentials and Google/Facebook OAuth identities; the `profiles` table stores the display name, while each user's workspace and conversation are protected by row-level security. MrX local planning works without Supabase. Gemini chat additionally requires a server-side Google AI API key and is optional; MrX does not claim to be a trained or generative AI model.
+The Supabase project URL for this app is `https://idsrpsleoogqpaculctf.supabase.co`. Email/social accounts and private cloud workspaces require its public anon/publishable key. Supabase Auth receives and manages email/password credentials and Google/Facebook OAuth identities; the `profiles` table stores the display name, while each user's workspace and conversation are protected by row-level security. MrX's on-device Qwen2 language model and built-in planner do not require Supabase. Optional Gemini chat requires a server-side Google AI API key and the Supabase Edge Function.
 
 To activate accounts and per-user cloud storage:
 
@@ -43,11 +44,11 @@ To activate accounts and per-user cloud storage:
 
 `profiles`, `user_workspaces`, and `assistant_messages` enforce per-user access with Supabase Auth row-level security. Users see only their own saved workspace and conversations. The AI provider receives the recent chat context when the signed-in user sends a message; the key stays on the server. The assistant supports normal discussion plus validated note and plan actions that are saved to the signed-in user's workspace.
 
-Email sign-in, Google/Facebook OAuth, and cross-device cloud saving depend on completing the Supabase setup above. Google/Facebook login also requires OAuth credentials from those providers. The public `VITE_SUPABASE_ANON_KEY` is not currently configured in this repository's deployment settings, so those online account flows remain unavailable in published builds until the owner adds it. Gemini chat requires a Google Gemini API key stored in Supabase secrets. The MrX local helper and guided planner work without those services.
+Email sign-in, Google/Facebook OAuth, and cross-device cloud saving depend on completing the Supabase setup above. Google/Facebook login also requires OAuth credentials from those providers. The public `VITE_SUPABASE_ANON_KEY` is not currently configured in this repository's deployment settings, so those online account flows remain unavailable in published builds until the owner adds it. Gemini chat requires a Google Gemini API key stored in Supabase secrets. The on-device Qwen model can work without those services on a WebGPU-compatible device after its first download.
 
 ## Limitations
 
-TimeX does not currently publish a signed native iOS `.ipa`; install the website as a Home Screen app from Safari instead. This does not require an App Store account, but iOS background reminders and native-app capabilities are not available through the PWA. Gemini chat and cross-device accounts remain unavailable until the Supabase setup above is completed. Browser and Windows reminders require TimeX to remain open; Android reminder delivery depends on notification permission and device alarm settings.
+The on-device Qwen2 model is an open, general-purpose 0.5B language model served by [Hugging Face](https://huggingface.co/mlc-ai/Qwen2-0.5B-Instruct-q4f16_1-MLC) through [WebLLM](https://github.com/mlc-ai/web-llm). Its first download is about 278 MB and needs internet, free device storage, and a browser with WebGPU enabled; afterward, cached model files can be reused offline (the browser may evict caches). WebGPU is not available in every browser or phone, and generation speed and answer quality vary by device; the built-in rule-based MrX helper remains available when local inference is unsupported. TimeX does not currently publish a signed native iOS `.ipa`; install the website as a Home Screen app from Safari instead. This does not require an App Store account, but iOS background reminders and native-app capabilities are not available through the PWA. Gemini chat and cross-device accounts remain unavailable until the Supabase setup above is completed. Browser and Windows reminders require TimeX to remain open; Android reminder delivery depends on notification permission and device alarm settings.
 
 ## Website and browser-installable app
 

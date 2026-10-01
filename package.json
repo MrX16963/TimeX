@@ -1,7 +1,7 @@
 {
   "name": "timex",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A thoughtful time-management app for your day.",
   "author": "MrX OSA",
   "type": "module",

@@ -11,7 +11,8 @@ export type ChatMessage = {
 
 export type AssistantAction =
   | { type: "note"; title: string; body: string }
-  | { type: "plan"; goal: string; steps: string[] };
+  | { type: "plan"; goal: string; steps: string[] }
+  | { type: "task"; title: string };
 
 export type AssistantResponse = {
   reply: string;

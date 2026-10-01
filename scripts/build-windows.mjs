@@ -17,4 +17,4 @@ run(npm, ["run", "build"], {
   ...process.env,
   VITE_BASE_PATH: "./",
 });
-run(npm, ["exec", "electron-builder", "--", "--win", "nsis", "portable", "--x64"]);
+run(npm, ["exec", "electron-builder", "--", "--win", "nsis", "portable", "--x64", "--publish", "never"]);

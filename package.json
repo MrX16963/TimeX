@@ -72,10 +72,10 @@
             "x64"
           ]
         }
-      ],
-      "artifactName": "TimeX-${target}-x64.${ext}"
+      ]
     },
     "nsis": {
+      "artifactName": "TimeX-nsis-x64.exe",
       "oneClick": false,
       "perMachine": false,
       "allowToChangeInstallationDirectory": true,

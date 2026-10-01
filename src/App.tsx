@@ -34,14 +34,6 @@ import {
 } from "./reminders";
 import { respondAsMrX } from "./mrx-assistant";
 import { isDoubleBackPress } from "./back-navigation";
-import {
-  generateLocalAiReply,
-  initializeLocalAi,
-  isLocalAiSupported,
-  MRX_MODEL_SIZE_MB,
-  resetLocalAi,
-  type ModelProgress,
-} from "./local-ai";
 
 const englishCopy = {
     appName: "TimeX",
@@ -183,13 +175,8 @@ const englishCopy = {
     sendMessage: "Send message",
     signInForChat: "Sign in to sync your chat. MrX can help locally without an account.",
     configureForChat: "MrX works locally without an API key. Sign-in and cloud sync can be enabled after Supabase setup.",
-    mrxLocalMode: "MrX can load a free 0.5B language model and run it privately on this device. Its first download is about 278 MB; a compatible WebGPU browser is required.",
-    loadLocalModel: "Load free AI model",
-    loadingLocalModel: "Loading model…",
-    localModelReady: "On-device AI ready",
-    localModelUnsupported: "This browser does not support WebGPU. MrX's built-in planning helper is still available.",
-    localModelLoadError: "The local model could not be loaded. Check your connection and device storage, then try again.",
-    assistantLocalFallback: "The language model was unavailable, so MrX used its built-in planning helper instead.",
+    mrxLocalMode: "MrX starts instantly without downloading a large model. It helps turn goals into steps, prioritize tasks, add tasks, and save notes.",
+    assistantLocalFallback: "The connected AI service is unavailable, so MrX's on-device planning helper replied instead.",
     pressAgainToExit: "Press back again to exit TimeX.",
     assistantChatError: "I couldn't reach the planning assistant. Check its server configuration and try again.",
     chatSavingError: "Your workspace is saved, but a chat message couldn't be synced.",
@@ -343,13 +330,8 @@ const arabicCopy = {
     sendMessage: "إرسال الرسالة",
     signInForChat: "سجّل الدخول لمزامنة المحادثة. MrX متاح محليًا دون حساب.",
     configureForChat: "يعمل MrX محليًا دون مفتاح API. يمكن تفعيل تسجيل الدخول والمزامنة بعد إعداد Supabase.",
-    mrxLocalMode: "يمكن لـMrX تحميل نموذج لغوي مجاني بحجم 0.5B وتشغيله بخصوصية على هذا الجهاز. يحتاج التنزيل الأول إلى نحو 278 ميغابايت ومتصفح يدعم WebGPU.",
-    loadLocalModel: "تحميل وتشغيل نموذج الذكاء الاصطناعي المجاني",
-    loadingLocalModel: "جارٍ تحميل النموذج…",
-    localModelReady: "الذكاء الاصطناعي المحلي جاهز",
-    localModelUnsupported: "هذا المتصفح لا يدعم WebGPU. يظل مساعد MrX التخطيطي المدمج متاحًا.",
-    localModelLoadError: "تعذّر تحميل النموذج المحلي. تحقق من الاتصال ومساحة التخزين ثم حاول مجددًا.",
-    assistantLocalFallback: "النموذج اللغوي غير متاح، لذا استخدم MrX مساعد التخطيط المدمج.",
+    mrxLocalMode: "يعمل MrX فورًا دون تنزيل نموذج كبير. يساعدك على تحويل الأهداف إلى خطوات، وترتيب المهام، وإضافة المهام، وحفظ الملاحظات.",
+    assistantLocalFallback: "خدمة الذكاء الاصطناعي المتصلة غير متاحة، لذا أجابك MrX بمساعد التخطيط الموجود على الجهاز.",
     pressAgainToExit: "اضغط زر الرجوع مرة أخرى للخروج من TimeX.",
     assistantChatError: "تعذّر الاتصال بمساعد التخطيط. تحقق من إعداد الخادم ثم حاول مجددًا.",
     chatSavingError: "حُفظت مساحتك، لكن تعذّرت مزامنة رسالة من المحادثة.",
@@ -488,14 +470,6 @@ function App() {
   const [chatPending, setChatPending] = useState(false);
   const [chatError, setChatError] = useState("");
   const [chatNotice, setChatNotice] = useState("");
-  const [localAiSupported] = useState(isLocalAiSupported);
-  const [localAiReady, setLocalAiReady] = useState(false);
-  const [localAiLoading, setLocalAiLoading] = useState(false);
-  const [localAiProgress, setLocalAiProgress] = useState<ModelProgress>({
-    progress: 0,
-    text: "",
-  });
-  const [localAiError, setLocalAiError] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [appInstalled, setAppInstalled] = useState(() =>
     Capacitor.isNativePlatform() ||
@@ -1181,23 +1155,6 @@ function App() {
     }
   }
 
-  async function loadLocalAiModel() {
-    if (!localAiSupported || localAiLoading || localAiReady) return;
-    setLocalAiLoading(true);
-    setLocalAiError(false);
-    setLocalAiProgress({ progress: 0, text: "" });
-    setChatError("");
-    try {
-      await initializeLocalAi(setLocalAiProgress);
-      setLocalAiReady(true);
-    } catch (error) {
-      console.error("MrX could not initialize its on-device language model.", error);
-      setLocalAiError(true);
-    } finally {
-      setLocalAiLoading(false);
-    }
-  }
-
   async function sendAssistantMessage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const content = chatInput.trim();
@@ -1223,22 +1180,6 @@ function App() {
       const explicitAction = respondAsMrX(content, lang, { tasks: data.tasks, userName });
       if (explicitAction.actions.length > 0) {
         localResponse = explicitAction;
-      } else if (localAiReady) {
-        try {
-          const reply = await generateLocalAiReply(
-            conversation,
-            lang,
-            data.tasks,
-            setLocalAiProgress,
-          );
-          response = { reply, actions: [] };
-        } catch (error) {
-          console.error("MrX on-device generation failed; using the built-in planner.", error);
-          resetLocalAi();
-          setLocalAiReady(false);
-          setLocalAiError(true);
-          setChatNotice(t("assistantLocalFallback"));
-        }
       }
 
       if (!response && !localResponse && user && supabase) {
@@ -2267,38 +2208,11 @@ function App() {
                   <span aria-hidden="true">⌑</span>
                   <p>{t("assistantPrivacy")}</p>
                 </div>
-                <div className="local-ai-model">
-                  <div className="local-ai-model-copy">
-                    <strong>{localAiReady ? t("localModelReady") : "MrX · Qwen2 0.5B"}</strong>
-                    {localAiReady ? (
-                      <span>{t("mrxLocalMode")}</span>
-                    ) : localAiSupported ? (
-                      <span>{t("mrxLocalMode")}</span>
-                    ) : (
-                      <span>{t("localModelUnsupported")}</span>
-                    )}
+                <div className="assistant-local-mode">
+                  <div className="assistant-local-mode-copy">
+                    <strong>MrX · {t("assistantTab")}</strong>
+                    <span>{t("mrxLocalMode")}</span>
                   </div>
-                  {localAiSupported && !localAiReady && (
-                    <button
-                      className="text-button local-ai-load-button"
-                      type="button"
-                      disabled={localAiLoading}
-                      onClick={() => void loadLocalAiModel()}
-                    >
-                      {localAiLoading
-                        ? `${t("loadingLocalModel")} ${Math.round(localAiProgress.progress * 100)}%`
-                        : `${t("loadLocalModel")} · ${MRX_MODEL_SIZE_MB} MB`}
-                    </button>
-                  )}
-                  {localAiLoading && (
-                    <progress
-                      className="local-ai-progress"
-                      value={localAiProgress.progress}
-                      max={1}
-                      aria-label={localAiProgress.text || t("loadingLocalModel")}
-                    />
-                  )}
-                  {localAiError && <p className="local-ai-error" role="alert">{t("localModelLoadError")}</p>}
                 </div>
                 <div className="chat-transcript" aria-live="polite">
                   {chatMessages.length === 0 && (

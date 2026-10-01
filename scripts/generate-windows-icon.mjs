@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 const iconDirectory = path.join(root, "public", "icons");
-const sizes = [180, 192];
+const sizes = [180, 256];
 const entries = await Promise.all(
   sizes.map(async (size) => ({
     size,

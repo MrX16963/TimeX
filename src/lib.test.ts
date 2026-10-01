@@ -3,6 +3,7 @@ import {
   buildPlanSteps,
   DEFAULT_DATA,
   getQuadrant,
+  getCalendarWeek,
   layoutCalendarTasks,
   readAppData,
   type Task,
@@ -136,9 +137,22 @@ describe("readAppData", () => {
       startTime: "09:15",
       endTime: "10:00",
       reminderMinutes: 15,
+      color: "#6a9cff",
     };
 
     expect(readAppData(JSON.stringify({ tasks: [task] })).tasks).toEqual([task]);
+  });
+
+  it("builds a seven-day calendar strip starting on Sunday", () => {
+    expect(getCalendarWeek("2026-10-01")).toEqual([
+      "2026-09-27",
+      "2026-09-28",
+      "2026-09-29",
+      "2026-09-30",
+      "2026-10-01",
+      "2026-10-02",
+      "2026-10-03",
+    ]);
   });
 
   it("ignores malformed records in persisted collections", () => {
@@ -164,5 +178,26 @@ describe("readAppData", () => {
     }));
 
     expect(data.tasks).toEqual([]);
+  });
+
+  it("drops invalid task colors and preserves valid reminder intervals", () => {
+    const baseTask = {
+      id: "color-task",
+      title: "Color",
+      important: false,
+      urgent: false,
+      completed: false,
+      createdAt: 1,
+      scheduledDate: "2026-10-02",
+      startTime: "09:00",
+      endTime: "10:00",
+    };
+
+    expect(readAppData(JSON.stringify({
+      tasks: [{ ...baseTask, reminderMinutes: 60, color: "#ab42ef" }],
+    })).tasks).toHaveLength(1);
+    expect(readAppData(JSON.stringify({
+      tasks: [{ ...baseTask, reminderMinutes: 10, color: "blue" }],
+    })).tasks).toEqual([]);
   });
 });

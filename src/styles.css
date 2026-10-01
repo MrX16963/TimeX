@@ -885,7 +885,7 @@ select {
 
 .schedule-fields {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 9px;
   margin: 3px 0 12px;
   padding: 12px;
@@ -916,6 +916,13 @@ select {
   color: var(--text);
   background: var(--surface);
   font-size: 10px;
+}
+
+.schedule-fields .task-color-field input,
+.calendar-add-times .task-color-field input {
+  height: 35px;
+  padding: 4px;
+  cursor: pointer;
 }
 
 .primary-button {
@@ -1436,7 +1443,7 @@ select {
 
 .calendar-add-times {
   display: grid;
-  grid-template-columns: minmax(110px, 1fr) minmax(110px, 1fr) minmax(135px, 1.2fr) auto;
+  grid-template-columns: minmax(95px, 1fr) minmax(95px, 1fr) minmax(125px, 1.2fr) 75px auto;
   align-items: end;
   gap: 10px;
 }
@@ -1498,6 +1505,13 @@ select {
   position: relative;
   height: 1536px;
   border-inline-start: 1px solid var(--line);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 63px,
+    color-mix(in srgb, var(--line) 72%, transparent) 63px,
+    color-mix(in srgb, var(--line) 72%, transparent) 64px
+  );
 }
 
 .calendar-hour-line {
@@ -1514,16 +1528,20 @@ select {
   z-index: 1;
   display: grid;
   min-width: 0;
-  grid-template-columns: 17px minmax(0, 1fr) 20px;
+  grid-template-columns: 17px minmax(0, 1fr) 24px;
   align-items: start;
   gap: 6px;
   overflow: hidden;
   padding: 6px 7px;
-  border: 1px solid color-mix(in srgb, var(--accent) 30%, var(--line));
-  border-inline-start: 3px solid var(--accent);
+  border: 1px solid color-mix(in srgb, var(--event-color) 42%, var(--line));
+  border-inline-start: 3px solid var(--event-color);
   border-radius: 9px;
   color: var(--text);
-  background: linear-gradient(110deg, var(--accent-soft), color-mix(in srgb, var(--surface) 75%, var(--accent-soft)));
+  background: linear-gradient(
+    110deg,
+    color-mix(in srgb, var(--event-color) 24%, var(--surface)),
+    color-mix(in srgb, var(--event-color) 10%, var(--surface))
+  );
   box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12);
 }
 
@@ -1573,13 +1591,38 @@ select {
   white-space: nowrap;
 }
 
-.calendar-event-copy .calendar-event-reminder {
-  color: var(--accent) !important;
+.calendar-event-reminder-select {
+  width: fit-content;
+  max-width: 100%;
+  height: 18px;
+  padding: 0 3px;
+  border: 1px solid color-mix(in srgb, var(--event-color) 35%, var(--line));
+  border-radius: 5px;
+  color: var(--text);
+  background: color-mix(in srgb, var(--event-color) 12%, var(--surface));
+  font-size: 8px;
+  cursor: pointer;
 }
 
 .calendar-event-copy .priority-tag {
   width: fit-content;
   max-width: 100%;
+}
+
+.calendar-event-actions {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+}
+
+.calendar-event-color {
+  width: 19px;
+  height: 19px;
+  padding: 2px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--surface);
+  cursor: pointer;
 }
 
 .calendar-event-delete {
@@ -1588,9 +1631,86 @@ select {
   font-size: 15px;
 }
 
+.calendar-week-strip {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent) 7%, transparent), transparent 55%),
+    var(--surface-muted);
+}
+
+.calendar-week-day {
+  display: grid;
+  min-width: 0;
+  min-height: 68px;
+  justify-items: center;
+  align-content: center;
+  gap: 4px;
+  padding: 7px 2px;
+  border: 0;
+  border-inline-start: 1px solid var(--line);
+  color: var(--muted);
+  background: transparent;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease;
+}
+
+.calendar-week-day:first-child {
+  border-inline-start: 0;
+}
+
+.calendar-week-day:hover {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.calendar-week-day.selected {
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+.calendar-week-weekday {
+  overflow: hidden;
+  max-width: 100%;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-week-day strong {
+  font-size: 14px;
+  line-height: 1;
+}
+
+.calendar-week-markers {
+  display: flex;
+  min-height: 5px;
+  align-items: center;
+  gap: 3px;
+}
+
+.calendar-week-markers i {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+}
+
 .calendar-empty {
   min-height: 260px;
   padding: 20px;
+}
+
+.calendar-day-track > .calendar-empty {
+  position: absolute;
+  z-index: 1;
+  inset: 40px 10px auto;
+  min-height: 170px;
+  border: 1px dashed var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
 }
 
 .page-heading {
@@ -2913,7 +3033,7 @@ html[dir="rtl"] .chat-send {
   }
 
   .calendar-event {
-    grid-template-columns: 15px minmax(0, 1fr);
+    grid-template-columns: 15px minmax(0, 1fr) 22px;
     gap: 5px;
     padding-inline: 5px;
   }
@@ -2926,6 +3046,28 @@ html[dir="rtl"] .chat-send {
   .calendar-event-delete,
   .calendar-event-copy .priority-tag {
     display: none;
+  }
+
+  .calendar-event-actions {
+    align-content: start;
+  }
+
+  .calendar-event-color {
+    width: 18px;
+    height: 18px;
+  }
+
+  .calendar-event-reminder-select {
+    max-width: 100%;
+    font-size: 7px;
+  }
+
+  .calendar-week-day {
+    min-height: 62px;
+  }
+
+  .calendar-week-weekday {
+    font-size: 8px;
   }
 
   .calendar-event-copy > strong {

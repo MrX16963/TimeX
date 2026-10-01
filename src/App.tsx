@@ -15,6 +15,7 @@ import {
 import {
   buildPlanSteps,
   DEFAULT_DATA,
+  getCalendarWeek,
   getQuadrant,
   layoutCalendarTasks,
   readAppData,
@@ -50,6 +51,9 @@ const englishCopy = {
     startTime: "Starts",
     endTime: "Ends",
     reminder: "Reminder",
+    taskColor: "Task color",
+    chooseTaskColor: "Choose task color",
+    weekOverview: "Week overview",
     noReminder: "No reminder",
     reminderBefore: "{minutes} min before",
     reminderPermissionDenied: "Task saved, but notifications are blocked. Allow notifications in your device settings.",
@@ -198,6 +202,9 @@ const arabicCopy = {
     startTime: "البدء",
     endTime: "الانتهاء",
     reminder: "التذكير",
+    taskColor: "لون المهمة",
+    chooseTaskColor: "اختر لون المهمة",
+    weekOverview: "أيام الأسبوع",
     noReminder: "دون تذكير",
     reminderBefore: "قبل {minutes} دقيقة",
     reminderPermissionDenied: "حُفظت المهمة، لكن الإشعارات محظورة. اسمح بها من إعدادات جهازك.",
@@ -343,7 +350,7 @@ type InstallPromptEvent = Event & {
 };
 
 type TaskSchedule = Required<
-  Pick<Task, "scheduledDate" | "startTime" | "endTime" | "reminderMinutes">
+  Pick<Task, "scheduledDate" | "startTime" | "endTime" | "reminderMinutes" | "color">
 >;
 
 const themeOrder: Exclude<Theme, "custom">[] = ["light", "midnight", "sage", "lavender"];
@@ -417,6 +424,7 @@ function App() {
   const [calendarStartTime, setCalendarStartTime] = useState("09:00");
   const [calendarEndTime, setCalendarEndTime] = useState("10:00");
   const [calendarReminder, setCalendarReminder] = useState<number | null>(10);
+  const [calendarTaskColor, setCalendarTaskColor] = useState("#6a9cff");
   const [page, setPage] = useState<Page>("today");
   const [taskTitle, setTaskTitle] = useState("");
   const [taskImportant, setTaskImportant] = useState(false);
@@ -426,6 +434,7 @@ function App() {
   const [taskStartTime, setTaskStartTime] = useState("09:00");
   const [taskEndTime, setTaskEndTime] = useState("10:00");
   const [taskReminder, setTaskReminder] = useState<number | null>(10);
+  const [taskColor, setTaskColor] = useState("#6a9cff");
   const [matrixTaskTitle, setMatrixTaskTitle] = useState("");
   const [goal, setGoal] = useState("");
   const [running, setRunning] = useState(false);
@@ -779,6 +788,7 @@ function App() {
   const completedCount = data.tasks.filter((task) => task.completed).length;
   const calendarTasks = data.tasks.filter((task) => task.scheduledDate === calendarDate);
   const calendarLayout = layoutCalendarTasks(calendarTasks);
+  const calendarWeek = getCalendarWeek(calendarDate);
   const unscheduledCount = openTasks.filter((task) => !task.scheduledDate).length;
   const selectedCalendarDate = dateFromKey(calendarDate);
   const calendarDateLabel = new Intl.DateTimeFormat(lang, {
@@ -833,6 +843,7 @@ function App() {
           startTime: taskStartTime,
           endTime: taskEndTime,
           reminderMinutes: taskReminder,
+          color: taskColor,
         }
       : undefined;
     if (schedule && schedule.endTime <= schedule.startTime) {
@@ -865,6 +876,7 @@ function App() {
       startTime: calendarStartTime,
       endTime: calendarEndTime,
       reminderMinutes: calendarReminder,
+      color: calendarTaskColor,
     });
     setCalendarTaskTitle("");
     if (permission && permission !== "granted") {
@@ -874,6 +886,29 @@ function App() {
 
   function setCalendarDay(amount: number) {
     setCalendarDate((current) => shiftDate(current, amount));
+  }
+
+  async function updateTaskReminder(taskId: string, reminder: number | null) {
+    if (reminder !== null) {
+      const permission = await checkReminderPermission();
+      if (permission !== "granted") {
+        notify(t(permission === "unsupported" ? "reminderUnsupported" : "reminderPermissionDenied"));
+        return;
+      }
+    }
+    setData((current) => ({
+      ...current,
+      tasks: current.tasks.map((task) =>
+        task.id === taskId ? { ...task, reminderMinutes: reminder, reminderSentAt: undefined } : task,
+      ),
+    }));
+  }
+
+  function updateTaskColor(taskId: string, color: string) {
+    setData((current) => ({
+      ...current,
+      tasks: current.tasks.map((task) => task.id === taskId ? { ...task, color } : task),
+    }));
   }
 
   function formatCalendarTime(time: string): string {
@@ -1499,12 +1534,21 @@ function App() {
                           }
                         >
                           <option value="none">{t("noReminder")}</option>
-                          {[5, 10, 15, 30].map((reminder) => (
+                          {[5, 10, 15, 30, 60].map((reminder) => (
                             <option value={reminder} key={reminder}>
                               {t("reminderBefore").replace("{minutes}", String(reminder))}
                             </option>
                           ))}
                         </select>
+                      </label>
+                      <label className="task-color-field">
+                        <span>{t("taskColor")}</span>
+                        <input
+                          type="color"
+                          aria-label={t("chooseTaskColor")}
+                          value={taskColor}
+                          onChange={(event) => setTaskColor(event.target.value)}
+                        />
                       </label>
                     </div>
                   )}
@@ -1680,12 +1724,21 @@ function App() {
                         }
                       >
                         <option value="none">{t("noReminder")}</option>
-                        {[5, 10, 15, 30].map((reminder) => (
+                        {[5, 10, 15, 30, 60].map((reminder) => (
                           <option value={reminder} key={reminder}>
                             {t("reminderBefore").replace("{minutes}", String(reminder))}
                           </option>
                         ))}
                       </select>
+                    </label>
+                    <label className="task-color-field">
+                      <span>{t("taskColor")}</span>
+                      <input
+                        type="color"
+                        aria-label={t("chooseTaskColor")}
+                        value={calendarTaskColor}
+                        onChange={(event) => setCalendarTaskColor(event.target.value)}
+                      />
                     </label>
                     <button
                       className="primary-button calendar-add-button"
@@ -1715,62 +1768,83 @@ function App() {
                   </span>
                 </header>
                 <div className="calendar-scroll">
-                  {calendarTasks.length > 0 ? (
-                    <div className="calendar-time-grid">
-                      <div className="calendar-hours" aria-hidden="true">
-                        {Array.from({ length: 24 }, (_, hour) => (
-                          <span key={hour}>{formatHour(hour)}</span>
-                        ))}
-                      </div>
-                      <div className="calendar-day-track">
-                        {Array.from({ length: 24 }, (_, hour) => (
-                          <span
-                            className="calendar-hour-line"
-                            key={hour}
-                            style={{ top: `${hour * 64}px` }}
-                            aria-hidden="true"
-                          />
-                        ))}
-                        {calendarLayout.map(({ task, column, columns, startMinutes, durationMinutes }) => {
-                          const quadrant = getQuadrant(task);
-                          const columnWidth = 100 / columns;
-                          return (
-                            <article
-                              className={`calendar-event${task.completed ? " calendar-event-complete" : ""}`}
-                              key={task.id}
-                              style={{
-                                top: `${startMinutes * (64 / 60)}px`,
-                                height: `${Math.max(32, durationMinutes * (64 / 60))}px`,
-                                insetInlineStart: `calc(${column * columnWidth}% + 5px)`,
-                                width: `calc(${columnWidth}% - 10px)`,
-                              }}
+                  <div className="calendar-time-grid">
+                    <div className="calendar-hours" aria-hidden="true">
+                      {Array.from({ length: 24 }, (_, hour) => (
+                        <span key={hour}>{formatHour(hour)}</span>
+                      ))}
+                    </div>
+                    <div className="calendar-day-track">
+                      {Array.from({ length: 24 }, (_, hour) => (
+                        <span
+                          className="calendar-hour-line"
+                          key={hour}
+                          style={{ top: `${hour * 64}px` }}
+                          aria-hidden="true"
+                        />
+                      ))}
+                      {calendarLayout.map(({ task, column, columns, startMinutes, durationMinutes }) => {
+                        const quadrant = getQuadrant(task);
+                        const columnWidth = 100 / columns;
+                        return (
+                          <article
+                            className={`calendar-event${task.completed ? " calendar-event-complete" : ""}`}
+                            key={task.id}
+                            style={{
+                              "--event-color": task.color ?? "#6a9cff",
+                              top: `${startMinutes * (64 / 60)}px`,
+                              height: `${Math.max(32, durationMinutes * (64 / 60))}px`,
+                              insetInlineStart: `calc(${column * columnWidth}% + 5px)`,
+                              width: `calc(${columnWidth}% - 10px)`,
+                            } as CSSProperties}
+                          >
+                            <button
+                              className={`calendar-event-check${task.completed ? " checked" : ""}`}
+                              type="button"
+                              aria-label={task.completed ? t("markOpen") : t("markDone")}
+                              onClick={() => toggleTask(task.id)}
                             >
-                              <button
-                                className={`calendar-event-check${task.completed ? " checked" : ""}`}
-                                type="button"
-                                aria-label={task.completed ? t("markOpen") : t("markDone")}
-                                onClick={() => toggleTask(task.id)}
+                              {task.completed ? "✓" : ""}
+                            </button>
+                            <div className="calendar-event-copy">
+                              <strong>{task.title}</strong>
+                              <span>{formatCalendarTime(task.startTime)} – {formatCalendarTime(task.endTime)}</span>
+                              <select
+                                className="calendar-event-reminder-select"
+                                aria-label={`${t("reminder")} — ${task.title}`}
+                                value={task.reminderMinutes ?? "none"}
+                                onChange={(event) =>
+                                  void updateTaskReminder(
+                                    task.id,
+                                    event.target.value === "none" ? null : Number(event.target.value),
+                                  )
+                                }
                               >
-                                {task.completed ? "✓" : ""}
-                              </button>
-                              <div className="calendar-event-copy">
-                                <strong>{task.title}</strong>
-                                <span>{formatCalendarTime(task.startTime)} – {formatCalendarTime(task.endTime)}</span>
-                                {task.reminderMinutes != null && (
-                                  <span className="calendar-event-reminder">
-                                    ◉ {t("reminderBefore").replace("{minutes}", String(task.reminderMinutes))}
-                                  </span>
-                                )}
-                                <span className={`priority-tag priority-${quadrant}`}>
-                                  {task.important && task.urgent
-                                    ? `${t("important")} · ${t("urgent")}`
-                                    : task.important
-                                      ? t("important")
-                                      : task.urgent
-                                        ? t("urgent")
-                                        : t("unprioritized")}
-                                </span>
-                              </div>
+                                <option value="none">{t("noReminder")}</option>
+                                {[5, 10, 15, 30, 60].map((reminder) => (
+                                  <option value={reminder} key={reminder}>
+                                    {t("reminderBefore").replace("{minutes}", String(reminder))}
+                                  </option>
+                                ))}
+                              </select>
+                              <span className={`priority-tag priority-${quadrant}`}>
+                                {task.important && task.urgent
+                                  ? `${t("important")} · ${t("urgent")}`
+                                  : task.important
+                                    ? t("important")
+                                    : task.urgent
+                                      ? t("urgent")
+                                      : t("unprioritized")}
+                              </span>
+                            </div>
+                            <div className="calendar-event-actions">
+                              <input
+                                className="calendar-event-color"
+                                type="color"
+                                aria-label={`${t("chooseTaskColor")} — ${task.title}`}
+                                value={task.color ?? "#6a9cff"}
+                                onChange={(event) => updateTaskColor(task.id, event.target.value)}
+                              />
                               <button
                                 className="icon-button calendar-event-delete"
                                 type="button"
@@ -1779,19 +1853,51 @@ function App() {
                               >
                                 ×
                               </button>
-                            </article>
-                          );
-                        })}
-                      </div>
+                            </div>
+                          </article>
+                        );
+                      })}
+                      {calendarTasks.length === 0 && (
+                        <div className="empty-state calendar-empty">
+                          <span className="empty-spark" aria-hidden="true">◷</span>
+                          <strong>{t("calendarEmpty")}</strong>
+                          <p>{t("calendarEmptySub")}</p>
+                        </div>
+                      )}
                     </div>
-                  ) : (
-                    <div className="empty-state calendar-empty">
-                      <span className="empty-spark" aria-hidden="true">◷</span>
-                      <strong>{t("calendarEmpty")}</strong>
-                      <p>{t("calendarEmptySub")}</p>
-                    </div>
-                  )}
+                  </div>
                 </div>
+                <nav className="calendar-week-strip" aria-label={t("weekOverview")}>
+                  {calendarWeek.map((dateKey) => {
+                    const date = dateFromKey(dateKey);
+                    const tasksForDate = data.tasks.filter((task) => task.scheduledDate === dateKey);
+                    const fullDate = new Intl.DateTimeFormat(lang, {
+                      weekday: "long",
+                      month: "long",
+                      day: "numeric",
+                    }).format(date);
+                    return (
+                      <button
+                        className={`calendar-week-day${dateKey === calendarDate ? " selected" : ""}`}
+                        type="button"
+                        key={dateKey}
+                        aria-label={fullDate}
+                        aria-pressed={dateKey === calendarDate}
+                        onClick={() => setCalendarDate(dateKey)}
+                      >
+                        <span className="calendar-week-weekday">
+                          {new Intl.DateTimeFormat(lang, { weekday: "short" }).format(date)}
+                        </span>
+                        <strong>{date.getDate()}</strong>
+                        <span className="calendar-week-markers" aria-hidden="true">
+                          {tasksForDate.slice(0, 3).map((task) => (
+                            <i key={task.id} style={{ backgroundColor: task.color ?? "var(--accent)" }} />
+                          ))}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </nav>
               </section>
             </section>
           )}

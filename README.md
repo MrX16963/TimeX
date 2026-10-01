@@ -15,7 +15,7 @@ Use `npm run build` for a production build and `npm test` for focused unit tests
 
 - Arabic (default) and English interface, including right-to-left layout support.
 - Add, complete, and remove tasks; completion awards 10 points.
-- A day-by-day, 24-hour calendar: schedule tasks with start/end times and set 5-, 10-, 15-, or 30-minute reminders.
+- A day-by-day, 24-hour calendar with a geometric seven-day selector, individually colored tasks, and editable no-reminder, 5-, 10-, 15-, 30-, or 60-minute alerts.
 - Prioritize tasks by importance and urgency with the four-quadrant Eisenhower matrix.
 - 25-minute Pomodoro focus timer with start, pause, and reset controls.
 - Create and edit personal notes and save guided plans as task lists.

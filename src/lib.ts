@@ -13,6 +13,7 @@ export type Task = Priority & {
   endTime?: string;
   reminderMinutes?: number | null;
   reminderSentAt?: number;
+  color?: string;
 };
 
 export type Note = {
@@ -66,6 +67,17 @@ export type CalendarTaskLayout = {
   startMinutes: number;
   durationMinutes: number;
 };
+
+export function getCalendarWeek(dateKey: string): string[] {
+  const [year, month, day] = dateKey.split("-").map(Number);
+  const firstDay = new Date(year, month - 1, day, 12);
+  firstDay.setDate(firstDay.getDate() - firstDay.getDay());
+  return Array.from({ length: 7 }, (_, index) => {
+    const date = new Date(firstDay);
+    date.setDate(firstDay.getDate() + index);
+    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+  });
+}
 
 export function layoutCalendarTasks(tasks: Task[]): CalendarTaskLayout[] {
   const scheduled = tasks
@@ -177,6 +189,7 @@ function isTask(value: unknown): value is Task {
     typeof task.completed === "boolean" &&
     typeof task.createdAt === "number" &&
     Number.isFinite(task.createdAt) &&
+    (task.color === undefined || isHexColor(task.color)) &&
     (!hasSchedule ||
       (typeof task.scheduledDate === "string" &&
         isValidDate(task.scheduledDate) &&
@@ -187,7 +200,7 @@ function isTask(value: unknown): value is Task {
         task.startTime < task.endTime &&
         (task.reminderMinutes === undefined ||
           task.reminderMinutes === null ||
-          [5, 10, 15, 30].includes(task.reminderMinutes)) &&
+          [5, 10, 15, 30, 60].includes(task.reminderMinutes)) &&
         (task.reminderSentAt === undefined ||
           (typeof task.reminderSentAt === "number" &&
             Number.isFinite(task.reminderSentAt)))))

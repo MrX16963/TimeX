@@ -6,9 +6,11 @@ type InstallPromptEvent = Event & {
 };
 
 const releasesUrl = "https://github.com/MrX16963/TimeX/releases/latest";
-const windowsInstallerUrl = `${releasesUrl}/download/TimeX-nsis-x64.exe`;
-const windowsPortableUrl = `${releasesUrl}/download/TimeX-Portable-x64.exe`;
-const androidApkUrl = `${releasesUrl}/download/TimeX-Android.apk`;
+const currentRelease = "v1.0.8";
+const releaseDownloadUrl = `https://github.com/MrX16963/TimeX/releases/download/${currentRelease}`;
+const windowsInstallerUrl = `${releaseDownloadUrl}/TimeX-nsis-x64.exe`;
+const windowsPortableUrl = `${releaseDownloadUrl}/TimeX-Portable-x64.exe`;
+const androidApkUrl = `${releaseDownloadUrl}/TimeX-Android.apk`;
 
 function isStandalone(): boolean {
   return (
@@ -208,23 +210,24 @@ export default function LandingPage() {
           <div className="download-copy">
             <span className="site-kicker">A little more room in your day</span>
             <h2>Get TimeX for your device.</h2>
-            <p>Download the full Windows or Android app directly from GitHub Releases. Keep your workspace with you, even when you are offline.</p>
+            <span className="download-version">Latest release · {currentRelease}</span>
+            <p>Download TimeX for Android or Windows. Keep your workspace with you, even when you are offline.</p>
             {installError && <p className="download-error" role="alert">Your browser could not open the install prompt. Use its menu to install TimeX instead.</p>}
           </div>
           <div className="download-options">
             <article className="download-card">
+              <span className="download-device-icon android-icon" aria-hidden="true">▯</span>
+              <div><h3>Android app · {currentRelease}</h3><p>APK · Install on your phone</p></div>
+              <a href={androidApkUrl} aria-label={`Download the TimeX Android app ${currentRelease}`}>↓</a>
+            </article>
+            <article className="download-card">
               <span className="download-device-icon" aria-hidden="true">▱</span>
-              <div><h3>Windows installer</h3><p>Full setup · 64-bit</p></div>
+              <div><h3>Windows installer · {currentRelease}</h3><p>Full setup · 64-bit</p></div>
               <a href={windowsInstallerUrl} aria-label="Download the TimeX Windows installer from GitHub Releases">↓</a>
             </article>
             <article className="download-card">
-              <span className="download-device-icon android-icon" aria-hidden="true">▯</span>
-              <div><h3>Android app</h3><p>APK · Install on your device</p></div>
-              <a href={androidApkUrl} aria-label="Download the TimeX Android app from GitHub Releases">↓</a>
-            </article>
-            <article className="download-card">
               <span className="download-device-icon" aria-hidden="true">↗</span>
-              <div><h3>Windows portable</h3><p>Run without installing</p></div>
+              <div><h3>Windows portable · {currentRelease}</h3><p>Run without installing</p></div>
               <a href={windowsPortableUrl} aria-label="Download the portable TimeX Windows app from GitHub Releases">↓</a>
             </article>
             <a className="release-history-link" href={releasesUrl} target="_blank" rel="noreferrer">View all versions on GitHub Releases ↗</a>

@@ -201,6 +201,18 @@
   background: linear-gradient(116deg, #141518, #1b1c20 57%, #24262b);
 }
 
+.marketing-site .download-version {
+  display: inline-flex;
+  margin-bottom: 9px;
+  padding: 5px 9px;
+  border: 1px solid #3a3c42;
+  border-radius: 999px;
+  color: #d8d9dc;
+  background: rgba(8, 9, 11, 0.45);
+  font-size: 9px;
+  font-weight: 600;
+}
+
 .marketing-site .download-card {
   border-color: rgba(231, 231, 231, 0.13);
   background: rgba(8, 9, 11, 0.45);

@@ -49,11 +49,7 @@
   border-radius: 15px;
 }
 
-.local-ai-model {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 9px 14px;
+.assistant-local-mode {
   margin: 0 16px 10px;
   padding: 11px 12px;
   border: 1px solid color-mix(in srgb, var(--accent) 25%, var(--line));
@@ -61,53 +57,37 @@
   background: color-mix(in srgb, var(--accent) 5%, var(--surface));
 }
 
-.local-ai-model-copy {
+.assistant-local-mode-copy {
   display: grid;
   min-width: 0;
   gap: 4px;
 }
 
-.local-ai-model-copy > strong {
+.assistant-local-mode-copy > strong {
   color: var(--text);
   font-size: 10px;
 }
 
-.local-ai-model-copy > span,
-.local-ai-error {
+.assistant-local-mode-copy > span {
   margin: 0;
   color: var(--muted);
   font-size: 9px;
   line-height: 1.6;
 }
 
-.local-ai-load-button {
-  min-height: 34px;
-  padding: 6px 9px;
-  border: 1px solid var(--line);
-  border-radius: 9px;
-  background: var(--surface-muted);
-  font-size: 9px;
-  text-align: center;
+.assistant-sources {
+  display: grid;
+  gap: 4px;
+  margin: 5px 0 0 33px;
+  padding-inline-start: 15px;
+  color: var(--muted);
+  font-size: 10px;
 }
 
-.local-ai-load-button:disabled {
-  opacity: 0.7;
-  cursor: progress;
-}
-
-.local-ai-progress,
-.local-ai-error {
-  grid-column: 1 / -1;
-  width: 100%;
-}
-
-.local-ai-progress {
-  height: 6px;
-  accent-color: var(--accent);
-}
-
-.local-ai-error {
-  color: #df958c;
+.assistant-sources a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .chat-transcript {
@@ -3202,6 +3182,271 @@ html[dir="rtl"] .chat-send {
     bottom: 80px;
     max-width: none;
   }
+}
+
+.marketing-site {
+  --site-ink: #f2f3f5;
+  --site-muted: #a0a3aa;
+  --site-purple: #e7e7e7;
+  --site-purple-deep: #151619;
+  --site-purple-soft: #26272a;
+  --site-line: #292b30;
+  --site-paper: #141518;
+  color: var(--site-ink);
+  background:
+    radial-gradient(ellipse at 80% 3%, rgba(255, 255, 255, 0.11), transparent 30%),
+    radial-gradient(ellipse at 8% 48%, rgba(199, 169, 255, 0.055), transparent 35%),
+    linear-gradient(145deg, #050607 0%, #0b0c0f 48%, #111215 100%);
+}
+
+.site-header {
+  border-color: rgba(255, 255, 255, 0.09);
+}
+
+.site-brand-mark,
+.preview-brand > span {
+  color: #111214;
+  background: linear-gradient(145deg, #f2f2f2, #b9bbc1);
+}
+
+.site-nav a,
+.site-header-link {
+  color: #c5c7cc;
+}
+
+.site-nav a:hover,
+.site-header-link:hover,
+.site-header-link {
+  color: #e7e7e7;
+}
+
+.site-kicker,
+.site-hero h1 span,
+.site-section-heading h2 span,
+.site-platform-note > span {
+  color: #d2c4f1;
+}
+
+.site-kicker > span {
+  background: #c7a9ff;
+  box-shadow: 0 0 0 4px rgba(199, 169, 255, 0.12);
+}
+
+.site-hero-description,
+.site-section-heading > p,
+.site-platform-note,
+.steps-grid p,
+.site-privacy-note p {
+  color: var(--site-muted);
+}
+
+.site-primary-button {
+  color: #141518;
+  background: linear-gradient(145deg, #f2f2f2, #c8c9ce);
+  box-shadow: 0 7px 24px rgba(222, 222, 228, 0.12);
+}
+
+.site-secondary-button {
+  color: #e6e7eb;
+  border-color: var(--site-line);
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.site-secondary-button:hover {
+  border-color: #aaaab4;
+}
+
+.site-hero-visual::before {
+  background: radial-gradient(circle, rgba(199, 169, 255, 0.18), rgba(241, 241, 245, 0.055) 61%, transparent 71%);
+}
+
+.site-orbit {
+  border-color: rgba(222, 222, 232, 0.12);
+}
+
+.preview-window {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: #141518;
+  box-shadow: 0 29px 80px rgba(0, 0, 0, 0.48), 0 5px 18px rgba(0, 0, 0, 0.25);
+}
+
+.preview-topbar,
+.preview-task {
+  border-color: #292b30;
+}
+
+.preview-avatar {
+  color: #e7e2f2;
+  background: #332d3c;
+}
+
+.preview-date,
+.preview-content > p,
+.preview-stats span,
+.preview-task-heading > span,
+.floating-note small {
+  color: #a0a3aa;
+}
+
+.preview-stats > div {
+  border-color: #292b30;
+  background: #1b1c20;
+}
+
+.preview-stats strong,
+.preview-task > span {
+  color: #e3e4e8;
+}
+
+.preview-check {
+  border-color: #55575e;
+}
+
+.preview-task > b {
+  color: #b3d0b3;
+}
+
+.preview-task .preview-tag {
+  color: #ddcbff;
+  background: #30283d;
+}
+
+.preview-task .preview-tag.peach {
+  color: #f1d6b2;
+  background: #393126;
+}
+
+.preview-focus {
+  background: linear-gradient(115deg, #25232e, #383044);
+}
+
+.preview-focus > i > span {
+  background: #d9d0eb;
+}
+
+.floating-note {
+  border-color: #33343a;
+  background: #191a1e;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.35);
+}
+
+.floating-note > span {
+  color: #e6d9ff;
+  background: #332c40;
+}
+
+.visual-spark,
+.visual-spark-two {
+  color: #d1c2f3;
+}
+
+.site-trustbar,
+.site-footer {
+  border-color: var(--site-line);
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.site-trustbar > span {
+  color: #c3c5ca;
+}
+
+.site-trustbar i,
+.privacy-mark {
+  color: #d8c9f5;
+}
+
+.features-section,
+.site-how-section {
+  border-color: var(--site-line);
+}
+
+.feature-card,
+.plan-card,
+.site-install-modal,
+.install-instructions article {
+  border-color: var(--site-line);
+  color: var(--site-ink);
+  background: #141518;
+}
+
+.feature-card:hover {
+  box-shadow: 0 13px 30px rgba(0, 0, 0, 0.25);
+}
+
+.feature-card p,
+.install-instructions p,
+.site-install-modal > p {
+  color: var(--site-muted);
+}
+
+.feature-icon.lavender,
+.feature-icon.peach,
+.feature-icon.mint,
+.feature-icon.butter,
+.step-index,
+.install-instructions article > span {
+  color: #e0d4fa;
+  border-color: #37333f;
+  background: #26232d;
+}
+
+.steps-grid article {
+  color: var(--site-ink);
+}
+
+.steps-grid h3,
+.feature-card h3,
+.site-privacy-note strong {
+  color: var(--site-ink);
+}
+
+.site-download-section {
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  background:
+    radial-gradient(ellipse at 90% 5%, rgba(199, 169, 255, 0.16), transparent 45%),
+    linear-gradient(135deg, #17181c, #202027);
+}
+
+.site-download-section .site-kicker {
+  color: #d2c4f1;
+}
+
+.download-card {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.055);
+}
+
+.download-card > a {
+  color: #17181c;
+  background: #e7e7e7;
+}
+
+.release-guide-link,
+.site-privacy-note > a,
+.site-footer > a:last-child {
+  color: #d5c7f2;
+}
+
+.privacy-mark {
+  background: #28252f;
+}
+
+.site-modal-backdrop {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.site-install-modal {
+  border-color: #35363d;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.site-modal-close {
+  color: #dedfe3;
+  background: #26272c;
+}
+
+.install-instructions article {
+  background: #1b1c20;
 }
 
 @media (prefers-reduced-motion: reduce) {

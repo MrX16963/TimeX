@@ -20,15 +20,15 @@ export function respondAsMrX(
   if (!message) return { reply: greeting(language, context.userName), actions: [] };
 
   const taskTitle = getRequestedTask(message, language);
-  if (taskTitle) {
+  if (taskTitle.title) {
     return language === "ar"
       ? {
-          reply: `سأضيف «${taskTitle}» إلى قائمة مهامك على هذا الجهاز. يمكنك تحديد أهميتها وموعدها من صفحة المهام.`,
-          actions: [{ type: "task", title: taskTitle }],
+          reply: `أضفت «${taskTitle.title}» إلى مهامك${taskTitle.important || taskTitle.urgent ? ` وصنّفتها ${taskTitle.important ? "مهمة" : ""}${taskTitle.important && taskTitle.urgent ? " و" : ""}${taskTitle.urgent ? "عاجلة" : ""}` : ""}. يمكنك تعديل الموعد أو الأولوية من صفحة المهام.`,
+          actions: [{ type: "task", ...taskTitle }],
         }
       : {
-          reply: `I'll add “${taskTitle}” to your tasks on this device. You can set its priority and schedule from the tasks page.`,
-          actions: [{ type: "task", title: taskTitle }],
+          reply: `I added “${taskTitle.title}” to your tasks${taskTitle.important || taskTitle.urgent ? ` and marked it ${taskTitle.important ? "important" : ""}${taskTitle.important && taskTitle.urgent ? " and " : ""}${taskTitle.urgent ? "urgent" : ""}` : ""}. You can adjust its schedule or priority from the tasks page.`,
+          actions: [{ type: "task", ...taskTitle }],
         };
   }
 
@@ -50,26 +50,30 @@ export function respondAsMrX(
     const steps = buildPlanSteps(goal, language);
     return language === "ar"
       ? {
-          reply: `جهّزت خطة أولية لهدف «${goal}» من خمس خطوات، وحفظتها في صفحة «خطّط لهدف». راجعها وعدّلها بما يناسبك.`,
+          reply: `أنشأت خطة «${goal}» من خمس خطوات عملية، وحفظتها وأضفت خطواتها إلى مهامك. ابدأ بأول خطوة، ويمكنك تعديلها أو ترتيب أولويتها.`,
           actions: [{ type: "plan", goal, steps }],
         }
       : {
-          reply: `I drafted a five-step plan for “${goal}” and saved it to Plan a goal. Review and adapt it to fit your situation.`,
+          reply: `I made a practical five-step plan for “${goal}”, saved it, and added its steps to your tasks. Start with the first step; you can edit or reprioritize it anytime.`,
           actions: [{ type: "plan", goal, steps }],
         };
   }
 
-  if (/\b(today|tasks?|priorit(y|ies))\b|مهام|أولوي|اليوم/u.test(message)) {
+  if (/مرتبك|مضغوط|غارق|كثير|لا أعرف من أين أبدأ|مو قادر أبدأ|ما عم لحق|محتار|overwhelm|too much|stressed|can't focus|cannot focus/i.test(message)) {
+    return overwhelmedGuidance(language, context.tasks);
+  }
+
+  if (/\b(today|tasks?|priorit(y|ies)|what next|what should i do first|what.*next|where.*start)\b|مهام|أولوي|اليوم|شو أعمل|ماذا أفعل|بماذا أبدأ/iu.test(message)) {
     return taskGuidance(language, context.tasks);
   }
 
   return language === "ar"
     ? {
-        reply: `أنا MrX، مساعد تخطيط محلي يعمل دون اشتراك أو مفتاح API. أستطيع مساعدتك في تقسيم هدف إلى خطوات، إضافة مهمة، أو حفظ ملاحظة. ما النتيجة التي تريد الوصول إليها؟`,
+        reply: `أنا MrX، مساعد تخطيط يعمل على جهازك دون تنزيل نموذج. أساعدك في إنشاء خطة بخطوات عملية وإضافتها إلى مهامك، وترتيب أولويات اليوم، وإضافة مهمة أو حفظ ملاحظة. جرّب: «أريد الاستعداد للامتحان» أو «ما أولوياتي اليوم؟»`,
         actions: [],
       }
     : {
-        reply: `I'm MrX, a local planning helper that works without a subscription or API key. I can break a goal into steps, add a task, or save a note. What outcome are you working toward?`,
+        reply: `I'm MrX, an on-device planning helper that needs no model download. I can create a practical step-by-step plan and add it to your tasks, help prioritize today, add a task, or save a note. Try “I want to prepare for my exam” or “What should I do first?”`,
         actions: [],
       };
 }
@@ -85,11 +89,25 @@ function greeting(language: Language, userName?: string): string {
     : "Hello, I'm MrX. Tell me a goal, or ask me to add a task or save a note.";
 }
 
-function getRequestedTask(message: string, language: Language): string {
+function getRequestedTask(
+  message: string,
+  language: Language,
+): { title: string; important?: boolean; urgent?: boolean } {
   const pattern = language === "ar"
     ? /(?:أضف|أضيف|سجّل|سجل|أنشئ)\s+(?:لي\s+)?مهم(?:ة|ه)\s*(?:بعنوان|اسمها|[:：-])?\s*(.+)$/u
     : /(?:add|create)\s+(?:me\s+)?(?:a\s+)?task\s*(?:called|to|:|-)?\s*(.+)$/i;
-  return matchContent(message, pattern);
+  const content = matchContent(message, pattern);
+  const priorityLabels = content.split(/[:：]/u, 1)[0] ?? "";
+  const urgent = /عاجل(?:ة)?|urgent/iu.test(priorityLabels);
+  const important = /مهم(?:ة|ه)?|ضروري(?:ة)?|important|critical/iu.test(priorityLabels);
+  const title = content
+    .replace(/^(?:(?:و)?(?:عاجل(?:ة)?|مهم(?:ة|ه)?|ضروري(?:ة)?|urgent|important|critical)\s*[,،:：-]?\s*)+/iu, "")
+    .trim();
+  return {
+    title,
+    ...(important ? { important: true } : {}),
+    ...(urgent ? { urgent: true } : {}),
+  };
 }
 
 function getRequestedNote(message: string, language: Language): { title: string; body: string } | null {
@@ -139,10 +157,11 @@ function matchContent(message: string, pattern: RegExp): string {
 }
 
 function taskGuidance(language: Language, tasks: Task[]): MrXResponse {
-  const active = tasks.filter((task) => !task.completed);
-  const nextTask = active.find((task) => task.important && task.urgent) ??
-    active.find((task) => task.important) ??
-    active[0];
+  const active = tasks.filter((task) => !task.completed).sort(compareTasks);
+  const nextTask = active[0];
+  const scheduledToday = active.filter((task) => task.scheduledDate === todayDate());
+  const important = active.filter((task) => task.important);
+  const urgent = active.filter((task) => task.urgent);
   if (!nextTask) {
     return {
       reply: language === "ar"
@@ -153,8 +172,62 @@ function taskGuidance(language: Language, tasks: Task[]): MrXResponse {
   }
   return {
     reply: language === "ar"
-      ? `لديك ${active.length} ${active.length === 1 ? "مهمة" : "مهام"} قيد التنفيذ. ابدأ بـ«${nextTask.title}»${nextTask.important && nextTask.urgent ? " لأنها مهمة وعاجلة" : "، ثم ركّز على خطوة واحدة لمدة 25 دقيقة"}. هل تريد إضافة خطوة تالية؟`
-      : `You have ${active.length} active task${active.length === 1 ? "" : "s"}. Start with “${nextTask.title}”${nextTask.important && nextTask.urgent ? " because it is important and urgent" : ", then focus on one step for 25 minutes"}. Would you like to add a next step?`,
+      ? `لديك ${active.length} ${active.length === 1 ? "مهمة مفتوحة" : "مهام مفتوحة"}، منها ${important.length} مهمة مهمة و${urgent.length} عاجلة${scheduledToday.length ? ` و${scheduledToday.length} مجدولة اليوم` : ""}. ابدأ بـ«${nextTask.title}»${taskReason(nextTask, language)}، واضبط مؤقت تركيز لـ25 دقيقة. بعد الجلسة أخبرني بما أنجزت لأقترح الخطوة التالية.`
+      : `You have ${active.length} open task${active.length === 1 ? "" : "s"}: ${important.length} important, ${urgent.length} urgent${scheduledToday.length ? `, and ${scheduledToday.length} scheduled today` : ""}. Start with “${nextTask.title}”${taskReason(nextTask, language)}, then focus for 25 minutes. Tell me what you finish and I’ll help choose the next step.`,
     actions: [],
   };
+}
+
+function overwhelmedGuidance(language: Language, tasks: Task[]): MrXResponse {
+  const active = tasks.filter((task) => !task.completed).sort(compareTasks);
+  if (!active.length) {
+    return {
+      reply: language === "ar"
+        ? "خلّينا نخفف الضغط: لا توجد مهام مفتوحة الآن. اكتب أهم نتيجة واحدة تتمنى إنجازها، وسأقسمها إلى خطوة صغيرة."
+        : "Let's lower the pressure: you have no open tasks. Tell me the one outcome that matters most, and I'll break it into a small first step.",
+      actions: [],
+    };
+  }
+  const first = active[0];
+  const second = active[1];
+  return {
+    reply: language === "ar"
+      ? `مو لازم تنجز كل شيء الآن. لديك ${active.length} مهام مفتوحة. اخترت «${first.title}» كبداية${taskReason(first, language)}. خذ دقيقة لكتابة أول حركة صغيرة، ثم ركّز عليها 10 دقائق فقط. ${second ? `اترك «${second.title}» لما بعد ذلك.` : "بعدها خذ استراحة قصيرة."}`
+      : `You don't need to finish everything now. You have ${active.length} open tasks. Start with “${first.title}”${taskReason(first, language)}. Write down one tiny action and work on it for just 10 minutes. ${second ? `Leave “${second.title}” for later.` : "Take a short break afterward."}`,
+    actions: [],
+  };
+}
+
+function compareTasks(left: Task, right: Task): number {
+  const today = todayDate();
+  const leftDue = left.scheduledDate && left.scheduledDate <= today ? 0 : 1;
+  const rightDue = right.scheduledDate && right.scheduledDate <= today ? 0 : 1;
+  if (leftDue !== rightDue) return leftDue - rightDue;
+  const leftPriority = Number(left.important) + Number(left.urgent);
+  const rightPriority = Number(right.important) + Number(right.urgent);
+  if (leftPriority !== rightPriority) return rightPriority - leftPriority;
+  if (left.scheduledDate && right.scheduledDate && left.scheduledDate !== right.scheduledDate) {
+    return left.scheduledDate.localeCompare(right.scheduledDate);
+  }
+  return left.createdAt - right.createdAt;
+}
+
+function taskReason(task: Task, language: Language): string {
+  if (task.scheduledDate && task.scheduledDate <= todayDate()) {
+    return language === "ar" ? " لأنها مستحقة اليوم أو متأخرة" : " because it is due today or overdue";
+  }
+  if (task.important && task.urgent) {
+    return language === "ar" ? " لأنها مهمة وعاجلة" : " because it is important and urgent";
+  }
+  if (task.important) return language === "ar" ? " لأنها مهمة" : " because it is important";
+  if (task.urgent) return language === "ar" ? " لأنها عاجلة" : " because it is urgent";
+  return "";
+}
+
+function todayDate(): string {
+  const date = new Date();
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }

@@ -35,9 +35,10 @@ describe("Gemini assistant provider", () => {
     });
   });
 
-  it("defines only the validated note and plan actions", () => {
+  it("defines validated note, task, and plan actions", () => {
     expect(assistantFunctions[0].functionDeclarations.map(({ name }) => name)).toEqual([
       "save_note",
+      "create_task",
       "create_plan",
     ]);
     expect(assistantFunctions[0].functionDeclarations[0].parameters.required).toEqual([
@@ -45,6 +46,11 @@ describe("Gemini assistant provider", () => {
       "body",
     ]);
     expect(assistantFunctions[0].functionDeclarations[1].parameters.required).toEqual([
+      "title",
+      "important",
+      "urgent",
+    ]);
+    expect(assistantFunctions[0].functionDeclarations[2].parameters.required).toEqual([
       "goal",
       "steps",
     ]);

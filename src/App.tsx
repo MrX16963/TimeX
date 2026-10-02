@@ -34,14 +34,6 @@ import {
 } from "./reminders";
 import { respondAsMrX } from "./mrx-assistant";
 import { isDoubleBackPress } from "./back-navigation";
-import {
-  generateLocalAiReply,
-  initializeLocalAi,
-  isLocalAiSupported,
-  MRX_MODEL_SIZE_MB,
-  resetLocalAi,
-  type ModelProgress,
-} from "./local-ai";
 
 const englishCopy = {
     appName: "TimeX",
@@ -183,13 +175,9 @@ const englishCopy = {
     sendMessage: "Send message",
     signInForChat: "Sign in to sync your chat. MrX can help locally without an account.",
     configureForChat: "MrX works locally without an API key. Sign-in and cloud sync can be enabled after Supabase setup.",
-    mrxLocalMode: "MrX can load a free 0.5B language model and run it privately on this device. Its first download is about 278 MB; a compatible WebGPU browser is required.",
-    loadLocalModel: "Load free AI model",
-    loadingLocalModel: "Loading model…",
-    localModelReady: "On-device AI ready",
-    localModelUnsupported: "This browser does not support WebGPU. MrX's built-in planning helper is still available.",
-    localModelLoadError: "The local model could not be loaded. Check your connection and device storage, then try again.",
-    assistantLocalFallback: "The language model was unavailable, so MrX used its built-in planning helper instead.",
+    mrxLocalMode: "MrX starts instantly without downloading a large model. It helps turn goals into steps, prioritize tasks, add tasks, and save notes.",
+    assistantLocalFallback: "The connected AI service is unavailable, so MrX's on-device planning helper replied instead.",
+    assistantSources: "Sources",
     pressAgainToExit: "Press back again to exit TimeX.",
     assistantChatError: "I couldn't reach the planning assistant. Check its server configuration and try again.",
     chatSavingError: "Your workspace is saved, but a chat message couldn't be synced.",
@@ -200,7 +188,7 @@ const englishCopy = {
     loadingWorkspace: "Loading your private workspace…",
     authenticationRequired: "Create an account or sign in to sync your own workspace across devices.",
     signInSuccessful: "Welcome back.",
-    assistantPrivacy: "MrX's built-in helper runs on this device. When you sign in, your chat history syncs to your private Supabase account; messages are sent to an AI provider only when one is configured.",
+    assistantPrivacy: "The no-download planner runs on this device. If you sign in and Gemini is configured, your message and open tasks go to Gemini; web-search requests can include Google source links.",
 };
 
 const arabicCopy = {
@@ -343,13 +331,9 @@ const arabicCopy = {
     sendMessage: "إرسال الرسالة",
     signInForChat: "سجّل الدخول لمزامنة المحادثة. MrX متاح محليًا دون حساب.",
     configureForChat: "يعمل MrX محليًا دون مفتاح API. يمكن تفعيل تسجيل الدخول والمزامنة بعد إعداد Supabase.",
-    mrxLocalMode: "يمكن لـMrX تحميل نموذج لغوي مجاني بحجم 0.5B وتشغيله بخصوصية على هذا الجهاز. يحتاج التنزيل الأول إلى نحو 278 ميغابايت ومتصفح يدعم WebGPU.",
-    loadLocalModel: "تحميل وتشغيل نموذج الذكاء الاصطناعي المجاني",
-    loadingLocalModel: "جارٍ تحميل النموذج…",
-    localModelReady: "الذكاء الاصطناعي المحلي جاهز",
-    localModelUnsupported: "هذا المتصفح لا يدعم WebGPU. يظل مساعد MrX التخطيطي المدمج متاحًا.",
-    localModelLoadError: "تعذّر تحميل النموذج المحلي. تحقق من الاتصال ومساحة التخزين ثم حاول مجددًا.",
-    assistantLocalFallback: "النموذج اللغوي غير متاح، لذا استخدم MrX مساعد التخطيط المدمج.",
+    mrxLocalMode: "يعمل MrX فورًا دون تنزيل نموذج كبير. يساعدك على تحويل الأهداف إلى خطوات، وترتيب المهام، وإضافة المهام، وحفظ الملاحظات.",
+    assistantLocalFallback: "خدمة الذكاء الاصطناعي المتصلة غير متاحة، لذا أجابك MrX بمساعد التخطيط الموجود على الجهاز.",
+    assistantSources: "المصادر",
     pressAgainToExit: "اضغط زر الرجوع مرة أخرى للخروج من TimeX.",
     assistantChatError: "تعذّر الاتصال بمساعد التخطيط. تحقق من إعداد الخادم ثم حاول مجددًا.",
     chatSavingError: "حُفظت مساحتك، لكن تعذّرت مزامنة رسالة من المحادثة.",
@@ -360,7 +344,7 @@ const arabicCopy = {
     loadingWorkspace: "جارٍ تحميل مساحتك الخاصة…",
     authenticationRequired: "أنشئ حسابًا أو سجّل الدخول لمزامنة مساحتك الخاصة بين الأجهزة.",
     signInSuccessful: "أهلًا بعودتك.",
-    assistantPrivacy: "يعمل مساعد MrX المدمج على هذا الجهاز. عند تسجيل الدخول، تُزامن المحادثة مع حسابك الخاص في Supabase؛ ولا تُرسل الرسائل إلى مزوّد خارجي إلا عند إعداد واحد.",
+    assistantPrivacy: "يعمل مخطّط MrX دون تنزيل على جهازك. إذا سجلت الدخول وأُعدّ Gemini، تُرسل رسالتك ومهامك المفتوحة إليه؛ وقد تتضمن إجابات البحث روابط مصادر من Google.",
 } satisfies Record<keyof typeof englishCopy, string>;
 
 const copy = {
@@ -488,14 +472,6 @@ function App() {
   const [chatPending, setChatPending] = useState(false);
   const [chatError, setChatError] = useState("");
   const [chatNotice, setChatNotice] = useState("");
-  const [localAiSupported] = useState(isLocalAiSupported);
-  const [localAiReady, setLocalAiReady] = useState(false);
-  const [localAiLoading, setLocalAiLoading] = useState(false);
-  const [localAiProgress, setLocalAiProgress] = useState<ModelProgress>({
-    progress: 0,
-    text: "",
-  });
-  const [localAiError, setLocalAiError] = useState(false);
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [appInstalled, setAppInstalled] = useState(() =>
     Capacitor.isNativePlatform() ||
@@ -690,7 +666,7 @@ function App() {
         supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
         supabase
           .from("assistant_messages")
-          .select("id, role, content, created_at")
+          .select("id, role, content, sources, created_at")
           .eq("user_id", user.id)
           .order("created_at", { ascending: false })
           .limit(100),
@@ -1044,15 +1020,21 @@ function App() {
   }
 
   function addPlanToTasks(plan: Plan) {
-    const tasks = plan.steps.map((title): Task => ({
-      id: makeId(),
-      title,
-      important: false,
-      urgent: false,
-      completed: false,
-      createdAt: Date.now(),
-    }));
-    setData((current) => ({ ...current, tasks: [...tasks, ...current.tasks] }));
+    const existing = new Set(data.tasks.map((task) => task.title.trim().toLocaleLowerCase()));
+    const tasks = plan.steps
+      .filter((title) => !existing.has(title.trim().toLocaleLowerCase()))
+      .map((title, index): Task => ({
+        id: makeId(),
+        title,
+        important: index === 0,
+        urgent: false,
+        completed: false,
+        createdAt: Date.now(),
+      }));
+    if (!tasks.length) return;
+    setData((current) => {
+      return { ...current, tasks: [...tasks, ...current.tasks] };
+    });
     notify(t("planAdded"));
   }
 
@@ -1174,27 +1156,11 @@ function App() {
         user_id: userId,
         role: message.role,
         content: message.content,
+        sources: message.sources ?? [],
       });
     if (error) {
       console.error("TimeX could not sync a private assistant message.", error);
       setCloudSyncFailed(true);
-    }
-  }
-
-  async function loadLocalAiModel() {
-    if (!localAiSupported || localAiLoading || localAiReady) return;
-    setLocalAiLoading(true);
-    setLocalAiError(false);
-    setLocalAiProgress({ progress: 0, text: "" });
-    setChatError("");
-    try {
-      await initializeLocalAi(setLocalAiProgress);
-      setLocalAiReady(true);
-    } catch (error) {
-      console.error("MrX could not initialize its on-device language model.", error);
-      setLocalAiError(true);
-    } finally {
-      setLocalAiLoading(false);
     }
   }
 
@@ -1220,30 +1186,9 @@ function App() {
     try {
       let response: AssistantResponse | null = null;
       let localResponse: ReturnType<typeof respondAsMrX> | null = null;
-      const explicitAction = respondAsMrX(content, lang, { tasks: data.tasks, userName });
-      if (explicitAction.actions.length > 0) {
-        localResponse = explicitAction;
-      } else if (localAiReady) {
+      if (user && supabase) {
         try {
-          const reply = await generateLocalAiReply(
-            conversation,
-            lang,
-            data.tasks,
-            setLocalAiProgress,
-          );
-          response = { reply, actions: [] };
-        } catch (error) {
-          console.error("MrX on-device generation failed; using the built-in planner.", error);
-          resetLocalAi();
-          setLocalAiReady(false);
-          setLocalAiError(true);
-          setChatNotice(t("assistantLocalFallback"));
-        }
-      }
-
-      if (!response && !localResponse && user && supabase) {
-        try {
-          const { data, error } = await supabase.functions.invoke<AssistantResponse>(
+          const { data: assistantData, error } = await supabase.functions.invoke<AssistantResponse>(
             "timex-assistant",
             {
               body: {
@@ -1253,20 +1198,38 @@ function App() {
                 })),
                 language: lang,
                 userName,
+                tasks: data.tasks
+                  .filter((task) => !task.completed)
+                  .slice(0, 30)
+                  .map(({ title, important, urgent, scheduledDate }) => ({
+                    title,
+                    important,
+                    urgent,
+                    scheduledDate,
+                  })),
               },
             },
           );
           if (error) throw error;
           if (
-            !data ||
-            typeof data.reply !== "string" ||
-            !data.reply.trim() ||
-            data.reply.length > 8000 ||
-            !Array.isArray(data.actions)
+            !assistantData ||
+            typeof assistantData.reply !== "string" ||
+            !assistantData.reply.trim() ||
+            assistantData.reply.length > 8000 ||
+            !Array.isArray(assistantData.actions) ||
+            (assistantData.sources !== undefined &&
+              (!Array.isArray(assistantData.sources) ||
+                assistantData.sources.some(
+                  (source) =>
+                    !source ||
+                    typeof source.title !== "string" ||
+                    typeof source.url !== "string" ||
+                    !source.url.startsWith("https://"),
+                )))
           ) {
             throw new Error("The configured assistant returned an invalid response.");
           }
-          response = data;
+          response = assistantData;
         } catch (error) {
           console.error("TimeX could not reach the configured assistant; using MrX locally.", error);
           setChatNotice(t("assistantLocalFallback"));
@@ -1281,6 +1244,7 @@ function App() {
         role: "assistant",
         content: (response?.reply ?? localResponse?.reply ?? "").trim(),
         created_at: new Date().toISOString(),
+        ...(response?.sources?.length ? { sources: response.sources } : {}),
       };
       if (!assistantMessage.content) throw new Error("MrX returned an empty response.");
       setChatMessages((current) => [...current, assistantMessage].slice(-100));
@@ -1320,15 +1284,34 @@ function App() {
           steps,
           createdAt: Date.now(),
         };
-        setData((current) => ({ ...current, plans: [plan, ...current.plans] }));
+        setData((current) => {
+          const existingTitles = new Set(
+            current.tasks.map((task) => task.title.trim().toLocaleLowerCase()),
+          );
+          const newTasks = steps
+            .filter((step) => !existingTitles.has(step.trim().toLocaleLowerCase()))
+            .map((title, index): Task => ({
+              id: createLocalId(),
+              title,
+              important: index === 0,
+              urgent: false,
+              completed: false,
+              createdAt: Date.now(),
+            }));
+          return {
+            ...current,
+            plans: [plan, ...current.plans],
+            tasks: [...newTasks, ...current.tasks],
+          };
+        });
       } else if (action.type === "task") {
         const title = action.title.trim().slice(0, 160);
         if (!title) continue;
         const task: Task = {
           id: createLocalId(),
           title,
-          important: false,
-          urgent: false,
+          important: action.important === true,
+          urgent: action.urgent === true,
           completed: false,
           createdAt: Date.now(),
         };
@@ -2267,38 +2250,11 @@ function App() {
                   <span aria-hidden="true">⌑</span>
                   <p>{t("assistantPrivacy")}</p>
                 </div>
-                <div className="local-ai-model">
-                  <div className="local-ai-model-copy">
-                    <strong>{localAiReady ? t("localModelReady") : "MrX · Qwen2 0.5B"}</strong>
-                    {localAiReady ? (
-                      <span>{t("mrxLocalMode")}</span>
-                    ) : localAiSupported ? (
-                      <span>{t("mrxLocalMode")}</span>
-                    ) : (
-                      <span>{t("localModelUnsupported")}</span>
-                    )}
+                <div className="assistant-local-mode">
+                  <div className="assistant-local-mode-copy">
+                    <strong>MrX · {t("assistantTab")}</strong>
+                    <span>{t("mrxLocalMode")}</span>
                   </div>
-                  {localAiSupported && !localAiReady && (
-                    <button
-                      className="text-button local-ai-load-button"
-                      type="button"
-                      disabled={localAiLoading}
-                      onClick={() => void loadLocalAiModel()}
-                    >
-                      {localAiLoading
-                        ? `${t("loadingLocalModel")} ${Math.round(localAiProgress.progress * 100)}%`
-                        : `${t("loadLocalModel")} · ${MRX_MODEL_SIZE_MB} MB`}
-                    </button>
-                  )}
-                  {localAiLoading && (
-                    <progress
-                      className="local-ai-progress"
-                      value={localAiProgress.progress}
-                      max={1}
-                      aria-label={localAiProgress.text || t("loadingLocalModel")}
-                    />
-                  )}
-                  {localAiError && <p className="local-ai-error" role="alert">{t("localModelLoadError")}</p>}
                 </div>
                 <div className="chat-transcript" aria-live="polite">
                   {chatMessages.length === 0 && (
@@ -2316,6 +2272,17 @@ function App() {
                         <span className="message-avatar" aria-hidden="true">✳</span>
                       )}
                       <p>{message.content}</p>
+                      {message.sources?.length ? (
+                        <ul className="assistant-sources" aria-label={t("assistantSources")}>
+                          {message.sources.map((source) => (
+                            <li key={source.url}>
+                              <a href={source.url} target="_blank" rel="noreferrer">
+                                {source.title}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </article>
                   ))}
                   {chatPending && (

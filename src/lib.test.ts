@@ -73,7 +73,7 @@ describe("buildPlanSteps", () => {
     const steps = buildPlanSteps("Learn conversational Spanish");
     expect(steps).toHaveLength(5);
     expect(steps[0]).toContain("Learn conversational Spanish");
-    expect(steps[3]).toContain("smallest useful next step");
+    expect(steps[2]).toContain("recall");
   });
 
   it("does not create a plan for an empty goal", () => {
@@ -84,6 +84,13 @@ describe("buildPlanSteps", () => {
     const steps = buildPlanSteps("تعلّم اللغة الإسبانية", "ar");
     expect(steps).toHaveLength(5);
     expect(steps[0]).toContain("تعلّم اللغة الإسبانية");
+  });
+
+  it("tailors study plans around deadlines and active recall", () => {
+    const steps = buildPlanSteps("Prepare for my certification exam");
+
+    expect(steps[0]).toContain("deadline");
+    expect(steps[2]).toContain("recall");
   });
 });
 

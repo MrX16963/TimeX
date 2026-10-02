@@ -7,16 +7,18 @@ export type ChatMessage = {
   role: ChatRole;
   content: string;
   created_at: string;
+  sources?: Array<{ title: string; url: string }>;
 };
 
 export type AssistantAction =
   | { type: "note"; title: string; body: string }
   | { type: "plan"; goal: string; steps: string[] }
-  | { type: "task"; title: string };
+  | { type: "task"; title: string; important?: boolean; urgent?: boolean };
 
 export type AssistantResponse = {
   reply: string;
   actions: AssistantAction[];
+  sources?: Array<{ title: string; url: string }>;
 };
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
@@ -59,6 +61,15 @@ function isChatMessage(value: unknown): value is ChatMessage {
     typeof message.id === "string" &&
     (message.role === "user" || message.role === "assistant") &&
     typeof message.content === "string" &&
-    typeof message.created_at === "string"
+    typeof message.created_at === "string" &&
+    (message.sources === undefined ||
+      (Array.isArray(message.sources) &&
+        message.sources.every(
+          (source) =>
+            source &&
+            typeof source.title === "string" &&
+            typeof source.url === "string" &&
+            source.url.startsWith("https://"),
+        )))
   );
 }

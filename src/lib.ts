@@ -134,21 +134,75 @@ export function buildPlanSteps(goal: string, language: "ar" | "en" = "en"): stri
   if (!cleanedGoal) return [];
 
   if (language === "ar") {
+    if (/امتحان|اختبار|شهادة|دراسة|مذاكر|مادة|تعلم|تعلّم|لغة|برمجة/u.test(cleanedGoal)) {
+      return [
+        `حدّد موعد «${cleanedGoal}» والموضوعات التي يجب تغطيتها`,
+        "قسّم الموضوعات إلى جلسات قصيرة، وحدد أول جلسة في التقويم",
+        "ادرس موضوعًا واحدًا ثم اختبر نفسك دون الرجوع إلى الملاحظات",
+        "راجع الأسئلة أو النقاط الصعبة وركّز على أضعف جزء",
+        "أجرِ مراجعة تجريبية، ثم حدّد الخطوة التالية وفق نتيجتها",
+      ];
+    }
+    if (/رياضة|لياقة|تمرين|صحة|مشي|جري|وزن/u.test(cleanedGoal)) {
+      return [
+        `حدّد نتيجة واقعية وموعدًا لمراجعة التقدم في «${cleanedGoal}»`,
+        "اختر نشاطًا مناسبًا لمستواك الحالي واستشر مختصًا عند الحاجة",
+        "ابدأ بجلسة قصيرة وخفيفة وسجّل ما أنجزته",
+        "حدّد جلستين إضافيتين في الأسبوع مع وقت للراحة",
+        "راجع شعورك والتزامك أسبوعيًا وعدّل الخطة تدريجيًا",
+      ];
+    }
+    if (/وظيف|عمل|سيرة|مقابل|مشروع|موقع|تطبيق|إطلاق|إنشاء|بناء/u.test(cleanedGoal)) {
+      return [
+        `اكتب نتيجة محددة يمكن اعتبار «${cleanedGoal}» منجزًا عند الوصول إليها`,
+        "اجمع المتطلبات وحدد أصغر نسخة قابلة للإنجاز",
+        "قسّم العمل إلى مهام صغيرة وقدّر وقت أول مهمة",
+        "أنجز نسخة أولى واطلب ملاحظات من شخص مناسب",
+        "راجع الملاحظات وحدد موعدًا وخطوة الإطلاق التالية",
+      ];
+    }
     return [
-      `حدّد كيف ستعرف أنك أنجزت «${cleanedGoal}»`,
-      `قسّم «${cleanedGoal}» إلى مراحل صغيرة قابلة للتحقيق`,
-      "جهّز الوقت والأدوات والمعلومات التي تحتاجها",
-      "ابدأ بأصغر خطوة مفيدة يمكنك تنفيذها",
-      "راجع تقدّمك وعدّل خطتك عند الحاجة",
+      `اكتب نتيجة واضحة يمكن ملاحظتها عند إنجاز «${cleanedGoal}»`,
+      "حدّد أول خطوتين وما تحتاج إليه للبدء",
+      "خصص 25 دقيقة لأول خطوة وأبعد مصدر تشتيت واحدًا",
+      "سجّل ما أنجزته وما الذي أوقفك",
+      "اختر الخطوة التالية وموعدًا قصيرًا لمراجعة تقدمك",
     ];
   }
 
+  if (/\b(exam|test|certification|study|learn|language|programming|course)\b/i.test(cleanedGoal)) {
+    return [
+      `List the topics and deadline for “${cleanedGoal}”`,
+      "Split the topics into short sessions and schedule the first one",
+      "Study one topic, then recall it from memory without notes",
+      "Review mistakes and spend the next session on the weakest area",
+      "Try a timed practice set and adjust your plan from the result",
+    ];
+  }
+  if (/\b(fitness|exercise|work out|health|walk|run|weight)\b/i.test(cleanedGoal)) {
+    return [
+      `Choose a realistic outcome and a date to review “${cleanedGoal}”`,
+      "Pick an activity that fits your current level; ask a professional when needed",
+      "Start with a short, easy session and record how it felt",
+      "Schedule two more sessions with recovery time between them",
+      "Review energy and consistency weekly, then adjust gradually",
+    ];
+  }
+  if (/\b(job|career|resume|interview|project|website|app|launch|build|create)\b/i.test(cleanedGoal)) {
+    return [
+      `Define a visible result that means “${cleanedGoal}” is done`,
+      "Gather requirements and choose the smallest useful first version",
+      "Break the work into small tasks and estimate the first one",
+      "Complete a first draft and ask one relevant person for feedback",
+      "Review feedback and schedule the next delivery step",
+    ];
+  }
   return [
-    `Define what “${cleanedGoal}” will look like when it's done`,
-    `Break “${cleanedGoal}” into small, achievable milestones`,
-    `Gather the time, tools, and information you need`,
-    `Start with the smallest useful next step`,
-    `Review your progress and adjust the plan`,
+    `Write a visible result that would mean “${cleanedGoal}” is done`,
+    "Choose the first two actions and gather what you need",
+    "Set aside 25 minutes for the first action and remove one distraction",
+    "Record what you finished and anything that got in the way",
+    "Pick the next action and a short time to review your progress",
   ];
 }
 

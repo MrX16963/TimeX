@@ -49,6 +49,26 @@ describe("assistant conversation storage", () => {
     ]);
   });
 
+  it("keeps valid HTTPS web sources with their assistant reply", () => {
+    const message: ChatMessage = {
+      id: "source-reply",
+      role: "assistant",
+      content: "Here is what I found.",
+      created_at: "2026-10-01T17:00:00.000Z",
+      sources: [{ title: "Example research", url: "https://example.com/research" }],
+    };
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        localStorage: {
+          getItem: () => JSON.stringify([message]),
+        },
+      },
+    });
+
+    expect(readChatMessages("timex-chat")).toEqual([message]);
+  });
+
   it("creates a fresh local conversation identifier", () => {
     expect(createLocalId()).toEqual(expect.any(String));
     expect(createLocalId()).not.toEqual(createLocalId());

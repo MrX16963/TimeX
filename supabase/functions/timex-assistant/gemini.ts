@@ -19,6 +19,19 @@ export const assistantFunctions = [
         },
       },
       {
+        name: "create_task",
+        description: "Add one clearly requested task to the signed-in user's TimeX task list.",
+        parameters: {
+          type: "OBJECT",
+          properties: {
+            title: { type: "STRING" },
+            important: { type: "BOOLEAN" },
+            urgent: { type: "BOOLEAN" },
+          },
+          required: ["title", "important", "urgent"],
+        },
+      },
+      {
         name: "create_plan",
         description: "Build and save an actionable plan in this signed-in user's TimeX workspace.",
         parameters: {
@@ -60,4 +73,35 @@ export function fetchGemini(
       }),
     },
   );
+}
+
+export function needsWebSearch(message: string): boolean {
+  return /ابحث|ابحثلي|دور على|دوّر على|على الانترنت|على الإنترنت|مصادر|مصدر|رابط|آخر الأخبار|اخر الاخبار|السعر الحالي|حاليًا|حالياً|google|search|look up|find sources|current|latest|news|weather|price today|source|sources/i.test(
+    message,
+  );
+}
+
+export function extractWebSources(candidate: unknown): Array<{ title: string; url: string }> {
+  if (!candidate || typeof candidate !== "object") return [];
+  const metadata = (candidate as { groundingMetadata?: unknown }).groundingMetadata;
+  if (!metadata || typeof metadata !== "object") return [];
+  const chunks = (metadata as { groundingChunks?: unknown }).groundingChunks;
+  if (!Array.isArray(chunks)) return [];
+
+  const sources = new Map<string, { title: string; url: string }>();
+  for (const chunk of chunks) {
+    if (!chunk || typeof chunk !== "object") continue;
+    const web = (chunk as { web?: unknown }).web;
+    if (!web || typeof web !== "object") continue;
+    const { uri, title } = web as { uri?: unknown; title?: unknown };
+    if (typeof uri !== "string" || typeof title !== "string" || !title.trim()) continue;
+    try {
+      const url = new URL(uri);
+      if (url.protocol !== "https:") continue;
+      if (!sources.has(url.href)) sources.set(url.href, { title: title.slice(0, 200), url: url.href });
+    } catch {
+      continue;
+    }
+  }
+  return [...sources.values()].slice(0, 5);
 }

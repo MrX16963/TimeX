@@ -10,8 +10,8 @@
   "orientation": "any",
   "lang": "ar",
   "dir": "rtl",
-  "theme_color": "#f5f3ee",
-  "background_color": "#f5f3ee",
+  "theme_color": "#08090b",
+  "background_color": "#08090b",
   "categories": ["productivity", "lifestyle"],
   "icons": [
     {

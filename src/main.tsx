@@ -4,6 +4,7 @@ import { Capacitor } from "@capacitor/core";
 import App from "./App";
 import LandingPage from "./LandingPage";
 import "./styles.css";
+import "./landing-theme.css";
 
 if (
   "serviceWorker" in navigator &&

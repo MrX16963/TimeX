@@ -1,0 +1,256 @@
+.marketing-site.marketing-site {
+  --site-ink: #f2f3f5;
+  --site-muted: #a0a3aa;
+  --site-purple: #e7e7e7;
+  --site-purple-deep: #141518;
+  --site-purple-soft: #222328;
+  --site-line: #292b30;
+  --site-paper: #141518;
+  color: #f2f3f5;
+  background: #08090b;
+}
+
+.marketing-site .site-header,
+.marketing-site .site-how-section,
+.marketing-site .site-footer {
+  border-color: #292b30;
+}
+
+.marketing-site .site-brand-mark,
+.marketing-site .preview-brand > span {
+  color: #08090b;
+  background: #e7e7e7;
+}
+
+.marketing-site .site-nav a,
+.marketing-site .site-header-link,
+.marketing-site .site-nav a:hover,
+.marketing-site .site-header-link:hover,
+.marketing-site .site-privacy-note > a,
+.marketing-site .site-footer > a:last-child {
+  color: #d8d9dc;
+}
+
+.marketing-site .site-kicker,
+.marketing-site .site-hero h1 span,
+.marketing-site .site-section-heading h2 span,
+.marketing-site .site-platform-note > span,
+.marketing-site .site-download-section .site-kicker {
+  color: #e7e7e7;
+}
+
+.marketing-site .site-kicker > span,
+.marketing-site .site-download-section .site-kicker > span {
+  background: #b8bbc2;
+  box-shadow: 0 0 0 4px rgba(184, 187, 194, 0.13);
+}
+
+.marketing-site .site-hero-description,
+.marketing-site .site-section-heading > p,
+.marketing-site .site-platform-note,
+.marketing-site .site-privacy-note p,
+.marketing-site .site-footer > span {
+  color: #a0a3aa;
+}
+
+.marketing-site .site-primary-button {
+  color: #08090b;
+  background: #e7e7e7;
+  box-shadow: 0 7px 22px rgba(231, 231, 231, 0.12);
+}
+
+.marketing-site .site-secondary-button {
+  color: #f2f3f5;
+  border-color: #3a3c42;
+  background: #141518;
+}
+
+.marketing-site .site-secondary-button:hover {
+  border-color: #a0a3aa;
+}
+
+.marketing-site .site-hero-visual::before {
+  background: radial-gradient(circle, rgba(76, 79, 86, 0.38), rgba(37, 39, 44, 0.2) 61%, transparent 71%);
+}
+
+.marketing-site .site-orbit {
+  border-color: rgba(184, 187, 194, 0.13);
+}
+
+.marketing-site .preview-window {
+  border-color: #36383e;
+  background: #141518;
+  box-shadow: 0 29px 80px rgba(0, 0, 0, 0.4), 0 5px 18px rgba(0, 0, 0, 0.25);
+}
+
+.marketing-site .preview-topbar,
+.marketing-site .preview-task {
+  border-color: #292b30;
+}
+
+.marketing-site .preview-avatar,
+.marketing-site .preview-stats > div {
+  color: #e0e1e4;
+  border-color: #292b30;
+  background: #1b1c20;
+}
+
+.marketing-site .preview-date,
+.marketing-site .preview-content > p,
+.marketing-site .preview-stats span,
+.marketing-site .preview-task-heading > span,
+.marketing-site .floating-note small {
+  color: #a0a3aa;
+}
+
+.marketing-site .preview-stats strong,
+.marketing-site .preview-task > span {
+  color: #e0e1e4;
+}
+
+.marketing-site .preview-check {
+  color: #08090b;
+  border-color: #55575e;
+}
+
+.marketing-site .preview-check.checked {
+  border-color: #e7e7e7;
+  background: #e7e7e7;
+}
+
+.marketing-site .preview-task > b {
+  color: #c8cacf;
+}
+
+.marketing-site .preview-task .preview-tag,
+.marketing-site .preview-task .preview-tag.peach {
+  color: #e0e1e4;
+  background: #292b30;
+}
+
+.marketing-site .preview-focus {
+  color: #f2f3f5;
+  background: linear-gradient(115deg, #292b30, #1b1c20);
+}
+
+.marketing-site .preview-focus > i > span {
+  background: #e7e7e7;
+}
+
+.marketing-site .floating-note {
+  border-color: #36383e;
+  background: #1b1c20;
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.38);
+}
+
+.marketing-site .floating-note > span {
+  color: #e0e1e4;
+  background: #292b30;
+}
+
+.marketing-site .visual-spark,
+.marketing-site .visual-spark-two {
+  color: #c5c7cc;
+}
+
+.marketing-site .site-trustbar,
+.marketing-site .site-footer {
+  background: #0d0e10;
+}
+
+.marketing-site .site-trustbar {
+  border-color: #292b30;
+}
+
+.marketing-site .site-trustbar > span {
+  color: #b4b6bc;
+}
+
+.marketing-site .site-trustbar i {
+  color: #d4d6da;
+}
+
+.marketing-site .feature-card {
+  border-color: #292b30;
+  background: #141518;
+}
+
+.marketing-site .feature-card:hover {
+  box-shadow: 0 13px 34px rgba(0, 0, 0, 0.32);
+}
+
+.marketing-site .feature-icon.lavender,
+.marketing-site .feature-icon.peach,
+.marketing-site .feature-icon.mint,
+.marketing-site .feature-icon.butter,
+.marketing-site .step-index,
+.marketing-site .privacy-mark {
+  color: #e0e1e4;
+  border-color: #36383e;
+  background: #222328;
+}
+
+.marketing-site .feature-card p,
+.marketing-site .steps-grid p {
+  color: #a0a3aa;
+}
+
+.marketing-site .site-download-section {
+  color: #f2f3f5;
+  border: 1px solid #303238;
+  background: linear-gradient(116deg, #141518, #1b1c20 57%, #24262b);
+}
+
+.marketing-site .download-card {
+  border-color: rgba(231, 231, 231, 0.13);
+  background: rgba(8, 9, 11, 0.45);
+}
+
+.marketing-site .download-device-icon {
+  color: #f2f3f5;
+  background: rgba(231, 231, 231, 0.1);
+}
+
+.marketing-site .download-card > a {
+  color: #08090b;
+  background: #e7e7e7;
+}
+
+.marketing-site .release-guide-link {
+  color: #e7e7e7;
+}
+
+.marketing-site .privacy-mark {
+  color: #e0e1e4;
+}
+
+.marketing-site .site-modal-backdrop {
+  background: rgba(0, 0, 0, 0.72);
+}
+
+.marketing-site .site-install-modal {
+  color: #f2f3f5;
+  border-color: #36383e;
+  background: #141518;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+}
+
+.marketing-site .site-modal-close {
+  color: #d1d2d6;
+  background: #222328;
+}
+
+.marketing-site .site-install-modal > p,
+.marketing-site .install-instructions p {
+  color: #a0a3aa;
+}
+
+.marketing-site .install-instructions article {
+  border-color: #292b30;
+  background: #1b1c20;
+}
+
+.marketing-site .install-instructions article > span {
+  color: #e0e1e4;
+  background: #292b30;
+}

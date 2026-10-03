@@ -213,6 +213,12 @@
   font-weight: 600;
 }
 
+.marketing-site .download-copy .download-migration-note {
+  margin-top: 9px;
+  color: #c8cacf;
+  font-size: 9px;
+}
+
 .marketing-site .download-card {
   border-color: rgba(231, 231, 231, 0.13);
   background: rgba(8, 9, 11, 0.45);

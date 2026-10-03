@@ -6,4 +6,12 @@ release-output/
 .env
 .env.*
 !.env.example
+!.env.*.example
+*.jks
+*.keystore
+*.p12
+*.pem
+*.key
+**/google-services.json
+**/local.properties
 .DS_Store

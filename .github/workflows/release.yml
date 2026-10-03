@@ -73,6 +73,19 @@ jobs:
     runs-on: ubuntu-latest
     needs: release-info
     steps:
+      - name: Verify persistent Android signing credentials
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for name in ANDROID_KEYSTORE_BASE64 ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [[ -z "${!name}" ]]; then
+              echo "Missing repository secret: $name. Android releases must use the persistent signing key." >&2
+              exit 1
+            fi
+          done
       - name: Check out source
         uses: actions/checkout@v4
       - name: Set up Node.js
@@ -85,6 +98,12 @@ jobs:
         with:
           distribution: temurin
           java-version: "21"
+      - name: Prepare persistent Android signing key
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          printf '%s' "$ANDROID_KEYSTORE_BASE64" | base64 --decode > "$RUNNER_TEMP/timex-release.p12"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/timex-release.p12" >> "$GITHUB_ENV"
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
         with:
@@ -105,11 +124,17 @@ jobs:
         env:
           TIMEX_VERSION_CODE: ${{ github.run_number }}
           TIMEX_VERSION_NAME: ${{ needs.release-info.outputs.tag_name }}
-        run: ./gradlew --no-daemon assembleDebug "-PtimexVersionCode=$TIMEX_VERSION_CODE" "-PtimexVersionName=$TIMEX_VERSION_NAME"
+          ANDROID_KEYSTORE_PATH: ${{ runner.temp }}/timex-release.p12
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew --no-daemon assembleRelease "-PtimexVersionCode=$TIMEX_VERSION_CODE" "-PtimexVersionName=$TIMEX_VERSION_NAME"
+      - name: Verify Android APK signature
+        run: "$ANDROID_HOME/build-tools/36.0.0/apksigner verify --verbose android/app/build/outputs/apk/release/app-release.apk"
       - name: Prepare GitHub download
         run: |
           mkdir -p release-output/android
-          cp android/app/build/outputs/apk/debug/app-debug.apk release-output/android/TimeX-Android.apk
+          cp android/app/build/outputs/apk/release/app-release.apk release-output/android/TimeX-Android.apk
       - name: Upload Android download
         uses: actions/upload-artifact@v4
         with:
@@ -144,7 +169,7 @@ jobs:
             - **Windows portable:** `TimeX-Portable-x64.exe`
             - **Android app:** `TimeX-Android.apk`
 
-            The Android APK is signed with a temporary runner debug certificate. To install a newer release over an earlier one, uninstall the earlier APK first. Uninstalling also erases that installation's local app data.
+            Android releases use the persistent TimeX signing key, so future releases can be installed over the existing app while preserving local data. Versions before the first persistently signed release used a temporary debug key and require a one-time uninstall to switch signing keys; export or sync device-only data first.
 
             Windows and Android may display a warning because these direct-download builds are not distributed through their app stores.
           generate_release_notes: true

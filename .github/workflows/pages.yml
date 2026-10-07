@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - mrx16963-timex-productivity-app
+  release:
+    types:
+      - published
   workflow_dispatch:
 
 permissions:
@@ -28,6 +31,20 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Prepare the direct Android download
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          release_tag="$(gh api repos/MrX16963/TimeX/releases/latest --jq .tag_name)"
+          if [[ ! "$release_tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][[:alnum:].-]+)?$ ]]; then
+            echo "Could not determine the latest TimeX release tag." >&2
+            exit 1
+          fi
+          echo "VITE_RELEASE_TAG=$release_tag" >> "$GITHUB_ENV"
+          mkdir -p public/downloads
+          curl --fail --location --retry 3 --retry-all-errors --connect-timeout 15 --max-time 120 \
+            "https://github.com/MrX16963/TimeX/releases/download/$release_tag/TimeX-Android.apk" \
+            --output public/downloads/TimeX-Android.apk
       - name: Build website
         run: npm run build
         env:

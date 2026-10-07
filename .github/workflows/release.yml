@@ -56,11 +56,20 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci
+      - name: Set Windows app version to the release version
+        shell: pwsh
+        env:
+          TIMEX_RELEASE_TAG: ${{ needs.release-info.outputs.tag_name }}
+        run: |
+          $version = $env:TIMEX_RELEASE_TAG.TrimStart("v")
+          npm version $version --no-git-tag-version --allow-same-version
       - name: Build Windows installer and portable app
         run: npm run build:windows
         env:
           VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
           VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
+          CSC_LINK: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
+          CSC_KEY_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
       - name: Upload Windows downloads
         uses: actions/upload-artifact@v4
         with:

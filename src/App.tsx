@@ -493,7 +493,20 @@ function App() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const authCloseRef = useRef<HTMLButtonElement>(null);
   const activeUserId = useRef<string | null>(null);
+  const workspaceSyncPending = useRef(false);
+  const workspaceSyncRevision = useRef(0);
+  const skippedWorkspaceSync = useRef<string | null>(null);
+  const currentWorkspaceData = useRef(data);
+  currentWorkspaceData.current = data;
   const lastAndroidBackPress = useRef<number | null>(null);
+
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    if (url.searchParams.get("account") !== "1") return;
+    setShowAccount(true);
+    url.searchParams.delete("account");
+    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -644,6 +657,8 @@ function App() {
     }
 
     let active = true;
+    workspaceSyncPending.current = false;
+    skippedWorkspaceSync.current = null;
     setWorkspaceReady(false);
     setCloudSyncFailed(false);
 
@@ -719,6 +734,55 @@ function App() {
   }, [sessionReady, user?.id]);
 
   useEffect(() => {
+    const client = supabase;
+    if (!client || !sessionReady || !workspaceReady || !user) return;
+
+    let active = true;
+    const channel = client
+      .channel(`workspace:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "user_workspaces",
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (
+            !active ||
+            payload.eventType === "DELETE" ||
+            !payload.new ||
+            typeof payload.new.data !== "object" ||
+            payload.new.data === null
+          ) {
+            return;
+          }
+          if (workspaceSyncPending.current) return;
+
+          const remoteData = readAppData(JSON.stringify(payload.new.data));
+          if (JSON.stringify(remoteData) === JSON.stringify(currentWorkspaceData.current)) return;
+          skippedWorkspaceSync.current = JSON.stringify(remoteData);
+          currentWorkspaceData.current = remoteData;
+          setData(remoteData);
+          setCloudSyncFailed(false);
+        },
+      )
+      .subscribe((status, error) => {
+        if (!active || status === "SUBSCRIBED") return;
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+          console.error("TimeX could not receive live workspace updates.", error);
+          setCloudSyncFailed(true);
+        }
+      });
+
+    return () => {
+      active = false;
+      void client.removeChannel(channel);
+    };
+  }, [sessionReady, user?.id, workspaceReady]);
+
+  useEffect(() => {
     const handleInstallAvailable = (event: Event) => {
       event.preventDefault();
       setInstallPrompt(event as InstallPromptEvent);
@@ -762,6 +826,14 @@ function App() {
   useEffect(() => {
     const client = supabase;
     if (!sessionReady || !workspaceReady || !user || !client) return;
+    const serializedData = JSON.stringify(data);
+    if (skippedWorkspaceSync.current === serializedData) {
+      skippedWorkspaceSync.current = null;
+      return;
+    }
+    skippedWorkspaceSync.current = null;
+    workspaceSyncPending.current = true;
+    const revision = ++workspaceSyncRevision.current;
     const timer = window.setTimeout(() => {
       void client
         .from("user_workspaces")
@@ -774,6 +846,9 @@ function App() {
             console.error("TimeX could not sync the private workspace.", error);
             setCloudSyncFailed(true);
           } else {
+            if (workspaceSyncRevision.current === revision) {
+              workspaceSyncPending.current = false;
+            }
             setCloudSyncFailed(false);
           }
         });

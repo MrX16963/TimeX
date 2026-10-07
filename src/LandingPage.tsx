@@ -22,6 +22,7 @@ function isStandalone(): boolean {
 export default function LandingPage() {
   const baseUrl = import.meta.env.BASE_URL;
   const appHref = `${baseUrl}app.html`;
+  const accountHref = `${appHref}?account=1`;
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(isStandalone);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
@@ -88,7 +89,7 @@ export default function LandingPage() {
           <a href="#how-it-works">How it works</a>
           <a href="#download">Download</a>
         </nav>
-        <a className="site-header-link" href={appHref}>Open the app <span aria-hidden="true">↗</span></a>
+        <a className="site-header-link" href={accountHref}>Sign in &amp; sync <span aria-hidden="true">↗</span></a>
       </header>
 
       <main>
@@ -218,21 +219,21 @@ export default function LandingPage() {
             {installError && <p className="download-error" role="alert">Your browser could not open the install prompt. Use its menu to install TimeX instead.</p>}
           </div>
           <div className="download-options">
-            <article className="download-card">
+            <a className="download-card download-card-link" href={androidApkUrl} aria-label="Download the latest TimeX Android app">
               <span className="download-device-icon android-icon" aria-hidden="true">▯</span>
               <div><h3>{currentRelease} · Android</h3><p>APK · Install over your current version</p></div>
-              <a href={androidApkUrl} aria-label="Download the latest TimeX Android app">↓</a>
-            </article>
-            <article className="download-card">
+              <span className="download-card-cta" aria-hidden="true">↓</span>
+            </a>
+            <a className="download-card download-card-link" href={windowsInstallerUrl} aria-label="Download the latest TimeX Windows installer">
               <span className="download-device-icon" aria-hidden="true">▱</span>
               <div><h3>{currentRelease} · Windows</h3><p>Installer · Keeps your app data</p></div>
-              <a href={windowsInstallerUrl} aria-label="Download the latest TimeX Windows installer">↓</a>
-            </article>
-            <article className="download-card">
+              <span className="download-card-cta" aria-hidden="true">↓</span>
+            </a>
+            <a className="download-card download-card-link" href={windowsPortableUrl} aria-label="Download the latest portable TimeX Windows app">
               <span className="download-device-icon" aria-hidden="true">↗</span>
               <div><h3>Windows portable</h3><p>Run without installing</p></div>
-              <a href={windowsPortableUrl} aria-label="Download the latest portable TimeX Windows app">↓</a>
-            </article>
+              <span className="download-card-cta" aria-hidden="true">↓</span>
+            </a>
             <a className="release-history-link" href={releasesUrl} target="_blank" rel="noreferrer">View all versions on GitHub Releases ↗</a>
             <span className="download-footnote">Windows 64-bit · Android APK · Official GitHub releases · Free</span>
           </div>
@@ -241,7 +242,7 @@ export default function LandingPage() {
         <section className="site-privacy-note">
           <span className="privacy-mark" aria-hidden="true">⌑</span>
           <div><strong>Your day is yours.</strong><p>Use TimeX without an account and keep data on your device. Sign in to sync your private workspace; chat messages are sent to the configured AI provider.</p></div>
-          <a href={appHref}>Take a look around <span aria-hidden="true">↗</span></a>
+          <a href={accountHref}>Sign in to sync <span aria-hidden="true">↗</span></a>
         </section>
       </main>
 

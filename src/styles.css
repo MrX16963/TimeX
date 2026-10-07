@@ -4205,6 +4205,23 @@ html[dir="rtl"] .chat-send {
   backdrop-filter: blur(5px);
 }
 
+.download-card-link {
+  color: inherit;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.download-card-link:hover {
+  border-color: rgba(255, 255, 255, 0.34);
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.download-card-link:focus-visible {
+  outline: 3px solid #e7e7e7;
+  outline-offset: 3px;
+}
+
 .download-device-icon {
   display: grid;
   width: 35px;
@@ -4233,7 +4250,7 @@ html[dir="rtl"] .chat-send {
   font-size: 9px;
 }
 
-.download-card > a {
+.download-card-cta {
   display: grid;
   width: 32px;
   height: 32px;
@@ -4242,11 +4259,11 @@ html[dir="rtl"] .chat-send {
   color: var(--site-purple-deep);
   background: #fff;
   font-size: 17px;
-  cursor: pointer;
+  flex: 0 0 auto;
   transition: transform 160ms ease;
 }
 
-.download-card > a:hover {
+.download-card-link:hover .download-card-cta {
   transform: translateY(2px);
 }
 

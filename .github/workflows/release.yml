@@ -140,6 +140,17 @@ jobs:
         run: ./gradlew --no-daemon assembleRelease "-PtimexVersionCode=$TIMEX_VERSION_CODE" "-PtimexVersionName=$TIMEX_VERSION_NAME"
       - name: Verify Android APK signature
         run: "$ANDROID_HOME/build-tools/36.0.0/apksigner verify --verbose android/app/build/outputs/apk/release/app-release.apk"
+      - name: Verify Android update signing key
+        shell: bash
+        run: |
+          apk="android/app/build/outputs/apk/release/app-release.apk"
+          fingerprint="$("$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --print-certs "$apk" \
+            | awk -F': ' '/Signer #1 certificate SHA-256 digest/ { print tolower($2); exit }')"
+          expected="dd91b936612695469445b1e21c5914c805b828e824699e107639b91c35130771"
+          if [[ "$fingerprint" != "$expected" ]]; then
+            echo "APK signer changed; refusing to publish an Android update that cannot replace the installed app." >&2
+            exit 1
+          fi
       - name: Prepare GitHub download
         run: |
           mkdir -p release-output/android

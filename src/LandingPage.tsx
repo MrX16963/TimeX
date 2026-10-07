@@ -7,10 +7,12 @@ type InstallPromptEvent = Event & {
 
 const releasesBaseUrl = "https://github.com/MrX16963/TimeX/releases";
 const releasesUrl = `${releasesBaseUrl}/latest`;
-const currentRelease = "Latest release";
-const windowsInstallerUrl = `${releasesUrl}/download/TimeX-nsis-x64.exe`;
-const windowsPortableUrl = `${releasesUrl}/download/TimeX-Portable-x64.exe`;
-const androidApkUrl = `${releasesUrl}/download/TimeX-Android.apk`;
+const releaseTag = import.meta.env.VITE_RELEASE_TAG || "latest";
+const currentRelease = releaseTag === "latest" ? "Latest release" : releaseTag;
+const releaseDownloadUrl = `${releasesBaseUrl}/download/${releaseTag}`;
+const windowsInstallerUrl = `${releaseDownloadUrl}/TimeX-nsis-x64.exe`;
+const windowsPortableUrl = `${releaseDownloadUrl}/TimeX-Portable-x64.exe`;
+const androidApkUrl = `${import.meta.env.BASE_URL}downloads/TimeX-Android.apk`;
 
 function isStandalone(): boolean {
   return (
@@ -19,10 +21,21 @@ function isStandalone(): boolean {
   );
 }
 
+function getRecommendedDownload(): { href: string; label: string } | null {
+  if (/android/i.test(navigator.userAgent)) {
+    return { href: androidApkUrl, label: "Download for Android" };
+  }
+  if (/windows/i.test(navigator.userAgent) || /win/i.test(navigator.platform)) {
+    return { href: windowsInstallerUrl, label: "Download for Windows" };
+  }
+  return null;
+}
+
 export default function LandingPage() {
   const baseUrl = import.meta.env.BASE_URL;
   const appHref = `${baseUrl}app.html`;
   const accountHref = `${appHref}?account=1`;
+  const recommendedDownload = getRecommendedDownload();
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [installed, setInstalled] = useState(isStandalone);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
@@ -102,10 +115,17 @@ export default function LandingPage() {
               one small step at a time.
             </p>
             <div className="site-hero-actions">
-              <button className="site-primary-button" type="button" onClick={() => void installTimeX()}>
-                <span aria-hidden="true">{installed ? "↗" : "↓"}</span>
-                {installed ? "Open TimeX" : "Install TimeX"}
-              </button>
+              {recommendedDownload ? (
+                <a className="site-primary-button" href={recommendedDownload.href}>
+                  <span aria-hidden="true">↓</span>
+                  {recommendedDownload.label}
+                </a>
+              ) : (
+                <button className="site-primary-button" type="button" onClick={() => void installTimeX()}>
+                  <span aria-hidden="true">{installed ? "↗" : "↓"}</span>
+                  {installed ? "Open TimeX" : "Install TimeX"}
+                </button>
+              )}
               <a className="site-secondary-button" href={appHref}>Explore the app <span aria-hidden="true">↗</span></a>
             </div>
             <div className="site-platform-note">

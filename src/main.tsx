@@ -11,9 +11,12 @@ if (
   (window.location.protocol === "http:" || window.location.protocol === "https:")
 ) {
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register(`${import.meta.env.BASE_URL}sw.js`).catch((error: unknown) => {
-      console.error("TimeX could not register its offline app worker.", error);
-    });
+    void navigator.serviceWorker
+      .register(`${import.meta.env.BASE_URL}sw.js?v=3`, { updateViaCache: "none" })
+      .then((registration) => registration.update())
+      .catch((error: unknown) => {
+        console.error("TimeX could not update its offline app worker.", error);
+      });
   });
 }
 

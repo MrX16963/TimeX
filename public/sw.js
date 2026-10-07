@@ -1,4 +1,4 @@
-const CACHE_NAME = "timex-shell-v2";
+const CACHE_NAME = "timex-shell-v3";
 const BASE_PATH = new URL(".", self.registration.scope).pathname;
 const APP_PATH = `${BASE_PATH}app.html`;
 const APP_SHELL = ["", "app.html", "manifest.webmanifest", "icons/timex.svg", "icons/icon-192.png"]
@@ -28,6 +28,7 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   const url = new URL(request.url);
   if (request.method !== "GET" || url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith(`${BASE_PATH}downloads/`)) return;
 
   if (request.mode === "navigate") {
     event.respondWith(

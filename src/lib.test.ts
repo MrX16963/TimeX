@@ -207,4 +207,23 @@ describe("readAppData", () => {
       tasks: [{ ...baseTask, reminderMinutes: 10, color: "blue" }],
     })).tasks).toEqual([]);
   });
+
+  it("preserves safe research summaries and HTTPS citations on saved plans", () => {
+    const savedPlan = {
+      id: "plan-1",
+      goal: "Learn study skills",
+      steps: ["Read about study techniques"],
+      createdAt: 1,
+      researchSummary: "Study skills research summary.",
+      sources: [{ title: "Study skills", url: "https://en.wikipedia.org/?curid=42" }],
+    };
+    const data = readAppData(JSON.stringify({ ...DEFAULT_DATA, plans: [savedPlan] }));
+    expect(data.plans).toEqual([savedPlan]);
+
+    const unsafe = readAppData(JSON.stringify({
+      ...DEFAULT_DATA,
+      plans: [{ ...savedPlan, sources: [{ title: "Unsafe", url: "javascript:alert(1)" }] }],
+    }));
+    expect(unsafe.plans).toEqual([]);
+  });
 });

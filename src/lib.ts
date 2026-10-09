@@ -28,6 +28,8 @@ export type Plan = {
   goal: string;
   steps: string[];
   createdAt: number;
+  researchSummary?: string;
+  sources?: Array<{ title: string; url: string }>;
 };
 
 export type AppData = {
@@ -288,6 +290,16 @@ function isPlan(value: unknown): value is Plan {
     typeof plan.goal === "string" &&
     Array.isArray(plan.steps) &&
     plan.steps.every((step) => typeof step === "string") &&
+    (plan.researchSummary === undefined || typeof plan.researchSummary === "string") &&
+    (plan.sources === undefined ||
+      (Array.isArray(plan.sources) &&
+        plan.sources.every(
+          (source) =>
+            source &&
+            typeof source.title === "string" &&
+            typeof source.url === "string" &&
+            source.url.startsWith("https://"),
+        ))) &&
     typeof plan.createdAt === "number" &&
     Number.isFinite(plan.createdAt)
   );

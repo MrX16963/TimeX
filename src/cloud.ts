@@ -12,7 +12,13 @@ export type ChatMessage = {
 
 export type AssistantAction =
   | { type: "note"; title: string; body: string }
-  | { type: "plan"; goal: string; steps: string[] }
+  | {
+      type: "plan";
+      goal: string;
+      steps: string[];
+      researchSummary?: string;
+      sources?: Array<{ title: string; url: string }>;
+    }
   | { type: "task"; title: string; important?: boolean; urgent?: boolean };
 
 export type AssistantResponse = {

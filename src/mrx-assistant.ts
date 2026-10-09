@@ -1,21 +1,27 @@
-import { buildPlanSteps, type Language, type Task } from "./lib";
+import { buildPlanSteps, type Language, type Plan, type Task } from "./lib";
 import type { AssistantAction } from "./cloud";
+import type { ChatMode } from "./assistant-conversations";
 
 export type MrXResponse = {
   reply: string;
   actions: AssistantAction[];
+  sources?: Array<{ title: string; url: string }>;
 };
 
 type MrXContext = {
   tasks: Task[];
+  plans?: Plan[];
   userName?: string;
+  researchUnavailable?: boolean;
+  history?: Array<{ role: "user" | "assistant"; content: string }>;
 };
 
-export function respondAsMrX(
+export async function respondAsMrX(
   input: string,
   language: Language,
   context: MrXContext,
-): MrXResponse {
+  mode: ChatMode = "chat",
+): Promise<MrXResponse> {
   const message = input.trim();
   if (!message) return { reply: greeting(language, context.userName), actions: [] };
 
@@ -48,16 +54,24 @@ export function respondAsMrX(
   const goal = getRequestedGoal(message, language);
   if (goal) {
     const steps = buildPlanSteps(goal, language);
+    const localModeNotice = mode === "advanced-plan" || context.researchUnavailable
+      ? language === "ar"
+        ? "لم يتوفر بحث Google الآن، لذلك أنشأت الخطة محليًا دون مصادر ويب."
+        : "Google Search isn't available right now, so I created this plan offline without web sources."
+      : "";
     return language === "ar"
       ? {
-          reply: `أنشأت خطة «${goal}» من خمس خطوات عملية، وحفظتها وأضفت خطواتها إلى مهامك. ابدأ بأول خطوة، ويمكنك تعديلها أو ترتيب أولويتها.`,
+          reply: `${localModeNotice ? `${localModeNotice} ` : ""}أنشأت خطة «${goal}» من خمس خطوات عملية، وحفظتها وأضفت خطواتها إلى مهامك. ابدأ بأول خطوة، ويمكنك تعديلها أو ترتيب أولويتها.`,
           actions: [{ type: "plan", goal, steps }],
         }
       : {
-          reply: `I made a practical five-step plan for “${goal}”, saved it, and added its steps to your tasks. Start with the first step; you can edit or reprioritize it anytime.`,
+          reply: `${localModeNotice ? `${localModeNotice} ` : ""}I made a practical five-step plan for “${goal}”, saved it, and added its steps to your tasks. Start with the first step; you can edit or reprioritize it anytime.`,
           actions: [{ type: "plan", goal, steps }],
         };
   }
+
+  const planFollowUp = respondToPlanFollowUp(message, language, context.plans ?? []);
+  if (planFollowUp) return planFollowUp;
 
   if (/مرتبك|مضغوط|غارق|كثير|لا أعرف من أين أبدأ|مو قادر أبدأ|ما عم لحق|محتار|overwhelm|too much|stressed|can't focus|cannot focus/i.test(message)) {
     return overwhelmedGuidance(language, context.tasks);
@@ -67,13 +81,105 @@ export function respondAsMrX(
     return taskGuidance(language, context.tasks);
   }
 
+  if (isResearchRequest(message)) {
+    return {
+      reply: language === "ar"
+        ? "البحث في Google يحتاج اتصالًا بخدمة Gemini. سجّل الدخول بعد إعداد الخدمة، أو أخبرني بالموضوع لأساعدك محليًا دون بحث ويب."
+        : "Google Search needs the connected Gemini service. Sign in after it's configured, or tell me the topic and I'll help offline without web search.",
+      actions: [],
+    };
+  }
+
+  return conversationalReply(message, language, context);
+}
+
+export function isResearchRequest(message: string): boolean {
+  return /ابحث|بحث|دور على|دوّر على|على الانترنت|على الإنترنت|مصادر|مصدر|رابط|آخر الأخبار|اخر الاخبار|السعر الحالي|حاليًا|حالياً|google|search|look up|find sources|current|latest|news|weather|price today|source|sources/i.test(message);
+}
+
+function respondToPlanFollowUp(
+  message: string,
+  language: Language,
+  plans: Plan[],
+): MrXResponse | null {
+  const plan = plans[0];
+  if (!plan || !/خطو|task|step|plan|خطة|تفصيل|ابدأ|first|next|أبدأ|الأولى|الاولى|الثانية|الثاني|الثالثة|الثالث|الرابعة|الرابع|الخامسة|الخامس/i.test(message)) {
+    return null;
+  }
+  const ordinal = message.match(/(?:ال)?(الأول|الاول|الأولى|الاولى|الثاني|الثانية|الثالث|الثالثة|الرابع|الرابعة|الخامس|الخامسة)|\b(first|second|third|fourth|fifth)\b/i);
+  const indexByOrdinal: Record<string, number> = {
+    الأول: 0, الاول: 0, الأولى: 0, الاولى: 0, الثاني: 1, الثانية: 1, الثالث: 2,
+    الثالثة: 2, الرابع: 3, الرابعة: 3, الخامس: 4, الخامسة: 4,
+    first: 0, second: 1, third: 2, fourth: 3, fifth: 4,
+  };
+  const selectedIndex = ordinal?.[1] ?? ordinal?.[2];
+  const index = selectedIndex ? indexByOrdinal[selectedIndex.toLowerCase()] : undefined;
+  const selectedStep = index === undefined
+    ? undefined
+    : { number: index + 1, text: plan.steps[index] };
+  if (language === "ar") {
+    return {
+      reply: selectedStep?.text
+        ? `في خطة «${plan.goal}»، الخطوة ${selectedStep.number} هي: «${selectedStep.text}». ابدأ بها بجلسة قصيرة، وإذا أخبرتني بما أنجزته أساعدك في اختيار الخطوة التالية.`
+        : `خطتك «${plan.goal}» فيها ${plan.steps.length} خطوات: ${plan.steps.map((item, itemIndex) => `${itemIndex + 1}. ${item}`).join("؛ ")}. أي خطوة تريد أن نفصّلها أو نعدّلها؟`,
+      actions: [],
+      ...(plan.sources?.length ? { sources: plan.sources } : {}),
+    };
+  }
+  return {
+    reply: selectedStep?.text
+      ? `In your “${plan.goal}” plan, step ${selectedStep.number} is: “${selectedStep.text}”. Try a short focus session, then tell me what you finish and I’ll help choose what comes next.`
+      : `Your “${plan.goal}” plan has ${plan.steps.length} steps: ${plan.steps.map((item, itemIndex) => `${itemIndex + 1}. ${item}`).join("; ")}. Which step would you like to refine?`,
+    actions: [],
+    ...(plan.sources?.length ? { sources: plan.sources } : {}),
+  };
+}
+
+function conversationalReply(
+  message: string,
+  language: Language,
+  context: MrXContext,
+): MrXResponse {
+  if (/^(hi|hello|hey|مرحبا|مرحبًا|أهلًا|اهلا|السلام عليكم)[!؟?.\s]*$/iu.test(message)) {
+    return { reply: greeting(language, context.userName), actions: [] };
+  }
+  if (/^(thanks|thank you|شكرا|شكرًا|يسلمو|مشكور)[!؟?.\s]*$/iu.test(message)) {
+    return {
+      reply: language === "ar"
+        ? "العفو! كيف أقدر أساعدك بعد؟ فيني أبحث عن موضوع يخص هدفك، أشرح خطوة من خطتك، أو أساعدك بترتيب أولوياتك."
+        : "You're welcome! What would help next? I can research a goal, walk through a plan step, or help prioritize your tasks.",
+      actions: [],
+    };
+  }
+  if (/اشرح|فصّل|وضح|ماذا تقصد|كيف أبدأ|كيف ابدأ|tell me more|explain|what do you mean|how do i start/i.test(message)) {
+    const lastAssistantReply = [...(context.history ?? [])]
+      .reverse()
+      .find((item) => item.role === "assistant")?.content;
+    if (lastAssistantReply) {
+      const conciseReply = lastAssistantReply.slice(0, 220).replace(/\s+\S*$/, "");
+      return {
+        reply: language === "ar"
+          ? `أكيد. كنا نحكي عن: «${conciseReply}». أي جزء تحب أوضحه أكثر؟`
+          : `Of course. We were discussing: “${conciseReply}”. Which part would you like me to unpack?`,
+        actions: [],
+      };
+    }
+  }
+  if (/^(كيف|شو|ماذا|هل|لماذا|ليش|ساعدني|tell me|how|what|can you|could you|why|help me)/iu.test(message)) {
+    return {
+      reply: language === "ar"
+        ? `أكيد، خلّينا نفكر فيها سوا. عن أي جانب من «${message.slice(0, 100)}» تريد أن نبدأ؟ أقدر أبحث عن معلومات للموضوع، وأحوّل هدفك لخطة، وأساعدك خطوة بخطوة.`
+        : `Let's work through it together. Which part of “${message.slice(0, 100)}” should we start with? I can research the topic, turn a goal into a plan, and help you take it one step at a time.`,
+      actions: [],
+    };
+  }
   return language === "ar"
     ? {
-        reply: `أنا MrX، مساعد تخطيط يعمل على جهازك دون تنزيل نموذج. أساعدك في إنشاء خطة بخطوات عملية وإضافتها إلى مهامك، وترتيب أولويات اليوم، وإضافة مهمة أو حفظ ملاحظة. جرّب: «أريد الاستعداد للامتحان» أو «ما أولوياتي اليوم؟»`,
+        reply: `فهمت عليك: «${message.slice(0, 160)}». شو النتيجة اللي تتمنى توصل لها؟ فيني أبحث عن الموضوع إذا بدك خطة، أقسمه لخطوات، أو نبدأ بأصغر خطوة ممكنة.`,
         actions: [],
       }
     : {
-        reply: `I'm MrX, an on-device planning helper that needs no model download. I can create a practical step-by-step plan and add it to your tasks, help prioritize today, add a task, or save a note. Try “I want to prepare for my exam” or “What should I do first?”`,
+        reply: `I hear you: “${message.slice(0, 160)}”. What outcome are you hoping for? I can research the topic for a plan, break it into steps, or help find one small place to start.`,
         actions: [],
       };
 }

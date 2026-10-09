@@ -494,6 +494,10 @@ button:disabled {
   gap: 9px;
 }
 
+.desktop-only {
+  white-space: nowrap;
+}
+
 .subtle-button,
 .language-button {
   min-height: 37px;
@@ -2823,6 +2827,11 @@ html[dir="rtl"] .chat-send {
     min-height: 34px;
     padding-inline: 9px;
     font-size: 10px;
+    white-space: nowrap;
+  }
+
+  .desktop-only {
+    display: none;
   }
 
   .install-button {

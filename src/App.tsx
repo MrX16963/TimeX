@@ -428,6 +428,15 @@ function getDisplayName(user: User | null): string {
     : user.email?.split("@")[0] || "";
 }
 
+function detectMessageLanguage(message: string, fallback: Language): Language {
+  const trimmed = message.trim();
+  if (!trimmed) return fallback;
+  const arabicCount = (trimmed.match(/[\u0600-\u06FF]/g) ?? []).length;
+  const latinCount = (trimmed.match(/[A-Za-z]/g) ?? []).length;
+  if (arabicCount === latinCount) return fallback;
+  return arabicCount > latinCount ? "ar" : "en";
+}
+
 function App() {
   const [data, setData] = useState<AppData>(loadData);
   const [showThemePicker, setShowThemePicker] = useState(false);
@@ -1243,6 +1252,7 @@ function App() {
     event.preventDefault();
     const content = chatInput.trim();
     if (!content || chatPending) return;
+    const responseLanguage = detectMessageLanguage(content, lang);
 
     const userMessage: ChatMessage = {
       id: createLocalId(),
@@ -1271,7 +1281,7 @@ function App() {
                   role,
                   content: text,
                 })),
-                language: lang,
+                language: responseLanguage,
                 userName,
                 tasks: data.tasks
                   .filter((task) => !task.completed)
@@ -1312,7 +1322,7 @@ function App() {
       }
 
       if (!response && !localResponse) {
-        localResponse = respondAsMrX(content, lang, { tasks: data.tasks, userName });
+        localResponse = respondAsMrX(content, responseLanguage, { tasks: data.tasks, userName });
       }
       const assistantMessage: ChatMessage = {
         id: createLocalId(),

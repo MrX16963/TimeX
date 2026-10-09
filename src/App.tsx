@@ -160,6 +160,10 @@ const englishCopy = {
     installAndroid: "On Android, open the browser menu and choose “Install app” or “Add to Home screen.”",
     installApple: "On iPhone or iPad, open this page in Safari, tap Share, then choose “Add to Home Screen.”",
     installFailed: "The browser could not start installation. Try the install option in its menu instead.",
+    settings: "Settings",
+    settingsTitle: "Personalize TimeX",
+    assistantPlans: "My plans",
+    privacy: "Privacy",
     account: "Account",
     signIn: "Sign in",
     signOut: "Sign out",
@@ -329,6 +333,10 @@ const arabicCopy = {
     installAndroid: "على أندرويد، افتح قائمة المتصفح واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».",
     installApple: "على iPhone أو iPad، افتح الصفحة في Safari، واضغط «مشاركة»، ثم «إضافة إلى الشاشة الرئيسية».",
     installFailed: "تعذّر بدء التثبيت. جرّب خيار التثبيت من قائمة المتصفح.",
+    settings: "الإعدادات",
+    settingsTitle: "خصّص TimeX",
+    assistantPlans: "خططي",
+    privacy: "الخصوصية",
     account: "الحساب",
     signIn: "تسجيل الدخول",
     signOut: "تسجيل الخروج",
@@ -387,7 +395,7 @@ const copy = {
 } satisfies Record<Language, Record<string, string>>;
 
 type CopyKey = keyof typeof copy.en;
-type Page = "today" | "calendar" | "matrix" | "notes" | "planner" | "assistant";
+type Page = "today" | "calendar" | "matrix" | "notes" | "assistant";
 type AuthMode = "sign-in" | "sign-up";
 
 type InstallPromptEvent = Event & {
@@ -468,7 +476,8 @@ function getDisplayName(user: User | null): string {
 
 function App() {
   const [data, setData] = useState<AppData>(loadData);
-  const [showThemePicker, setShowThemePicker] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [assistantView, setAssistantView] = useState<"chat" | "plans">("chat");
   const [calendarDate, setCalendarDate] = useState(() => getLocalDateKey(new Date()));
   const [calendarTaskTitle, setCalendarTaskTitle] = useState("");
   const [calendarStartTime, setCalendarStartTime] = useState("09:00");
@@ -519,8 +528,8 @@ function App() {
   );
   const [showInstallHelp, setShowInstallHelp] = useState(false);
   const installCloseRef = useRef<HTMLButtonElement>(null);
-  const themeButtonRef = useRef<HTMLButtonElement>(null);
-  const themePickerRef = useRef<HTMLElement>(null);
+  const settingsButtonRef = useRef<HTMLButtonElement>(null);
+  const settingsCloseRef = useRef<HTMLButtonElement>(null);
   const lang = data.language;
   const isArabic = lang === "ar";
   const t = (key: CopyKey) => copy[lang][key];
@@ -559,6 +568,11 @@ function App() {
   useEffect(() => {
     if (Capacitor.getPlatform() !== "android") return;
     const listener = NativeApp.addListener("backButton", () => {
+      if (showSettings) {
+        setShowSettings(false);
+        lastAndroidBackPress.current = null;
+        return;
+      }
       if (showAccount) {
         setShowAccount(false);
         lastAndroidBackPress.current = null;
@@ -581,31 +595,20 @@ function App() {
     return () => {
       void listener.then((subscription) => subscription.remove());
     };
-  }, [lang, page, showAccount, showInstallHelp]);
+  }, [lang, page, showAccount, showInstallHelp, showSettings]);
 
   useEffect(() => {
-    if (!showThemePicker) return;
+    if (!showSettings) return;
+    settingsCloseRef.current?.focus();
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== "Escape") return;
-      setShowThemePicker(false);
-      themeButtonRef.current?.focus();
-    };
-    const closeOnOutsideClick = (event: PointerEvent) => {
-      if (!(event.target instanceof Node)) return;
-      if (
-        !themePickerRef.current?.contains(event.target) &&
-        !themeButtonRef.current?.contains(event.target)
-      ) {
-        setShowThemePicker(false);
+      if (event.key === "Escape") {
+        setShowSettings(false);
+        settingsButtonRef.current?.focus();
       }
     };
     window.addEventListener("keydown", closeOnEscape);
-    window.addEventListener("pointerdown", closeOnOutsideClick);
-    return () => {
-      window.removeEventListener("keydown", closeOnEscape);
-      window.removeEventListener("pointerdown", closeOnOutsideClick);
-    };
-  }, [showThemePicker]);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [showSettings]);
 
   useEffect(() => {
     const client = supabase;
@@ -1642,7 +1645,6 @@ function App() {
     { id: "today", icon: "⌂", label: "today" },
     { id: "calendar", icon: "◷", label: "calendar" },
     { id: "matrix", icon: "▦", label: "matrix" },
-    { id: "planner", icon: "✳", label: "planner" },
     { id: "notes", icon: "▤", label: "notes" },
     { id: "assistant", icon: "☷", label: "assistantTab" },
   ];
@@ -1749,108 +1751,16 @@ function App() {
           </div>
           <div className="topbar-actions">
             <button
-              className="subtle-button account-button"
+              ref={settingsButtonRef}
+              className="settings-button"
               type="button"
-              aria-label={user ? `${t("account")}: ${userName || user.email}` : t("signIn")}
-              onClick={() => {
-                setAuthError("");
-                setAuthNotice("");
-                setShowAccount(true);
-              }}
+              aria-label={t("settings")}
+              title={t("settings")}
+              aria-haspopup="dialog"
+              aria-expanded={showSettings}
+              onClick={() => setShowSettings(true)}
             >
-              <span aria-hidden="true">{user ? "●" : "♙"}</span>
-              <span className="desktop-only">{userName || t("signIn")}</span>
-            </button>
-            <div className="theme-control">
-              <button
-                ref={themeButtonRef}
-                className="subtle-button theme-button"
-                type="button"
-                onClick={() => setShowThemePicker((visible) => !visible)}
-                aria-label={t("themeSelection")}
-                aria-haspopup="true"
-                aria-expanded={showThemePicker}
-                aria-controls="theme-picker"
-                title={t("themeSelection")}
-              >
-                <span aria-hidden="true">◐</span>
-                <span className="desktop-only">{t(themeKey(data.theme))}</span>
-              </button>
-              {showThemePicker && (
-                <section
-                  ref={themePickerRef}
-                  className="theme-picker"
-                  id="theme-picker"
-                  role="group"
-                  aria-label={t("themeSelection")}
-                >
-                  <p className="theme-picker-heading">{t("themeSelection")}</p>
-                  <div className="theme-options">
-                    {themeOrder.map((theme) => (
-                      <button
-                        className={`theme-option${data.theme === theme ? " selected" : ""}`}
-                        key={theme}
-                        type="button"
-                        aria-pressed={data.theme === theme}
-                        onClick={() => setData((current) => ({ ...current, theme }))}
-                      >
-                        <span className={`theme-swatch theme-swatch-${theme}`} aria-hidden="true" />
-                        <span>{t(themeKey(theme))}</span>
-                        {data.theme === theme && <span className="theme-option-check" aria-hidden="true">✓</span>}
-                      </button>
-                    ))}
-                  </div>
-                  <label className="theme-custom-picker">
-                    <span className="theme-custom-label">
-                      <span
-                        className="theme-swatch theme-swatch-custom"
-                        style={{ backgroundColor: data.accentColor }}
-                        aria-hidden="true"
-                      />
-                      <span>{t("themeCustomColor")}</span>
-                    </span>
-                    <input
-                      type="color"
-                      value={data.accentColor}
-                      aria-label={t("themeCustomColor")}
-                      onChange={(event) =>
-                        setData((current) => ({
-                          ...current,
-                          theme: "custom",
-                          accentColor: event.target.value,
-                        }))
-                      }
-                    />
-                  </label>
-                  <p className="theme-picker-hint">{t("themePaletteHint")}</p>
-                </section>
-              )}
-            </div>
-            {!appInstalled && (
-              <button
-                className="subtle-button install-button"
-                type="button"
-                onClick={() => void installApp()}
-                aria-label={t("installApp")}
-                title={t("installApp")}
-              >
-                <span aria-hidden="true">⇩</span>
-                <span className="desktop-only">{t("installApp")}</span>
-              </button>
-            )}
-            <button
-              className="language-button"
-              type="button"
-              aria-label={`${t("language")}: ${t("switchLanguage")}`}
-              onClick={() =>
-                setData((current) => ({
-                  ...current,
-                  language: current.language === "ar" ? "en" : "ar",
-                }))
-              }
-            >
-              <span aria-hidden="true">文</span>
-              <span>{t("switchLanguage")}</span>
+              <span aria-hidden="true">⚙</span>
             </button>
           </div>
         </header>
@@ -2461,14 +2371,33 @@ function App() {
             </section>
           )}
 
-          {page === "planner" && (
-            <section className="content-page planner-page">
+          {page === "assistant" && assistantView === "plans" && (
+            <section className="content-page assistant-page">
               <div className="page-heading">
                 <div>
-                  <span className="eyebrow">{t("planner")}</span>
-                  <h1>{t("plannerIntro")}</h1>
+                  <span className="eyebrow">{t("assistantChat")}</span>
+                  <h1>{t("assistantPlans")}</h1>
+                  <p>{t("plannerIntro")}</p>
                 </div>
               </div>
+              <div className="assistant-view-switch" role="group" aria-label={t("assistantChat")}>
+                <button
+                  type="button"
+                  aria-pressed={false}
+                  onClick={() => setAssistantView("chat")}
+                >
+                  {t("assistantTab")}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={true}
+                  className="active"
+                  onClick={() => setAssistantView("plans")}
+                >
+                  {t("assistantPlans")}
+                </button>
+              </div>
+              <div className="assistant-view-panel">
               <div className="planner-layout">
                 <section className="panel planner-panel">
                   <div className="planner-icon" aria-hidden="true">✳</div>
@@ -2551,10 +2480,11 @@ function App() {
                   )}
                 </section>
               </div>
+              </div>
             </section>
           )}
 
-          {page === "assistant" && (
+          {page === "assistant" && assistantView === "chat" && (
             <section className="content-page assistant-page">
               <div className="page-heading">
                 <div>
@@ -2568,6 +2498,25 @@ function App() {
                   </span>
                 )}
               </div>
+              <div className="assistant-view-switch" role="group" aria-label={t("assistantChat")}>
+                <button
+                  type="button"
+                  aria-pressed={true}
+                  className="active"
+                  onClick={() => setAssistantView("chat")}
+                >
+                  {t("assistantTab")}
+                </button>
+                <button
+                  type="button"
+                  aria-pressed={false}
+                  onClick={() => setAssistantView("plans")}
+                >
+                  {t("assistantPlans")}
+                  {data.plans.length > 0 && <span>{data.plans.length}</span>}
+                </button>
+              </div>
+              <div className="assistant-view-panel">
               <div className="assistant-conversation-toolbar">
                 <button className="primary-button" type="button" onClick={startNewConversation}>
                   <span aria-hidden="true">＋</span>{t("newConversation")}
@@ -2630,22 +2579,16 @@ function App() {
                   <span className="chat-avatar" aria-hidden="true">✳</span>
                   <div>
                     <h2>{t("assistantChat")}</h2>
-                    <p>{user ? user.email : t("localAssistantLabel")}</p>
+                    <p>{t(chatMode === "advanced-plan" ? "advancedPlanMode" : chatMode === "plan" ? "planMode" : "chatMode")}</p>
                   </div>
                   <span className={`chat-connection${supabase && user ? " connected" : ""}`}>
                     {supabase && user ? t("cloudWorkspace") : t("localAssistantLabel")}
                   </span>
                 </div>
-                <div className="chat-privacy">
-                  <span aria-hidden="true">⌑</span>
+                <details className="chat-privacy">
+                  <summary><span aria-hidden="true">ⓘ</span>{t("privacy")}</summary>
                   <p>{t("assistantPrivacy")}</p>
-                </div>
-                <div className="assistant-local-mode">
-                  <div className="assistant-local-mode-copy">
-                    <strong>MrX · {t("assistantTab")}</strong>
-                    <span>{t("mrxLocalMode")}</span>
-                  </div>
-                </div>
+                </details>
                 <div className="chat-transcript" aria-live="polite">
                   {chatMessages.length === 0 && (
                     <article className="chat-message assistant-message">
@@ -2724,6 +2667,7 @@ function App() {
                 </form>
                 </section>
               </div>
+              </div>
             </section>
           )}
             </>
@@ -2746,6 +2690,120 @@ function App() {
           </button>
         ))}
       </nav>
+
+      {showSettings && (
+        <div
+          className="install-modal-backdrop"
+          onClick={(event) => {
+            if (event.target === event.currentTarget) setShowSettings(false);
+          }}
+        >
+          <section
+            className="install-modal settings-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="settings-modal-title"
+          >
+            <button
+              ref={settingsCloseRef}
+              className="icon-button install-modal-close"
+              type="button"
+              aria-label={t("close")}
+              onClick={() => setShowSettings(false)}
+            >
+              ×
+            </button>
+            <span className="install-modal-icon settings-modal-icon" aria-hidden="true">⚙</span>
+            <h2 id="settings-modal-title">{t("settingsTitle")}</h2>
+            <section className="settings-group" aria-labelledby="settings-appearance-title">
+              <h3 id="settings-appearance-title">{t("themeSelection")}</h3>
+              <div className="theme-options">
+                {themeOrder.map((theme) => (
+                  <button
+                    className={`theme-option${data.theme === theme ? " selected" : ""}`}
+                    key={theme}
+                    type="button"
+                    aria-pressed={data.theme === theme}
+                    onClick={() => setData((current) => ({ ...current, theme }))}
+                  >
+                    <span className={`theme-swatch theme-swatch-${theme}`} aria-hidden="true" />
+                    <span>{t(themeKey(theme))}</span>
+                    {data.theme === theme && <span className="theme-option-check" aria-hidden="true">✓</span>}
+                  </button>
+                ))}
+              </div>
+              <label className="theme-custom-picker">
+                <span className="theme-custom-label">
+                  <span
+                    className="theme-swatch theme-swatch-custom"
+                    style={{ backgroundColor: data.accentColor }}
+                    aria-hidden="true"
+                  />
+                  <span>{t("themeCustomColor")}</span>
+                </span>
+                <input
+                  type="color"
+                  value={data.accentColor}
+                  aria-label={t("themeCustomColor")}
+                  onChange={(event) =>
+                    setData((current) => ({
+                      ...current,
+                      theme: "custom",
+                      accentColor: event.target.value,
+                    }))
+                  }
+                />
+              </label>
+              <p className="theme-picker-hint">{t("themePaletteHint")}</p>
+            </section>
+            <section className="settings-group" aria-labelledby="settings-preferences-title">
+              <h3 id="settings-preferences-title">{t("settings")}</h3>
+              <button
+                className="settings-action"
+                type="button"
+                onClick={() =>
+                  setData((current) => ({
+                    ...current,
+                    language: current.language === "ar" ? "en" : "ar",
+                  }))
+                }
+              >
+                <span aria-hidden="true">文</span>
+                <span>{t("language")}</span>
+                <strong>{t("switchLanguage")}</strong>
+              </button>
+              <button
+                className="settings-action"
+                type="button"
+                onClick={() => {
+                  setShowSettings(false);
+                  setAuthError("");
+                  setAuthNotice("");
+                  setShowAccount(true);
+                }}
+              >
+                <span aria-hidden="true">♙</span>
+                <span>{t("account")}</span>
+                <strong>{user ? userName || user.email : t("signIn")}</strong>
+              </button>
+              {!appInstalled && (
+                <button
+                  className="settings-action"
+                  type="button"
+                  onClick={() => {
+                    setShowSettings(false);
+                    void installApp();
+                  }}
+                >
+                  <span aria-hidden="true">⇩</span>
+                  <span>{t("installApp")}</span>
+                  <strong aria-hidden="true">›</strong>
+                </button>
+              )}
+            </section>
+          </section>
+        </div>
+      )}
 
       {showInstallHelp && (
         <div

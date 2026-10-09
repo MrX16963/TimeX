@@ -6,7 +6,6 @@ import type { User } from "@supabase/supabase-js";
 import {
   cloudConfigurationMissing,
   createLocalId,
-  readChatMessages,
   supabase,
   type AssistantAction,
   type AssistantResponse,
@@ -32,7 +31,16 @@ import {
   scheduleBrowserReminders,
   syncNativeReminders,
 } from "./reminders";
-import { respondAsMrX } from "./mrx-assistant";
+import { isResearchRequest, respondAsMrX } from "./mrx-assistant";
+import {
+  createConversation,
+  createConversationStore,
+  saveConversationMessages,
+  isChatMode,
+  type AssistantConversation,
+  type ChatMode,
+  type ConversationStore,
+} from "./assistant-conversations";
 import { isDoubleBackPress } from "./back-navigation";
 
 const englishCopy = {
@@ -117,7 +125,9 @@ const englishCopy = {
     goalLabel: "What would you like to make progress on?",
     goalPlaceholder: "e.g. Prepare for my certification exam",
     makePlan: "Build my plan",
-    assistantNote: "MrX can turn a goal into a practical first-step plan locally. The built-in helper uses planning rules, not a trained language model.",
+    assistantNote: "MrX's offline plan builder turns a goal into small, actionable steps.",
+    plannerResearching: "Creating plan…",
+    planResearchLabel: "Research notes",
     planSteps: "A gentle place to start",
     addPlanTasks: "Add steps to my tasks",
     planAdded: "Steps added to your task list.",
@@ -171,11 +181,22 @@ const englishCopy = {
     assistantTab: "Assistant",
     assistantChatSub: "MrX helps turn goals into plans, tasks, and notes.",
     localAssistantLabel: "Offline mode",
+    newConversation: "New chat",
+    conversationHistory: "Chat history",
+    assistantMode: "Assistant mode",
+    emptyConversationHistory: "Your saved conversations will appear here.",
+    deleteConversation: "Delete conversation",
+    chatMode: "Conversation",
+    planMode: "Plan mode",
+    advancedPlanMode: "Advanced plan mode",
+    chatModeHint: "Ask, reflect, or request a web search.",
+    planModeHint: "Create and refine plans offline without web search.",
+    advancedPlanModeHint: "Research with Google Search and create cited plans.",
     assistantChatPlaceholder: "What would you like to talk through?",
     sendMessage: "Send message",
     signInForChat: "Sign in to sync your chat and use connected AI. MrX's built-in planner also works without an account.",
     configureForChat: "MrX's built-in planner works without an API key. Sign-in, cloud sync, and connected AI require Supabase setup.",
-    mrxLocalMode: "MrX keeps a lightweight offline planner for quick goals, priorities, tasks, and notes. Connected AI is available when you sign in and the service is configured.",
+    mrxLocalMode: "Chat and Plan mode work offline. Choose Advanced Plan mode or ask MrX to search Google for current information and cited sources.",
     assistantLocalFallback: "The connected AI service is unavailable, so MrX's built-in offline planner replied instead.",
     assistantSources: "Sources",
     pressAgainToExit: "Press back again to exit TimeX.",
@@ -188,7 +209,7 @@ const englishCopy = {
     loadingWorkspace: "Loading your private workspace…",
     authenticationRequired: "Create an account or sign in to sync your own workspace across devices.",
     signInSuccessful: "Welcome back.",
-    assistantPrivacy: "The offline planner runs on this device. If you sign in and OpenRouter is configured, your message and open tasks are sent to OpenRouter; web-search requests may include cited links.",
+    assistantPrivacy: "Regular chat and Plan mode run on this device. Google searches and Advanced Plan mode send your request to Gemini when the service is configured; cited source links are shown with the reply.",
 };
 
 const arabicCopy = {
@@ -273,7 +294,9 @@ const arabicCopy = {
     goalLabel: "ما الهدف الذي ترغب في التقدّم نحوه؟",
     goalPlaceholder: "مثال: الاستعداد لاختبار الشهادة المهنية",
     makePlan: "أنشئ خطتي",
-    assistantNote: "يساعدك MrX محليًا في تحويل الهدف إلى خطوات أولية عملية. يعتمد المساعد المدمج على قواعد تخطيط، وليس نموذجًا لغويًا مدرّبًا.",
+    assistantNote: "ينشئ مخطّط MrX دون اتصال خطة عملية ويقسّم الهدف إلى خطوات صغيرة قابلة للتنفيذ.",
+    plannerResearching: "جارٍ إنشاء الخطة…",
+    planResearchLabel: "معلومات البحث",
     planSteps: "خطوة هادئة للبدء",
     addPlanTasks: "أضف الخطوات إلى مهامي",
     planAdded: "أُضيفت الخطوات إلى مهامك.",
@@ -327,11 +350,22 @@ const arabicCopy = {
     assistantTab: "المساعد",
     assistantChatSub: "يساعدك MrX في تحويل الأهداف إلى خطط ومهام وملاحظات.",
     localAssistantLabel: "وضع دون اتصال",
+    newConversation: "محادثة جديدة",
+    conversationHistory: "سجل المحادثات",
+    assistantMode: "نمط المساعد",
+    emptyConversationHistory: "ستظهر محادثاتك المحفوظة هنا.",
+    deleteConversation: "حذف المحادثة",
+    chatMode: "محادثة",
+    planMode: "نمط الخطة",
+    advancedPlanMode: "نمط الخطة المتقدمة",
+    chatModeHint: "اسأل أو ناقش موضوعًا أو اطلب البحث على الويب.",
+    planModeHint: "أنشئ الخطط ونقّحها محليًا دون بحث ويب.",
+    advancedPlanModeHint: "ابحث عبر Google وأنشئ خططًا مدعومة بمصادر.",
     assistantChatPlaceholder: "ما الموضوع الذي ترغب في مناقشته؟",
     sendMessage: "إرسال الرسالة",
     signInForChat: "سجّل الدخول لمزامنة محادثتك واستخدام الذكاء الاصطناعي المتصل. ويعمل مخطّط MrX المدمج دون حساب أيضًا.",
     configureForChat: "يعمل مخطّط MrX المدمج دون مفتاح API. يتطلب تسجيل الدخول والمزامنة والذكاء الاصطناعي المتصل إعداد Supabase.",
-    mrxLocalMode: "يحتفظ MrX بمخطّط خفيف يعمل دون اتصال للأهداف والأولويات والمهام والملاحظات. يتاح الذكاء الاصطناعي المتصل عند تسجيل الدخول وإعداد الخدمة.",
+    mrxLocalMode: "تعمل المحادثة ونمط الخطة دون اتصال. اختر نمط الخطة المتقدمة أو اطلب من MrX البحث في Google عن أحدث المعلومات والمصادر.",
     assistantLocalFallback: "خدمة الذكاء الاصطناعي المتصلة غير متاحة، لذا أجابك مخطّط MrX المحلي المدمج.",
     assistantSources: "المصادر",
     pressAgainToExit: "اضغط زر الرجوع مرة أخرى للخروج من TimeX.",
@@ -344,7 +378,7 @@ const arabicCopy = {
     loadingWorkspace: "جارٍ تحميل مساحتك الخاصة…",
     authenticationRequired: "أنشئ حسابًا أو سجّل الدخول لمزامنة مساحتك الخاصة بين الأجهزة.",
     signInSuccessful: "أهلًا بعودتك.",
-    assistantPrivacy: "يعمل المخطّط دون اتصال على جهازك. إذا سجلت الدخول وأُعدّ OpenRouter، تُرسل رسالتك ومهامك المفتوحة إلى OpenRouter؛ وقد تتضمن طلبات البحث روابط موثّقة.",
+    assistantPrivacy: "تعمل المحادثات العادية ونمط الخطة على جهازك. تُرسل طلبات البحث ونمط الخطة المتقدمة إلى Gemini عند إعداد الخدمة، وتظهر روابط المصادر مع الرد.",
 } satisfies Record<keyof typeof englishCopy, string>;
 
 const copy = {
@@ -420,6 +454,10 @@ function chatStorageKey(userId: string | undefined): string {
   return userId ? `timex-chat:${userId}` : "timex-chat";
 }
 
+function conversationStorageKey(userId: string | undefined): string {
+  return userId ? `timex-conversations:${userId}` : "timex-conversations:local";
+}
+
 function getDisplayName(user: User | null): string {
   if (!user) return "";
   const name = user.user_metadata?.display_name || user.user_metadata?.full_name;
@@ -465,8 +503,8 @@ function App() {
   const [authPending, setAuthPending] = useState(false);
   const [authError, setAuthError] = useState("");
   const [authNotice, setAuthNotice] = useState("");
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(() =>
-    readChatMessages("timex-chat"),
+  const [conversationStore, setConversationStore] = useState<ConversationStore>(() =>
+    createConversationStore("timex-conversations:local", "timex-chat"),
   );
   const [chatInput, setChatInput] = useState("");
   const [chatPending, setChatPending] = useState(false);
@@ -487,6 +525,11 @@ function App() {
   const isArabic = lang === "ar";
   const t = (key: CopyKey) => copy[lang][key];
   const userName = getDisplayName(user);
+  const activeConversation = conversationStore.conversations.find(
+    (conversation) => conversation.id === conversationStore.activeId,
+  ) ?? conversationStore.conversations[0];
+  const chatMessages = activeConversation?.messages ?? [];
+  const chatMode = activeConversation?.mode ?? "chat";
   const greeting = userName
     ? t("welcomeWithName").replace("{name}", userName)
     : t("greeting");
@@ -664,7 +707,10 @@ function App() {
 
     if (!user) {
       setData(loadDataForKey(accountStorageKey(undefined)));
-      setChatMessages(readChatMessages(chatStorageKey(undefined)));
+      setConversationStore(createConversationStore(
+        conversationStorageKey(undefined),
+        chatStorageKey(undefined),
+      ));
       setWorkspaceReady(true);
       return () => {
         active = false;
@@ -672,7 +718,7 @@ function App() {
     }
 
     void (async () => {
-      const [workspaceResult, profileResult, messagesResult] = await Promise.all([
+      const [workspaceResult, profileResult, conversationsResult] = await Promise.all([
         supabase
           .from("user_workspaces")
           .select("data")
@@ -680,17 +726,27 @@ function App() {
           .maybeSingle(),
         supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
         supabase
-          .from("assistant_messages")
-          .select("id, role, content, sources, created_at")
+          .from("assistant_conversations")
+          .select("id, title, mode, created_at, updated_at")
           .eq("user_id", user.id)
-          .order("created_at", { ascending: false })
-          .limit(100),
+          .order("updated_at", { ascending: false })
+          .limit(50),
       ]);
+      const conversationIds = (conversationsResult.data ?? []).map((item) => item.id);
+      const messagesResult = conversationIds.length
+        ? await supabase
+            .from("assistant_messages")
+            .select("id, conversation_id, role, content, sources, created_at")
+            .eq("user_id", user.id)
+            .in("conversation_id", conversationIds)
+            .order("created_at", { ascending: true })
+            .limit(1000)
+        : { data: [], error: conversationsResult.error };
       if (!active) return;
 
-      if (workspaceResult.error || profileResult.error || messagesResult.error) {
+      if (workspaceResult.error || profileResult.error || conversationsResult.error || messagesResult.error) {
         const error =
-          workspaceResult.error || profileResult.error || messagesResult.error;
+          workspaceResult.error || profileResult.error || conversationsResult.error || messagesResult.error;
         console.error("TimeX could not load the private user workspace.", error);
         setCloudSyncFailed(true);
       }
@@ -716,15 +772,41 @@ function App() {
           ? readAppData(JSON.stringify(savedWorkspace))
           : loadDataForKey(accountStorageKey(user.id)),
       );
-      const messages = ((messagesResult.data ?? []) as ChatMessage[]).reverse();
-      setChatMessages(messages.length ? messages.slice(-100) : readChatMessages(chatStorageKey(user.id)));
+      const localStore = createConversationStore(
+        conversationStorageKey(user.id),
+        chatStorageKey(user.id),
+      );
+      const cloudConversations = conversationsResult.error
+        ? []
+        : (conversationsResult.data ?? []).map((item) => {
+            const messages = ((messagesResult.data ?? []) as Array<
+              ChatMessage & { conversation_id: string }
+            >)
+              .filter((message) => message.conversation_id === item.id)
+              .slice(-100)
+              .map(({ conversation_id: _conversationId, ...message }) => message);
+            return {
+              id: item.id,
+              title: item.title,
+              mode: isChatMode(item.mode) ? item.mode : "chat" as const,
+              messages,
+              createdAt: item.created_at,
+              updatedAt: item.updated_at,
+            } satisfies AssistantConversation;
+          });
+      setConversationStore(cloudConversations.length
+        ? { activeId: cloudConversations[0].id, conversations: cloudConversations }
+        : localStore);
       setWorkspaceReady(true);
     })().catch((error: unknown) => {
       if (!active) return;
       console.error("TimeX could not load the private user workspace.", error);
       setCloudSyncFailed(true);
       setData(loadDataForKey(accountStorageKey(user.id)));
-      setChatMessages(readChatMessages(chatStorageKey(user.id)));
+      setConversationStore(createConversationStore(
+        conversationStorageKey(user.id),
+        chatStorageKey(user.id),
+      ));
       setWorkspaceReady(true);
     });
 
@@ -859,11 +941,47 @@ function App() {
   useEffect(() => {
     if (!sessionReady || !workspaceReady) return;
     try {
-      window.localStorage.setItem(chatStorageKey(user?.id), JSON.stringify(chatMessages));
+      window.localStorage.setItem(
+        conversationStorageKey(user?.id),
+        JSON.stringify(conversationStore),
+      );
     } catch {
       setStorageFailed(true);
     }
-  }, [chatMessages, sessionReady, user?.id, workspaceReady]);
+  }, [conversationStore, sessionReady, user?.id, workspaceReady]);
+
+  useEffect(() => {
+    if (!supabase || !user || !sessionReady || !workspaceReady) return;
+    const client = supabase;
+    const conversations = conversationStore.conversations;
+    if (!conversations.length) return;
+    let active = true;
+    void Promise.all(conversations.map((conversation) =>
+      client
+        .from("assistant_conversations")
+        .upsert(
+          {
+            id: conversation.id,
+            user_id: user.id,
+            title: conversation.title.slice(0, 100),
+            mode: conversation.mode,
+            created_at: conversation.createdAt,
+            updated_at: conversation.updatedAt,
+          },
+          { onConflict: "id" },
+        ),
+    )).then((results) => {
+      if (!active) return;
+      const error = results.find((result) => result.error)?.error;
+      if (error) {
+        console.error("TimeX could not sync private assistant conversations.", error);
+        setCloudSyncFailed(true);
+      }
+    });
+    return () => {
+      active = false;
+    };
+  }, [conversationStore, sessionReady, user?.id, workspaceReady]);
 
   useEffect(() => {
     if (!running) return;
@@ -1222,13 +1340,39 @@ function App() {
     setAuthPending(false);
   }
 
-  async function storeAssistantMessage(message: ChatMessage, userId: string) {
+  async function storeAssistantConversation(
+    conversation: AssistantConversation,
+    userId: string,
+  ) {
+    if (!supabase) return;
+    const { error } = await supabase
+      .from("assistant_conversations")
+      .upsert({
+        id: conversation.id,
+        user_id: userId,
+        title: conversation.title.slice(0, 100),
+        mode: conversation.mode,
+        created_at: conversation.createdAt,
+        updated_at: conversation.updatedAt,
+      }, { onConflict: "id" });
+    if (error) {
+      console.error("TimeX could not sync a private assistant conversation.", error);
+      setCloudSyncFailed(true);
+    }
+  }
+
+  async function storeAssistantMessage(
+    message: ChatMessage,
+    userId: string,
+    conversationId: string,
+  ) {
     if (!supabase) return;
     const { error } = await supabase
       .from("assistant_messages")
       .insert({
         id: message.id,
         user_id: userId,
+        conversation_id: conversationId,
         role: message.role,
         content: message.content,
         sources: message.sources ?? [],
@@ -1236,6 +1380,67 @@ function App() {
     if (error) {
       console.error("TimeX could not sync a private assistant message.", error);
       setCloudSyncFailed(true);
+    }
+  }
+
+  function updateActiveConversation(
+    update: (conversation: AssistantConversation) => AssistantConversation,
+  ) {
+    setConversationStore((current) => {
+      const active = current.conversations.find((item) => item.id === current.activeId);
+      if (!active) {
+        const created = update(createConversation());
+        return { activeId: created.id, conversations: [created, ...current.conversations].slice(0, 50) };
+      }
+      const updated = update(active);
+      return {
+        ...current,
+        conversations: [updated, ...current.conversations.filter((item) => item.id !== active.id)],
+      };
+    });
+  }
+
+  function startNewConversation() {
+    const fresh = createConversation();
+    setConversationStore((current) => ({
+      activeId: fresh.id,
+      conversations: [fresh, ...current.conversations].slice(0, 50),
+    }));
+    setChatInput("");
+    setChatError("");
+    setChatNotice("");
+  }
+
+  function selectConversation(conversation: AssistantConversation) {
+    setConversationStore((current) => ({ ...current, activeId: conversation.id }));
+    setChatError("");
+    setChatNotice("");
+  }
+
+  function changeChatMode(mode: ChatMode) {
+    updateActiveConversation((conversation) => ({ ...conversation, mode }));
+    setChatNotice("");
+  }
+
+  async function deleteConversation(conversationId: string) {
+    setConversationStore((current) => {
+      const conversations = current.conversations.filter((item) => item.id !== conversationId);
+      const replacement = conversations[0] ?? createConversation();
+      return {
+        activeId: current.activeId === conversationId ? replacement.id : current.activeId,
+        conversations: conversations.length ? conversations : [replacement],
+      };
+    });
+    if (user && supabase) {
+      const { error } = await supabase
+        .from("assistant_conversations")
+        .delete()
+        .eq("id", conversationId)
+        .eq("user_id", user.id);
+      if (error) {
+        console.error("TimeX could not delete the private assistant conversation.", error);
+        setCloudSyncFailed(true);
+      }
     }
   }
 
@@ -1251,17 +1456,36 @@ function App() {
       created_at: new Date().toISOString(),
     };
     const conversation = [...chatMessages, userMessage].slice(-100);
-    setChatMessages(conversation);
+    const activeConversationId = activeConversation?.id ?? createConversation().id;
+    const savedConversation = activeConversation
+      ? saveConversationMessages(activeConversation, conversation)
+      : { ...createConversation(), messages: conversation };
+    setConversationStore((current) => ({
+      activeId: activeConversationId,
+      conversations: [
+        savedConversation,
+        ...current.conversations.filter((item) => item.id !== activeConversationId),
+      ].slice(0, 50),
+    }));
     setChatInput("");
     setChatError("");
     setChatNotice("");
     setChatPending(true);
-    if (user && supabase) void storeAssistantMessage(userMessage, user.id);
+    if (user && supabase) {
+      await storeAssistantConversation(savedConversation, user.id);
+      void storeAssistantMessage(userMessage, user.id, activeConversationId);
+    }
 
     try {
       let response: AssistantResponse | null = null;
-      let localResponse: ReturnType<typeof respondAsMrX> | null = null;
-      if (user && supabase) {
+      let localResponse: Awaited<ReturnType<typeof respondAsMrX>> | null = null;
+      const useConnectedAssistant = Boolean(
+        user &&
+        supabase &&
+        (chatMode === "advanced-plan" ||
+          (chatMode === "chat" && isResearchRequest(content))),
+      );
+      if (useConnectedAssistant && user && supabase) {
         try {
           const { data: assistantData, error } = await supabase.functions.invoke<AssistantResponse>(
             "timex-assistant",
@@ -1272,6 +1496,7 @@ function App() {
                   content: text,
                 })),
                 language: lang,
+                mode: chatMode,
                 userName,
                 tasks: data.tasks
                   .filter((task) => !task.completed)
@@ -1312,18 +1537,34 @@ function App() {
       }
 
       if (!response && !localResponse) {
-        localResponse = respondAsMrX(content, lang, { tasks: data.tasks, userName });
+        localResponse = await respondAsMrX(content, lang, {
+          tasks: data.tasks,
+          plans: data.plans,
+          userName,
+          researchUnavailable:
+            (chatMode === "advanced-plan" || isResearchRequest(content)) && !response,
+          history: conversation.slice(0, -1).slice(-12),
+        }, chatMode);
       }
       const assistantMessage: ChatMessage = {
         id: createLocalId(),
         role: "assistant",
         content: (response?.reply ?? localResponse?.reply ?? "").trim(),
         created_at: new Date().toISOString(),
-        ...(response?.sources?.length ? { sources: response.sources } : {}),
+        ...((response?.sources ?? localResponse?.sources)?.length
+          ? { sources: response?.sources ?? localResponse?.sources }
+          : {}),
       };
       if (!assistantMessage.content) throw new Error("MrX returned an empty response.");
-      setChatMessages((current) => [...current, assistantMessage].slice(-100));
-      if (user && supabase) void storeAssistantMessage(assistantMessage, user.id);
+      const completeMessages = [...conversation, assistantMessage].slice(-100);
+      const completedConversation = saveConversationMessages(
+        savedConversation,
+        completeMessages,
+      );
+      updateActiveConversation(() => completedConversation);
+      if (user && supabase) {
+        void storeAssistantMessage(assistantMessage, user.id, activeConversationId);
+      }
       applyAssistantActions(response?.actions ?? localResponse?.actions ?? []);
     } catch (error) {
       console.error("TimeX could not complete the assistant conversation.", error);
@@ -1358,6 +1599,8 @@ function App() {
           goal,
           steps,
           createdAt: Date.now(),
+          ...(action.researchSummary ? { researchSummary: action.researchSummary } : {}),
+          ...(action.sources?.length ? { sources: action.sources } : {}),
         };
         setData((current) => {
           const existingTitles = new Set(
@@ -2272,6 +2515,12 @@ function App() {
                           </button>
                         </div>
                         <p className="plan-steps-label">{t("planSteps")}</p>
+                        {plan.researchSummary && (
+                          <div className="plan-research">
+                            <p className="plan-steps-label">{t("planResearchLabel")}</p>
+                            <p>{plan.researchSummary}</p>
+                          </div>
+                        )}
                         <ol className="plan-steps">
                           {plan.steps.map((step, index) => (
                             <li key={`${plan.id}-${index}`}>
@@ -2280,6 +2529,15 @@ function App() {
                             </li>
                           ))}
                         </ol>
+                        {plan.sources?.length ? (
+                          <ul className="plan-sources" aria-label={t("assistantSources")}>
+                            {plan.sources.map((source) => (
+                              <li key={source.url}>
+                                <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
                         <button className="text-button plan-add-button" type="button" onClick={() => addPlanToTasks(plan)}>
                           <span aria-hidden="true">＋</span>{t("addPlanTasks")}
                         </button>
@@ -2310,7 +2568,64 @@ function App() {
                   </span>
                 )}
               </div>
-              <section className="chat-panel">
+              <div className="assistant-conversation-toolbar">
+                <button className="primary-button" type="button" onClick={startNewConversation}>
+                  <span aria-hidden="true">＋</span>{t("newConversation")}
+                </button>
+                <label>
+                  <span className="visually-hidden">{t("assistantMode")}</span>
+                  <select
+                    value={chatMode}
+                    onChange={(event) => changeChatMode(event.target.value as ChatMode)}
+                    aria-label={t("assistantMode")}
+                  >
+                    <option value="chat">{t("chatMode")}</option>
+                    <option value="plan">{t("planMode")}</option>
+                    <option value="advanced-plan">{t("advancedPlanMode")}</option>
+                  </select>
+                </label>
+                <p>
+                  {chatMode === "advanced-plan"
+                    ? t("advancedPlanModeHint")
+                    : chatMode === "plan"
+                      ? t("planModeHint")
+                      : t("chatModeHint")}
+                </p>
+              </div>
+              <div className="assistant-chat-layout">
+                <aside className="assistant-history">
+                  <h2>{t("conversationHistory")}</h2>
+                  {conversationStore.conversations.length ? (
+                    <ul>
+                      {[...conversationStore.conversations]
+                        .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+                        .map((conversation) => (
+                          <li key={conversation.id}>
+                            <button
+                              className={`assistant-history-item${conversation.id === activeConversation?.id ? " active" : ""}`}
+                              type="button"
+                              aria-current={conversation.id === activeConversation?.id ? "true" : undefined}
+                              onClick={() => selectConversation(conversation)}
+                            >
+                              <span>{conversation.title || t(conversation.mode === "advanced-plan" ? "advancedPlanMode" : conversation.mode === "plan" ? "planMode" : "chatMode")}</span>
+                              <small>{conversation.messages.length}</small>
+                            </button>
+                            <button
+                              className="assistant-history-delete"
+                              type="button"
+                              aria-label={`${t("deleteConversation")}: ${conversation.title || t("assistantChat")}`}
+                              onClick={() => void deleteConversation(conversation.id)}
+                            >
+                              ×
+                            </button>
+                          </li>
+                        ))}
+                    </ul>
+                  ) : (
+                    <p>{t("emptyConversationHistory")}</p>
+                  )}
+                </aside>
+                <section className="chat-panel">
                 <div className="chat-header">
                   <span className="chat-avatar" aria-hidden="true">✳</span>
                   <div>
@@ -2407,7 +2722,8 @@ function App() {
                     <span aria-hidden="true">➤</span>
                   </button>
                 </form>
-              </section>
+                </section>
+              </div>
             </section>
           )}
             </>

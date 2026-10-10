@@ -3,6 +3,7 @@ const { app, BrowserWindow, ipcMain, Menu, shell } = require("electron");
 
 let mainWindow;
 let queuedAuthUrl = null;
+const hostedAppUrl = "https://mrx16963.github.io/TimeX/app.html";
 
 const initialAuthUrl = process.argv.find((argument) =>
   argument.startsWith("timex://login-callback"),
@@ -68,10 +69,24 @@ function createWindow() {
     }
   });
 
-  const appEntry = app.isPackaged
+  const bundledAppEntry = app.isPackaged
     ? path.join(process.resourcesPath, "app", "app.html")
     : path.join(__dirname, "..", "dist", "app.html");
-  void mainWindow.loadFile(appEntry);
+  let usingBundledFallback = false;
+
+  mainWindow.webContents.once("did-fail-load", (_event, errorCode, _errorDescription, validatedUrl, isMainFrame) => {
+    if (
+      isMainFrame &&
+      !usingBundledFallback &&
+      validatedUrl.startsWith(hostedAppUrl) &&
+      errorCode !== -3
+    ) {
+      usingBundledFallback = true;
+      void mainWindow.loadFile(bundledAppEntry);
+    }
+  });
+
+  void mainWindow.loadURL(hostedAppUrl);
 }
 
 app.whenReady().then(() => {

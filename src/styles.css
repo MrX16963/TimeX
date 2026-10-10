@@ -22,24 +22,34 @@
 }
 
 .chat-privacy {
-  display: flex;
-  align-items: center;
-  gap: 7px;
   padding: 8px 16px;
   border-bottom: 1px solid var(--line);
   color: var(--muted);
-  background: var(--surface-muted);
+  background: var(--surface);
+  font-size: 10px;
 }
 
-.chat-privacy > span {
+.chat-privacy summary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  list-style: none;
+}
+
+.chat-privacy summary::-webkit-details-marker {
+  display: none;
+}
+
+.chat-privacy summary > span {
   flex: 0 0 auto;
   color: var(--accent);
   font-size: 13px;
 }
 
 .chat-privacy p {
-  margin: 0;
-  font-size: 9px;
+  margin: 8px 0 0;
+  font-size: 11px;
   line-height: 1.6;
 }
 
@@ -288,7 +298,8 @@ button {
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-textarea:focus-visible {
+textarea:focus-visible,
+select:focus-visible {
   outline: 3px solid var(--accent, #91baff);
   outline-offset: 3px;
 }
@@ -316,9 +327,7 @@ button:disabled {
   min-height: 100vh;
   color: var(--text);
   background:
-    radial-gradient(ellipse at 80% 2%, rgba(255, 255, 255, 0.13), transparent 33%),
-    radial-gradient(ellipse at 8% 72%, rgba(255, 255, 255, 0.035), transparent 36%),
-    linear-gradient(145deg, #050607 0%, #0b0c0f 48%, #111215 100%);
+    linear-gradient(145deg, #090b0d 0%, #0c0e10 58%, #111315 100%);
   background-attachment: fixed;
   transition: color 180ms ease, background-color 180ms ease;
 }
@@ -3362,6 +3371,204 @@ html[dir="rtl"] .chat-send {
     inset-inline: 12px;
     bottom: 80px;
     max-width: none;
+  }
+}
+
+.settings-button {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  color: var(--text);
+  background: var(--surface);
+  font-size: 19px;
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.settings-button:hover {
+  border-color: color-mix(in srgb, var(--accent) 40%, var(--line));
+  background: var(--surface-muted);
+  transform: rotate(12deg);
+}
+
+.assistant-view-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 15px;
+  padding: 4px;
+  border: 1px solid var(--line);
+  border-radius: 13px;
+  background: color-mix(in srgb, var(--surface) 76%, transparent);
+}
+
+.assistant-view-switch button {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 15px;
+  border: 0;
+  border-radius: 9px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 12px;
+  cursor: pointer;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.assistant-view-switch button.active {
+  color: var(--text);
+  background: var(--surface-muted);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+
+.assistant-view-switch button > span {
+  min-width: 19px;
+  padding: 1px 5px;
+  border-radius: 8px;
+  color: var(--muted);
+  background: var(--surface);
+  font-size: 10px;
+}
+
+.settings-modal {
+  max-height: min(760px, calc(100dvh - 36px));
+  overflow-y: auto;
+}
+
+.settings-modal-icon {
+  color: var(--accent-ink);
+  background: var(--accent);
+  font-family: inherit;
+  font-size: 23px;
+  letter-spacing: 0;
+}
+
+.settings-group {
+  margin-top: 22px;
+  padding-top: 17px;
+  border-top: 1px solid var(--line);
+}
+
+.settings-group h3 {
+  margin: 0 0 11px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.settings-modal .theme-options {
+  gap: 8px;
+}
+
+.settings-modal .theme-option {
+  min-height: 47px;
+  font-size: 11px;
+}
+
+.settings-modal .theme-swatch {
+  width: 19px;
+  height: 19px;
+}
+
+.settings-modal .theme-picker-hint {
+  font-size: 11px;
+}
+
+.settings-action {
+  display: grid;
+  width: 100%;
+  min-height: 46px;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 10px;
+  color: var(--text);
+  background: transparent;
+  text-align: start;
+  cursor: pointer;
+}
+
+.settings-action:hover {
+  background: var(--surface-muted);
+}
+
+.settings-action > span:first-child {
+  color: var(--accent);
+  text-align: center;
+  font-size: 16px;
+}
+
+.settings-action > span:nth-child(2) {
+  font-size: 12px;
+}
+
+.settings-action strong {
+  max-width: 190px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-shell .panel,
+.app-shell .task-panel,
+.app-shell .focus-panel,
+.app-shell .plan-card,
+.app-shell .note-card,
+.app-shell .assistant-history,
+.app-shell .chat-panel {
+  box-shadow: 0 5px 18px rgba(0, 0, 0, 0.16);
+}
+
+.app-shell .chat-message p,
+.app-shell .plan-steps li {
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+.mobile-nav {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.mobile-nav-item > span:last-child {
+  font-size: 9px;
+}
+
+@media (max-width: 640px) {
+  .settings-button {
+    width: 38px;
+    height: 38px;
+  }
+
+  .assistant-view-switch {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 12px;
+  }
+
+  .assistant-view-switch button {
+    min-height: 42px;
+    padding-inline: 8px;
+  }
+
+  .settings-modal {
+    width: min(100%, 440px);
+    padding: 25px 20px;
+  }
+
+  .settings-action strong {
+    max-width: 145px;
   }
 }
 

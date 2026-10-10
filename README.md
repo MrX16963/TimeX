@@ -21,6 +21,7 @@ Use `npm run build` for a production build and `npm test` for focused unit tests
 - Create and edit personal notes and save guided plans as task lists.
 - Four dark palettes: noir-and-pearl, arctic blue, forest emerald, and amethyst violet.
 - A black-and-silver gradient visual style, four coordinated accent palettes, and a custom color picker; theme and accent preferences save with the user's workspace.
+- A calmer, simplified workspace with plan creation and saved plans together in MrX, plus one Settings control for appearance, language, account, and installation options.
 - Without a connected account, tasks, notes, plans, points, language, and theme are stored in browser/app storage on that device.
 - Optional email, Google, and Facebook sign-in, an isolated private cloud workspace per account, and saved assistant conversation history.
 - MrX's built-in Arabic/English planning helper works immediately on-device with no model download, API key, account, or internet. It can draft goal-specific study, fitness, and project plans; add plan steps to tasks; save notes; and recommend a next task using due dates and Eisenhower priority. It is a practical rules-based assistant, not a generative language model.

@@ -24,6 +24,7 @@ import {
   type Plan,
   type Task,
   type Theme,
+  type VoiceNote,
 } from "./lib";
 import {
   type ReminderPermission,
@@ -42,6 +43,7 @@ import {
   type ConversationStore,
 } from "./assistant-conversations";
 import { isDoubleBackPress } from "./back-navigation";
+import { deleteVoiceRecording, readVoiceRecording, saveVoiceRecording } from "./voice-notes";
 
 const englishCopy = {
     appName: "TimeX",
@@ -82,6 +84,15 @@ const englishCopy = {
     greetingSub: "Choose one thing that matters and begin there.",
     focus: "Focus session",
     focusSub: "One thing at a time. You've got this.",
+    focusWork: "Focus",
+    focusBreak: "Break",
+    pomodoroPresets: "Pomodoro presets",
+    pomodoroCustom: "Custom session",
+    workMinutes: "Focus minutes",
+    breakMinutes: "Break minutes",
+    applyTimer: "Apply timer",
+    startBreak: "Start break",
+    startFocus: "Start focus",
     start: "Start focus",
     pause: "Pause",
     resume: "Resume",
@@ -121,6 +132,14 @@ const englishCopy = {
     noteBody: "Start writing...",
     noteEmpty: "Your notes are just for you. Create one to get started.",
     deleteNote: "Delete note",
+    voiceNotes: "Voice notes",
+    recordVoiceNote: "Record voice note",
+    stopRecording: "Stop recording",
+    recordingVoiceNote: "Recording…",
+    voiceNoteUnsupported: "Voice recording is not supported on this device.",
+    microphonePermissionDenied: "Microphone access was not granted. Allow it in your device settings and try again.",
+    voiceNoteSaveFailed: "Could not save the voice note. Check device storage and try again.",
+    deleteVoiceNote: "Delete voice note",
     plannerIntro: "Turn a big intention into a few small, doable next steps.",
     goalLabel: "What would you like to make progress on?",
     goalPlaceholder: "e.g. Prepare for my certification exam",
@@ -255,6 +274,15 @@ const arabicCopy = {
     greetingSub: "اختر أمرًا واحدًا مهمًا وابدأ به.",
     focus: "جلسة تركيز",
     focusSub: "شيء واحد في كل مرة. أنت قادر.",
+    focusWork: "تركيز",
+    focusBreak: "استراحة",
+    pomodoroPresets: "قوالب بومودورو",
+    pomodoroCustom: "جلسة مخصّصة",
+    workMinutes: "دقائق التركيز",
+    breakMinutes: "دقائق الاستراحة",
+    applyTimer: "تطبيق المؤقت",
+    startBreak: "ابدأ الاستراحة",
+    startFocus: "ابدأ التركيز",
     start: "ابدأ التركيز",
     pause: "إيقاف مؤقت",
     resume: "متابعة",
@@ -294,6 +322,14 @@ const arabicCopy = {
     noteBody: "ابدأ الكتابة...",
     noteEmpty: "ملاحظاتك لك وحدك. أنشئ ملاحظة للبدء.",
     deleteNote: "حذف الملاحظة",
+    voiceNotes: "ملاحظات صوتية",
+    recordVoiceNote: "تسجيل ملاحظة صوتية",
+    stopRecording: "إيقاف التسجيل",
+    recordingVoiceNote: "جارٍ التسجيل…",
+    voiceNoteUnsupported: "تسجيل الملاحظات الصوتية غير مدعوم على هذا الجهاز.",
+    microphonePermissionDenied: "لم يُسمح بالوصول للميكروفون. اسمح به من إعدادات الجهاز ثم حاول مجددًا.",
+    voiceNoteSaveFailed: "تعذّر حفظ الملاحظة الصوتية. تحقق من مساحة الجهاز ثم حاول مجددًا.",
+    deleteVoiceNote: "حذف الملاحظة الصوتية",
     plannerIntro: "حوّل ما تطمح إليه إلى خطوات صغيرة قابلة للتنفيذ.",
     goalLabel: "ما الهدف الذي ترغب في التقدّم نحوه؟",
     goalPlaceholder: "مثال: الاستعداد لاختبار الشهادة المهنية",
@@ -497,7 +533,15 @@ function App() {
   const [matrixTaskTitle, setMatrixTaskTitle] = useState("");
   const [goal, setGoal] = useState("");
   const [running, setRunning] = useState(false);
-  const [secondsLeft, setSecondsLeft] = useState(25 * 60);
+  const [pomodoroPhase, setPomodoroPhase] = useState<"work" | "break">("work");
+  const [secondsLeft, setSecondsLeft] = useState(() => data.pomodoro.workMinutes * 60);
+  const [pomodoroWorkInput, setPomodoroWorkInput] = useState(String(data.pomodoro.workMinutes));
+  const [pomodoroBreakInput, setPomodoroBreakInput] = useState(String(data.pomodoro.breakMinutes));
+  const [recordingNoteId, setRecordingNoteId] = useState<string | null>(null);
+  const [voiceUrls, setVoiceUrls] = useState<Record<string, string>>({});
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const recordingStartedAtRef = useRef<number>(0);
+  const recordingChunksRef = useRef<Blob[]>([]);
   const [toast, setToast] = useState("");
   const [storageFailed, setStorageFailed] = useState(false);
   const [cloudSyncFailed, setCloudSyncFailed] = useState(false);
@@ -999,6 +1043,39 @@ function App() {
   }, [secondsLeft]);
 
   useEffect(() => {
+    setPomodoroWorkInput(String(data.pomodoro.workMinutes));
+    setPomodoroBreakInput(String(data.pomodoro.breakMinutes));
+  }, [data.pomodoro.breakMinutes, data.pomodoro.workMinutes]);
+
+  useEffect(() => {
+    const recordings = data.notes.flatMap((note) => note.audio ?? []);
+    if (!recordings.length) {
+      setVoiceUrls({});
+      return;
+    }
+    let active = true;
+    const urls: string[] = [];
+    void Promise.all(recordings.map(async (recording) => {
+      const blob = await readVoiceRecording(recording.id);
+      return blob ? [recording.id, URL.createObjectURL(blob)] as const : null;
+    })).then((entries) => {
+      if (!active) {
+        entries.forEach((entry) => entry && URL.revokeObjectURL(entry[1]));
+        return;
+      }
+      const nextUrls = Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => entry !== null));
+      urls.push(...Object.values(nextUrls));
+      setVoiceUrls(nextUrls);
+    }).catch((error: unknown) => {
+      console.error("TimeX could not load voice notes.", error);
+    });
+    return () => {
+      active = false;
+      urls.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [data.notes]);
+
+  useEffect(() => {
     if (Capacitor.isNativePlatform()) {
       void syncNativeReminders(data.tasks, lang).catch((error: unknown) => {
         console.error("TimeX could not sync native task reminders.", error);
@@ -1036,6 +1113,9 @@ function App() {
   }).format(selectedCalendarDate);
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const seconds = String(secondsLeft % 60).padStart(2, "0");
+  const timerDuration = (pomodoroPhase === "work"
+    ? data.pomodoro.workMinutes
+    : data.pomodoro.breakMinutes) * 60;
 
   function notify(message: string) {
     setToast(message);
@@ -1199,6 +1279,103 @@ function App() {
           : note,
       ),
     }));
+  }
+
+  function setPomodoroDurations(workMinutes: number, breakMinutes: number) {
+    setRunning(false);
+    setPomodoroPhase("work");
+    setSecondsLeft(workMinutes * 60);
+    setData((current) => ({
+      ...current,
+      pomodoro: { workMinutes, breakMinutes },
+    }));
+  }
+
+  function applyCustomPomodoro(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const workMinutes = Number(pomodoroWorkInput);
+    const breakMinutes = Number(pomodoroBreakInput);
+    if (
+      !Number.isInteger(workMinutes) ||
+      !Number.isInteger(breakMinutes) ||
+      workMinutes < 1 ||
+      workMinutes > 180 ||
+      breakMinutes < 1 ||
+      breakMinutes > 60
+    ) {
+      return;
+    }
+    setPomodoroDurations(workMinutes, breakMinutes);
+  }
+
+  function switchPomodoroPhase() {
+    const nextPhase = pomodoroPhase === "work" ? "break" : "work";
+    setRunning(false);
+    setPomodoroPhase(nextPhase);
+    setSecondsLeft((nextPhase === "work"
+      ? data.pomodoro.workMinutes
+      : data.pomodoro.breakMinutes) * 60);
+  }
+
+  async function startVoiceRecording(noteId: string) {
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === "undefined") {
+      notify(t("voiceNoteUnsupported"));
+      return;
+    }
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const recorder = new MediaRecorder(stream);
+      recordingChunksRef.current = [];
+      recordingStartedAtRef.current = Date.now();
+      mediaRecorderRef.current = recorder;
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) recordingChunksRef.current.push(event.data);
+      };
+      recorder.onstop = () => {
+        const durationSeconds = Math.max(1, Math.round((Date.now() - recordingStartedAtRef.current) / 1000));
+        const mimeType = recorder.mimeType || "audio/webm";
+        const blob = new Blob(recordingChunksRef.current, { type: mimeType });
+        stream.getTracks().forEach((track) => track.stop());
+        setRecordingNoteId(null);
+        mediaRecorderRef.current = null;
+        if (!blob.size) return;
+        const audio: VoiceNote = {
+          id: makeId(),
+          createdAt: Date.now(),
+          durationSeconds,
+          mimeType,
+        };
+        void saveVoiceRecording(audio.id, blob)
+          .then(() => updateNote(noteId, {
+            audio: [...(data.notes.find((note) => note.id === noteId)?.audio ?? []), audio],
+          }))
+          .catch((error: unknown) => {
+            console.error("TimeX could not save a voice note.", error);
+            notify(t("voiceNoteSaveFailed"));
+          });
+      };
+      recorder.start();
+      setRecordingNoteId(noteId);
+    } catch (error: unknown) {
+      console.error("TimeX could not access the microphone.", error);
+      notify(t("microphonePermissionDenied"));
+    }
+  }
+
+  function stopVoiceRecording() {
+    if (mediaRecorderRef.current?.state === "recording") mediaRecorderRef.current.stop();
+  }
+
+  function removeVoiceNote(noteId: string, audioId: string) {
+    void deleteVoiceRecording(audioId)
+      .then(() => updateNote(noteId, {
+        audio: (data.notes.find((note) => note.id === noteId)?.audio ?? [])
+          .filter((audio) => audio.id !== audioId),
+      }))
+      .catch((error: unknown) => {
+        console.error("TimeX could not delete a voice note.", error);
+        notify(t("voiceNoteSaveFailed"));
+      });
   }
 
   function buildPlan(event: FormEvent<HTMLFormElement>) {
@@ -1931,9 +2108,31 @@ function App() {
                 <section className="panel focus-panel">
                   <div className="focus-topline">
                     <span className="focus-icon" aria-hidden="true">◷</span>
-                    <span className="eyebrow">{t("focus")}</span>
+                    <span className="eyebrow">
+                      {t("focus")} · {pomodoroPhase === "work" ? t("focusWork") : t("focusBreak")}
+                    </span>
                   </div>
                   <h2>{t("focusSub")}</h2>
+                  <div className="pomodoro-presets" aria-label={t("pomodoroPresets")}>
+                    {[
+                      { workMinutes: 25, breakMinutes: 5 },
+                      { workMinutes: 50, breakMinutes: 10 },
+                      { workMinutes: 75, breakMinutes: 15 },
+                    ].map((preset) => {
+                      const selected = data.pomodoro.workMinutes === preset.workMinutes &&
+                        data.pomodoro.breakMinutes === preset.breakMinutes;
+                      return (
+                        <button
+                          className={`pomodoro-preset${selected ? " selected" : ""}`}
+                          type="button"
+                          key={`${preset.workMinutes}-${preset.breakMinutes}`}
+                          onClick={() => setPomodoroDurations(preset.workMinutes, preset.breakMinutes)}
+                        >
+                          {preset.workMinutes} / {preset.breakMinutes}
+                        </button>
+                      );
+                    })}
+                  </div>
                   <div
                     className="timer-face"
                     role="timer"
@@ -1945,22 +2144,29 @@ function App() {
                     <span>{seconds}</span>
                   </div>
                   <div className="timer-track" aria-hidden="true">
-                    <span style={{ width: `${((25 * 60 - secondsLeft) / (25 * 60)) * 100}%` }} />
+                    <span style={{ width: `${((timerDuration - secondsLeft) / timerDuration) * 100}%` }} />
                   </div>
-                  {secondsLeft === 0 && <p className="timer-finished">{t("sessionDone")}</p>}
+                  {secondsLeft === 0 && (
+                    <p className="timer-finished">
+                      {t("sessionDone")}{" "}
+                      <button type="button" className="text-button" onClick={switchPomodoroPhase}>
+                        {pomodoroPhase === "work" ? t("startBreak") : t("startFocus")}
+                      </button>
+                    </p>
+                  )}
                   <div className="timer-controls">
                     <button
                       className="primary-button timer-start"
                       type="button"
                       onClick={() => {
-                        if (secondsLeft === 0) setSecondsLeft(25 * 60);
+                        if (secondsLeft === 0) setSecondsLeft(timerDuration);
                         setRunning((current) => !current);
                       }}
                     >
                       <span aria-hidden="true">{running ? "Ⅱ" : "▶"}</span>
                       {running
                         ? t("pause")
-                        : secondsLeft === 25 * 60 || secondsLeft === 0
+                        : secondsLeft === timerDuration || secondsLeft === 0
                           ? t("start")
                           : t("resume")}
                     </button>
@@ -1969,12 +2175,36 @@ function App() {
                       type="button"
                       onClick={() => {
                         setRunning(false);
-                        setSecondsLeft(25 * 60);
+                        setSecondsLeft(timerDuration);
                       }}
                     >
                       {t("reset")}
                     </button>
                   </div>
+                  <form className="pomodoro-custom" onSubmit={applyCustomPomodoro}>
+                    <span>{t("pomodoroCustom")}</span>
+                    <label>
+                      <span>{t("workMinutes")}</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="180"
+                        value={pomodoroWorkInput}
+                        onChange={(event) => setPomodoroWorkInput(event.target.value)}
+                      />
+                    </label>
+                    <label>
+                      <span>{t("breakMinutes")}</span>
+                      <input
+                        type="number"
+                        min="1"
+                        max="60"
+                        value={pomodoroBreakInput}
+                        onChange={(event) => setPomodoroBreakInput(event.target.value)}
+                      />
+                    </label>
+                    <button className="text-button" type="submit">{t("applyTimer")}</button>
+                  </form>
                   <div className="focus-decoration focus-decoration-one" aria-hidden="true" />
                   <div className="focus-decoration focus-decoration-two" aria-hidden="true" />
                 </section>
@@ -2332,10 +2562,17 @@ function App() {
                           type="button"
                           aria-label={t("deleteNote")}
                           onClick={() =>
-                            setData((current) => ({
-                              ...current,
-                              notes: current.notes.filter((item) => item.id !== note.id),
-                            }))
+                            {
+                              void Promise.all((note.audio ?? []).map((audio) =>
+                                deleteVoiceRecording(audio.id),
+                              )).catch((error: unknown) => {
+                                console.error("TimeX could not delete voice notes.", error);
+                              });
+                              setData((current) => ({
+                                ...current,
+                                notes: current.notes.filter((item) => item.id !== note.id),
+                              }));
+                            }
                           }
                         >
                           ×
@@ -2358,6 +2595,55 @@ function App() {
                         maxLength={3000}
                         onChange={(event) => updateNote(note.id, { body: event.target.value })}
                       />
+                      <section className="voice-notes" aria-label={t("voiceNotes")}>
+                        <div className="voice-notes-heading">
+                          <span>{t("voiceNotes")}</span>
+                          {recordingNoteId === note.id ? (
+                            <button
+                              className="text-button voice-recording"
+                              type="button"
+                              onClick={stopVoiceRecording}
+                            >
+                              <span aria-hidden="true">■</span> {t("stopRecording")}
+                            </button>
+                          ) : (
+                            <button
+                              className="text-button"
+                              type="button"
+                              disabled={recordingNoteId !== null}
+                              onClick={() => void startVoiceRecording(note.id)}
+                            >
+                              <span aria-hidden="true">●</span> {t("recordVoiceNote")}
+                            </button>
+                          )}
+                        </div>
+                        {recordingNoteId === note.id && (
+                          <p className="voice-recording-status" role="status">{t("recordingVoiceNote")}</p>
+                        )}
+                        {(note.audio?.length ?? 0) > 0 && (
+                          <ul className="voice-note-list">
+                            {note.audio?.map((audio) => (
+                              <li key={audio.id}>
+                                {voiceUrls[audio.id] ? (
+                                  <audio controls preload="metadata" src={voiceUrls[audio.id]}>
+                                    {t("voiceNoteUnsupported")}
+                                  </audio>
+                                ) : (
+                                  <span>{Math.ceil(audio.durationSeconds / 60)} min</span>
+                                )}
+                                <button
+                                  className="icon-button"
+                                  type="button"
+                                  aria-label={t("deleteVoiceNote")}
+                                  onClick={() => removeVoiceNote(note.id, audio.id)}
+                                >
+                                  ×
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </section>
                     </article>
                   ))}
                 </div>

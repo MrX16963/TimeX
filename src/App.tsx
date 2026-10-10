@@ -199,6 +199,9 @@ const englishCopy = {
     continueFacebook: "Continue with Facebook",
     accountError: "We couldn't complete that account request. Check your details and try again.",
     confirmationSent: "Check your email to confirm your account, then sign in.",
+    emailNotConfirmed: "Your email isn't confirmed yet. We re-sent the confirmation link; open it, then sign in.",
+    invalidCredentials: "Incorrect email or password.",
+    emailRateLimited: "Too many emails were sent. Wait a few minutes and try again.",
     greetingName: "Hello {name}, I'm MrX. I can help turn goals into steps, add tasks, and save notes.",
     assistantChat: "MrX · planning companion",
     assistantTab: "Assistant",
@@ -389,6 +392,9 @@ const arabicCopy = {
     continueFacebook: "المتابعة باستخدام Facebook",
     accountError: "تعذّر إكمال طلب الحساب. تحقق من بياناتك ثم حاول مجددًا.",
     confirmationSent: "تحقق من بريدك لتأكيد حسابك ثم سجّل الدخول.",
+    emailNotConfirmed: "بريدك لم يُؤكَّد بعد. أعدنا إرسال رابط التأكيد؛ افتحه ثم سجّل الدخول.",
+    invalidCredentials: "البريد أو كلمة المرور غير صحيحة.",
+    emailRateLimited: "أُرسلت رسائل كثيرة. انتظر بضع دقائق ثم حاول مجددًا.",
     greetingName: "مرحبًا {name}، أنا MrX. أساعدك في تحويل الأهداف إلى خطوات وإضافة المهام وحفظ الملاحظات.",
     assistantChat: "MrX · مساعد التخطيط",
     assistantTab: "المساعد",
@@ -1468,7 +1474,21 @@ function App() {
       }
     } catch (error) {
       console.error("TimeX email authentication failed.", error);
-      setAuthError(t("accountError"));
+      const code = (error as { code?: string }).code;
+      if (code === "email_not_confirmed") {
+        await supabase.auth.resend({
+          type: "signup",
+          email: authEmail.trim(),
+          options: { emailRedirectTo: getAuthenticationRedirect() },
+        });
+        setAuthError(t("emailNotConfirmed"));
+      } else if (code === "invalid_credentials") {
+        setAuthError(t("invalidCredentials"));
+      } else if (code === "over_email_send_rate_limit") {
+        setAuthError(t("emailRateLimited"));
+      } else {
+        setAuthError(t("accountError"));
+      }
     } finally {
       setAuthPending(false);
     }

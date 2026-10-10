@@ -21,6 +21,19 @@ export type Note = {
   title: string;
   body: string;
   updatedAt: number;
+  audio?: VoiceNote[];
+};
+
+export type VoiceNote = {
+  id: string;
+  createdAt: number;
+  durationSeconds: number;
+  mimeType: string;
+};
+
+export type PomodoroSettings = {
+  workMinutes: number;
+  breakMinutes: number;
 };
 
 export type Plan = {
@@ -40,6 +53,7 @@ export type AppData = {
   theme: Theme;
   accentColor: string;
   language: Language;
+  pomodoro: PomodoroSettings;
 };
 
 export type Theme = "light" | "midnight" | "sage" | "lavender" | "custom";
@@ -53,6 +67,7 @@ export const DEFAULT_DATA: AppData = {
   theme: "light",
   accentColor: "#e7e7e7",
   language: "ar",
+  pomodoro: { workMinutes: 25, breakMinutes: 5 },
 };
 
 export function getQuadrant({ important, urgent }: Priority): number {
@@ -223,6 +238,7 @@ export function readAppData(raw: string | null): AppData {
       theme: isTheme(parsed.theme) ? parsed.theme : DEFAULT_DATA.theme,
       accentColor: isHexColor(parsed.accentColor) ? parsed.accentColor : DEFAULT_DATA.accentColor,
       language: parsed.language === "en" ? "en" : "ar",
+      pomodoro: isPomodoroSettings(parsed.pomodoro) ? parsed.pomodoro : DEFAULT_DATA.pomodoro,
     };
   } catch {
     return DEFAULT_DATA;
@@ -278,7 +294,38 @@ function isNote(value: unknown): value is Note {
     typeof note.title === "string" &&
     typeof note.body === "string" &&
     typeof note.updatedAt === "number" &&
-    Number.isFinite(note.updatedAt)
+    Number.isFinite(note.updatedAt) &&
+    (note.audio === undefined ||
+      (Array.isArray(note.audio) && note.audio.every(isVoiceNote)))
+  );
+}
+
+function isVoiceNote(value: unknown): value is VoiceNote {
+  if (!value || typeof value !== "object") return false;
+  const audio = value as Partial<VoiceNote>;
+  return (
+    typeof audio.id === "string" &&
+    typeof audio.createdAt === "number" &&
+    Number.isFinite(audio.createdAt) &&
+    typeof audio.durationSeconds === "number" &&
+    Number.isFinite(audio.durationSeconds) &&
+    audio.durationSeconds >= 0 &&
+    typeof audio.mimeType === "string"
+  );
+}
+
+function isPomodoroSettings(value: unknown): value is PomodoroSettings {
+  if (!value || typeof value !== "object") return false;
+  const settings = value as Partial<PomodoroSettings>;
+  return (
+    typeof settings.workMinutes === "number" &&
+    Number.isInteger(settings.workMinutes) &&
+    settings.workMinutes >= 1 &&
+    settings.workMinutes <= 180 &&
+    typeof settings.breakMinutes === "number" &&
+    Number.isInteger(settings.breakMinutes) &&
+    settings.breakMinutes >= 1 &&
+    settings.breakMinutes <= 60
   );
 }
 

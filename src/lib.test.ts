@@ -104,6 +104,7 @@ describe("readAppData", () => {
       theme: "light",
       accentColor: "#e7e7e7",
       language: "ar",
+      pomodoro: { workMinutes: 25, breakMinutes: 5 },
     });
   });
 
@@ -130,6 +131,14 @@ describe("readAppData", () => {
     expect(
       readAppData(JSON.stringify({ theme: "custom", accentColor: "red" })).accentColor,
     ).toBe(DEFAULT_DATA.accentColor);
+  });
+
+  it("preserves valid Pomodoro durations and rejects unsafe values", () => {
+    expect(
+      readAppData(JSON.stringify({ pomodoro: { workMinutes: 50, breakMinutes: 10 } })).pomodoro,
+    ).toEqual({ workMinutes: 50, breakMinutes: 10 });
+    expect(readAppData(JSON.stringify({ pomodoro: { workMinutes: 0, breakMinutes: 90 } })).pomodoro)
+      .toEqual(DEFAULT_DATA.pomodoro);
   });
 
   it("preserves scheduled task dates, times, and reminder settings", () => {

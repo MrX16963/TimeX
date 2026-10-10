@@ -17,8 +17,8 @@ Use `npm run build` for a production build and `npm test` for focused unit tests
 - Add, complete, and remove tasks; completion awards 10 points.
 - A day-by-day, 24-hour calendar with a geometric seven-day selector, individually colored tasks, and editable no-reminder, 5-, 10-, 15-, 30-, or 60-minute alerts.
 - Prioritize tasks by importance and urgency with the four-quadrant Eisenhower matrix.
-- 25-minute Pomodoro focus timer with start, pause, and reset controls.
-- Create and edit personal notes and save guided plans as task lists.
+- Custom Pomodoro focus timer with 25/5, 50/10, and 75/15 presets, custom work/break durations, start, pause, reset, and phase switching.
+- Create and edit personal notes, record/play/delete voice notes, and save guided plans as task lists. Voice recordings are stored only on the current device/browser and do not synchronize to another device.
 - Four dark palettes: noir-and-pearl, arctic blue, forest emerald, and amethyst violet.
 - A black-and-silver gradient visual style, four coordinated accent palettes, and a custom color picker; theme and accent preferences save with the user's workspace.
 - A calmer, simplified workspace with plan creation and saved plans together in MrX, plus one Settings control for appearance, language, account, and installation options.

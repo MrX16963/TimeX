@@ -188,7 +188,7 @@ const englishCopy = {
     signOut: "Sign out",
     welcomeWithName: "Welcome, {name}. A little progress adds up.",
     accountHelp: "Sign in to keep your private workspace in sync across your devices.",
-    accountNotConfigured: "Email, Google, and GitHub sign-in use Supabase Auth, but the public Supabase client key is not configured for this build yet. MrX remains available locally.",
+    accountNotConfigured: "Email, Google, GitHub, and X sign-in use Supabase Auth, but the public Supabase client key is not configured for this build yet. MrX remains available locally.",
     displayName: "Your name",
     email: "Email address",
     password: "Password",
@@ -197,6 +197,7 @@ const englishCopy = {
     needAccount: "New to TimeX? Create an account",
     continueGoogle: "Continue with Google",
     continueGithub: "Continue with GitHub",
+    continueX: "Continue with X",
     accountError: "We couldn't complete that account request. Check your details and try again.",
     confirmationSent: "Check your email to confirm your account, then sign in.",
     emailNotConfirmed: "Your email isn't confirmed yet. We re-sent the confirmation link; open it, then sign in.",
@@ -381,7 +382,7 @@ const arabicCopy = {
     signOut: "تسجيل الخروج",
     welcomeWithName: "أهلًا {name}، كل تقدّم صغير يصنع فرقًا.",
     accountHelp: "سجّل الدخول لمزامنة مساحتك الخاصة بين أجهزتك.",
-    accountNotConfigured: "يُرسل تسجيل البريد وGoogle وGitHub إلى Supabase Auth، لكن مفتاح Supabase العام غير مضبوط في هذه النسخة بعد. يظل MrX متاحًا محليًا.",
+    accountNotConfigured: "يُرسل تسجيل البريد وGoogle وGitHub وX إلى Supabase Auth، لكن مفتاح Supabase العام غير مضبوط في هذه النسخة بعد. يظل MrX متاحًا محليًا.",
     displayName: "اسمك",
     email: "البريد الإلكتروني",
     password: "كلمة المرور",
@@ -390,6 +391,7 @@ const arabicCopy = {
     needAccount: "جديد في TimeX؟ أنشئ حسابًا",
     continueGoogle: "المتابعة باستخدام Google",
     continueGithub: "المتابعة باستخدام GitHub",
+    continueX: "المتابعة باستخدام X",
     accountError: "تعذّر إكمال طلب الحساب. تحقق من بياناتك ثم حاول مجددًا.",
     confirmationSent: "تحقق من بريدك لتأكيد حسابك ثم سجّل الدخول.",
     emailNotConfirmed: "بريدك لم يُؤكَّد بعد. أعدنا إرسال رابط التأكيد؛ افتحه ثم سجّل الدخول.",
@@ -1529,7 +1531,7 @@ function App() {
     }
   }
 
-  async function signInWithProvider(provider: "google" | "github") {
+  async function signInWithProvider(provider: "google" | "github" | "x") {
     if (!supabase) return;
     setAuthPending(true);
     setAuthError("");
@@ -3313,6 +3315,9 @@ function App() {
                   </button>
                   <button className="auth-provider" type="button" disabled={authPending} onClick={() => void signInWithProvider("github")}>
                     <span aria-hidden="true">GH</span>{t("continueGithub")}
+                  </button>
+                  <button className="auth-provider" type="button" disabled={authPending} onClick={() => void signInWithProvider("x")}>
+                    <span aria-hidden="true">X</span>{t("continueX")}
                   </button>
                 </div>
               </>

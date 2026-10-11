@@ -601,6 +601,7 @@ function App() {
   const authCloseRef = useRef<HTMLButtonElement>(null);
   const activeUserId = useRef<string | null>(null);
   const workspaceSyncPending = useRef(false);
+  const cloudLoadFailed = useRef(false);
   const workspaceSyncRevision = useRef(0);
   const skippedWorkspaceSync = useRef<string | null>(null);
   const currentWorkspaceData = useRef(data);
@@ -772,6 +773,7 @@ function App() {
 
     let active = true;
     workspaceSyncPending.current = false;
+    cloudLoadFailed.current = false;
     skippedWorkspaceSync.current = null;
     setWorkspaceReady(false);
     setCloudSyncFailed(false);
@@ -819,6 +821,7 @@ function App() {
         const error =
           workspaceResult.error || profileResult.error || conversationsResult.error || messagesResult.error;
         console.error("TimeX could not load the private user workspace.", error);
+        cloudLoadFailed.current = true;
         setCloudSyncFailed(true);
       }
 
@@ -872,6 +875,7 @@ function App() {
     })().catch((error: unknown) => {
       if (!active) return;
       console.error("TimeX could not load the private user workspace.", error);
+      cloudLoadFailed.current = true;
       setCloudSyncFailed(true);
       setData(loadDataForKey(accountStorageKey(user.id)));
       setConversationStore(createConversationStore(
@@ -985,10 +989,11 @@ function App() {
       return;
     }
     skippedWorkspaceSync.current = null;
+    if (cloudLoadFailed.current) return;
     workspaceSyncPending.current = true;
     const revision = ++workspaceSyncRevision.current;
-    const timer = window.setTimeout(() => {
-      void client
+    const save = () =>
+      client
         .from("user_workspaces")
         .upsert(
           { user_id: user.id, data, updated_at: new Date().toISOString() },
@@ -1005,8 +1010,20 @@ function App() {
             setCloudSyncFailed(false);
           }
         });
-    }, 450);
-    return () => window.clearTimeout(timer);
+    const timer = window.setTimeout(() => void save(), 450);
+    const flush = () => {
+      if (document.visibilityState === "hidden" && workspaceSyncPending.current) {
+        window.clearTimeout(timer);
+        void save();
+      }
+    };
+    document.addEventListener("visibilitychange", flush);
+    window.addEventListener("pagehide", flush);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", flush);
+      window.removeEventListener("pagehide", flush);
+    };
   }, [data, sessionReady, user, workspaceReady]);
 
   useEffect(() => {

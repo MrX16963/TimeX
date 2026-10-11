@@ -1,6 +1,7 @@
 import { buildPlanSteps, type Language, type Plan, type Task } from "./lib";
 import type { AssistantAction } from "./cloud";
 import type { ChatMode } from "./assistant-conversations";
+import { isInformationQuestion, lookupWeb } from "./web-lookup";
 
 export type MrXResponse = {
   reply: string;
@@ -79,6 +80,19 @@ export async function respondAsMrX(
 
   if (/\b(today|tasks?|priorit(y|ies)|what next|what should i do first|what.*next|where.*start)\b|مهام|أولوي|اليوم|شو أعمل|ماذا أفعل|بماذا أبدأ/iu.test(message)) {
     return taskGuidance(language, context.tasks);
+  }
+
+  if (isResearchRequest(message) || isInformationQuestion(message)) {
+    const found = await lookupWeb(message, language);
+    if (found) {
+      return {
+        reply: language === "ar"
+          ? `بحثت قبل أن أجيب. إليك ما وجدته عن «${found.title}»: ${found.summary}\n\nهل تريد أن أحوّل هذا إلى خطة أو مهمة؟`
+          : `I looked this up before answering. Here's what I found about “${found.title}”: ${found.summary}\n\nWould you like me to turn this into a plan or a task?`,
+        actions: [],
+        sources: [{ title: found.title, url: found.url }],
+      };
+    }
   }
 
   if (isResearchRequest(message)) {

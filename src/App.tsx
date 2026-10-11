@@ -1936,6 +1936,38 @@ function App() {
     }
   }, [user]);
 
+  const swipeStart = useRef<{ x: number; y: number } | null>(null);
+
+  function handleSwipeStart(event: React.TouchEvent) {
+    const target = event.target as HTMLElement;
+    const blocked = target.closest("input, textarea, select, audio, [contenteditable], .modal, [role='dialog']");
+    let scrollable: HTMLElement | null = target;
+    while (scrollable && scrollable !== event.currentTarget) {
+      if (scrollable.scrollWidth > scrollable.clientWidth + 4 && getComputedStyle(scrollable).overflowX !== "visible") {
+        swipeStart.current = null;
+        return;
+      }
+      scrollable = scrollable.parentElement;
+    }
+    const touch = event.touches[0];
+    swipeStart.current = blocked || !touch ? null : { x: touch.clientX, y: touch.clientY };
+  }
+
+  function handleSwipeEnd(event: React.TouchEvent) {
+    const start = swipeStart.current;
+    swipeStart.current = null;
+    const touch = event.changedTouches[0];
+    if (!start || !touch || showAccount || showWelcomeGate) return;
+    const dx = touch.clientX - start.x;
+    const dy = touch.clientY - start.y;
+    if (Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.6) return;
+    const forward = isArabic ? dx > 0 : dx < 0;
+    const index = navItems.findIndex((item) => item.id === page);
+    const next = navItems[index + (forward ? 1 : -1)];
+    if (!next) return;
+    if (next.id === "assistant" && blockGuest()) return;
+    setPage(next.id);
+  }
   function renderTask(task: Task) {
     const quadrant = getQuadrant(task);
     return (
@@ -2033,7 +2065,7 @@ function App() {
         </div>
       </aside>
 
-      <main className="main-area">
+      <main className="main-area" onTouchStart={handleSwipeStart} onTouchEnd={handleSwipeEnd}>
         <header className="topbar">
           <div className="topbar-context">
             <span className="date-dot" />

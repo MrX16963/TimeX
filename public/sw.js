@@ -1,4 +1,4 @@
-const CACHE_NAME = "timex-shell-v3";
+const CACHE_NAME = "timex-shell-v4";
 const BASE_PATH = new URL(".", self.registration.scope).pathname;
 const APP_PATH = `${BASE_PATH}app.html`;
 const APP_SHELL = ["", "app.html", "manifest.webmanifest", "icons/timex.svg", "icons/icon-192.png"]

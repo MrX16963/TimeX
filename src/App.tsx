@@ -198,6 +198,11 @@ const englishCopy = {
     continueGoogle: "Continue with Google",
     continueGithub: "Continue with GitHub",
     continueX: "Continue with X",
+    guestGateTitle: "Welcome to TimeX",
+    guestGateBody: "Sign in to save tasks, plan with MrX, and sync across your devices, or continue as a guest.",
+    continueAsGuest: "Continue as guest",
+    guestLocked: "Sign in to add tasks and use the MrX assistant.",
+    guestBanner: "You are browsing as a guest. Sign in to add tasks and use the MrX assistant.",
     accountError: "We couldn't complete that account request. Check your details and try again.",
     confirmationSent: "Check your email to confirm your account, then sign in.",
     emailNotConfirmed: "Your email isn't confirmed yet. We re-sent the confirmation link; open it, then sign in.",
@@ -392,6 +397,11 @@ const arabicCopy = {
     continueGoogle: "المتابعة باستخدام Google",
     continueGithub: "المتابعة باستخدام GitHub",
     continueX: "المتابعة باستخدام X",
+    guestGateTitle: "مرحبًا بك في TimeX",
+    guestGateBody: "سجّل الدخول لحفظ مهامك والتخطيط مع MrX والمزامنة بين أجهزتك، أو تابع كضيف.",
+    continueAsGuest: "المتابعة كضيف",
+    guestLocked: "سجّل الدخول لإضافة المهام واستخدام مساعد MrX.",
+    guestBanner: "أنت تتصفح كضيف. سجّل الدخول لإضافة المهام واستخدام مساعد MrX.",
     accountError: "تعذّر إكمال طلب الحساب. تحقق من بياناتك ثم حاول مجددًا.",
     confirmationSent: "تحقق من بريدك لتأكيد حسابك ثم سجّل الدخول.",
     emailNotConfirmed: "بريدك لم يُؤكَّد بعد. أعدنا إرسال رابط التأكيد؛ افتحه ثم سجّل الدخول.",
@@ -563,6 +573,13 @@ function App() {
   const [workspaceReady, setWorkspaceReady] = useState(supabase === null);
   const [authMode, setAuthMode] = useState<AuthMode>("sign-in");
   const [showAccount, setShowAccount] = useState(false);
+  const [guestChosen, setGuestChosen] = useState(() => {
+    try {
+      return window.localStorage.getItem("timex-guest-mode") === "1";
+    } catch {
+      return false;
+    }
+  });
   const [authName, setAuthName] = useState("");
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
@@ -1165,12 +1182,34 @@ function App() {
     window.setTimeout(() => setToast(""), 2800);
   }
 
+  const guestRestricted = supabase !== null && sessionReady && !user;
+  const showWelcomeGate = guestRestricted && !guestChosen;
+
+  function blockGuest(): boolean {
+    if (!guestRestricted) return false;
+    notify(t("guestLocked"));
+    setAuthError("");
+    setAuthNotice("");
+    setShowAccount(true);
+    return true;
+  }
+
+  function continueAsGuest() {
+    try {
+      window.localStorage.setItem("timex-guest-mode", "1");
+    } catch {
+      // The choice only lasts for this session when storage is unavailable.
+    }
+    setGuestChosen(true);
+  }
+
   function addTask(
     title: string,
     important = false,
     urgent = false,
     schedule?: TaskSchedule,
   ) {
+    if (blockGuest()) return;
     const trimmed = title.trim();
     if (!trimmed) return;
     const task: Task = {
@@ -1197,6 +1236,7 @@ function App() {
 
   async function submitTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (blockGuest()) return;
     const schedule = taskScheduleOpen
       ? {
           scheduledDate: taskScheduledDate,
@@ -1224,6 +1264,7 @@ function App() {
 
   async function submitCalendarTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (blockGuest()) return;
     if (calendarEndTime <= calendarStartTime) {
       notify(t("timeRangeInvalid"));
       return;
@@ -1436,6 +1477,7 @@ function App() {
   }
 
   function addPlanToTasks(plan: Plan) {
+    if (blockGuest()) return;
     const existing = new Set(data.tasks.map((task) => task.title.trim().toLocaleLowerCase()));
     const tasks = plan.steps
       .filter((title) => !existing.has(title.trim().toLocaleLowerCase()))
@@ -1875,13 +1917,28 @@ function App() {
     }
   }
 
-  const navItems: { id: Page; icon: string; label: CopyKey }[] = [
+  const allNavItems: { id: Page; icon: string; label: CopyKey }[] = [
     { id: "today", icon: "⌂", label: "today" },
     { id: "calendar", icon: "◷", label: "calendar" },
     { id: "matrix", icon: "▦", label: "matrix" },
     { id: "notes", icon: "▤", label: "notes" },
     { id: "assistant", icon: "☷", label: "assistantTab" },
   ];
+  const navItems = guestRestricted ? allNavItems.filter((item) => item.id !== "assistant") : allNavItems;
+
+  useEffect(() => {
+    if (!user) return;
+    setGuestChosen(false);
+    try {
+      window.localStorage.removeItem("timex-guest-mode");
+    } catch {
+      // Ignore unavailable storage.
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (guestRestricted && page === "assistant") setPage("today");
+  }, [guestRestricted, page]);
 
   function renderTask(task: Task) {
     const quadrant = getQuadrant(task);
@@ -2000,6 +2057,23 @@ function App() {
         </header>
 
         <div className="page-content">
+          {guestRestricted && (
+            <div className="chat-access-notice guest-banner">
+              <span aria-hidden="true">ⓘ</span>
+              <p>{t("guestBanner")}</p>
+              <button
+                className="text-button"
+                type="button"
+                onClick={() => {
+                  setAuthError("");
+                  setAuthNotice("");
+                  setShowAccount(true);
+                }}
+              >
+                {t("signIn")}
+              </button>
+            </div>
+          )}
           {!workspaceReady ? (
             <div className="workspace-loading" role="status" aria-live="polite">
               <span className="workspace-loading-spinner" aria-hidden="true" />
@@ -3187,6 +3261,30 @@ function App() {
               onClick={() => setShowInstallHelp(false)}
             >
               {t("close")}
+            </button>
+          </section>
+        </div>
+      )}
+
+      {showWelcomeGate && (
+        <div className="install-modal-backdrop">
+          <section className="install-modal account-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-gate-title">
+            <span className="install-modal-icon" aria-hidden="true">t.</span>
+            <h2 id="welcome-gate-title">{t("guestGateTitle")}</h2>
+            <p>{t("guestGateBody")}</p>
+            <button
+              className="primary-button install-modal-done"
+              type="button"
+              onClick={() => {
+                setAuthError("");
+                setAuthNotice("");
+                setShowAccount(true);
+              }}
+            >
+              {t("signIn")}
+            </button>
+            <button className="auth-provider" type="button" onClick={continueAsGuest}>
+              {t("continueAsGuest")}
             </button>
           </section>
         </div>

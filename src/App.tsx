@@ -1936,10 +1936,6 @@ function App() {
     }
   }, [user]);
 
-  useEffect(() => {
-    if (guestRestricted && page === "assistant") setPage("today");
-  }, [guestRestricted, page]);
-
   function renderTask(task: Task) {
     const quadrant = getQuadrant(task);
     return (

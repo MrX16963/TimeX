@@ -1761,8 +1761,7 @@ function App() {
       const useConnectedAssistant = Boolean(
         user &&
         supabase &&
-        (chatMode === "advanced-plan" ||
-          (chatMode === "chat" && isResearchRequest(content))),
+        (chatMode === "advanced-plan" || chatMode === "chat"),
       );
       if (useConnectedAssistant && user && supabase) {
         try {

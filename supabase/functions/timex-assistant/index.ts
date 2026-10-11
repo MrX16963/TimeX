@@ -120,9 +120,6 @@ Deno.serve(async (request) => {
   }
   const lastUserMessage = messages.at(-1)?.content ?? "";
   const searchRequest = mode === "advanced-plan" || needsWebSearch(lastUserMessage);
-  if (!searchRequest) {
-    return jsonResponse(400, { error: "This request does not need Google Search." });
-  }
   const tasks = Array.isArray(body.tasks) ? body.tasks.filter(isTaskContext).slice(0, 30) : [];
   const metadataName =
     authData.user.user_metadata?.display_name ??
@@ -192,6 +189,18 @@ Deno.serve(async (request) => {
           }],
         },
       ];
+    } else if (!searchRequest) {
+      const chatResponse = await fetchGemini(apiKey, model, systemPrompt, contents);
+      if (!chatResponse.ok) {
+        console.error("Gemini rejected the chat request.", chatResponse.status);
+        return jsonResponse(502, { error: "MrX could not answer right now. Please try again." });
+      }
+      const chatPayload = await chatResponse.json();
+      const chatReply = extractText(chatPayload.candidates?.[0]?.content?.parts);
+      if (!chatReply || chatReply.length > 8000) {
+        return jsonResponse(502, { error: "MrX returned an invalid response. Please try again." });
+      }
+      return jsonResponse(200, { reply: chatReply, actions: [], sources: [] });
     } else {
       const searchResponse = await fetchGemini(
         apiKey,

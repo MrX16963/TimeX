@@ -1924,7 +1924,7 @@ function App() {
     { id: "notes", icon: "▤", label: "notes" },
     { id: "assistant", icon: "☷", label: "assistantTab" },
   ];
-  const navItems = guestRestricted ? allNavItems.filter((item) => item.id !== "assistant") : allNavItems;
+  const navItems = allNavItems;
 
   useEffect(() => {
     if (!user) return;
@@ -2007,7 +2007,10 @@ function App() {
               key={item.id}
               type="button"
               aria-current={page === item.id ? "page" : undefined}
-              onClick={() => setPage(item.id)}
+              onClick={() => {
+                if (item.id === "assistant" && blockGuest()) return;
+                setPage(item.id);
+              }}
             >
               <span className="nav-icon" aria-hidden="true">{item.icon}</span>
               <span>{t(item.label)}</span>
@@ -3100,7 +3103,10 @@ function App() {
             key={item.id}
             type="button"
             aria-current={page === item.id ? "page" : undefined}
-            onClick={() => setPage(item.id)}
+            onClick={() => {
+                if (item.id === "assistant" && blockGuest()) return;
+                setPage(item.id);
+              }}
           >
             <span aria-hidden="true">{item.icon}</span>
             <span>{t(item.label)}</span>

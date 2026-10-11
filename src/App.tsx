@@ -516,6 +516,11 @@ function getDisplayName(user: User | null): string {
     : user.email?.split("@")[0] || "";
 }
 
+function describeAuthError(error: unknown): string {
+  const details = error as { code?: string; message?: string } | null;
+  return (details?.code ?? details?.message ?? "unknown").slice(0, 120);
+}
+
 function App() {
   const [data, setData] = useState<AppData>(loadData);
   const [showSettings, setShowSettings] = useState(false);
@@ -736,7 +741,7 @@ function App() {
         setAuthNotice(t("signInSuccessful"));
       } catch (error) {
         console.error("TimeX could not complete native social sign-in.", error);
-        setAuthError(t("accountError"));
+        setAuthError(`${t("accountError")} (${describeAuthError(error)})`);
         setShowAccount(true);
       }
     }
@@ -1500,7 +1505,7 @@ function App() {
       } else if (code === "over_email_send_rate_limit") {
         setAuthError(t("emailRateLimited"));
       } else {
-        setAuthError(t("accountError"));
+        setAuthError(`${t("accountError")} (${describeAuthError(error)})`);
       }
     } finally {
       setAuthPending(false);
@@ -1533,7 +1538,7 @@ function App() {
       setAuthPending(false);
     } catch (error) {
       console.error(`TimeX ${provider} sign-in failed.`, error);
-      setAuthError(t("accountError"));
+      setAuthError(`${t("accountError")} (${describeAuthError(error)})`);
       setAuthPending(false);
     }
   }

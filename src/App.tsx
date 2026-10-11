@@ -712,13 +712,26 @@ function App() {
       try {
         await Browser.close().catch(() => undefined);
         const callback = new URL(url);
-        const authError = callback.searchParams.get("error_description");
+        const hash = new URLSearchParams(callback.hash.replace(/^#/, ""));
+        const authError =
+          callback.searchParams.get("error_description") ?? hash.get("error_description");
         if (authError) throw new Error(authError);
 
         const code = callback.searchParams.get("code");
-        if (!code) throw new Error("The sign-in response did not include a session code.");
-        const { error } = await authClient.auth.exchangeCodeForSession(code);
-        if (error) throw error;
+        const accessToken = hash.get("access_token");
+        const refreshToken = hash.get("refresh_token");
+        if (code) {
+          const { error } = await authClient.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (accessToken && refreshToken) {
+          const { error } = await authClient.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (error) throw error;
+        } else {
+          throw new Error("The sign-in response did not include a session.");
+        }
         setAuthError("");
         setAuthNotice(t("signInSuccessful"));
       } catch (error) {

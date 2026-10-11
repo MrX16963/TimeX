@@ -63,7 +63,7 @@ export function fetchGemini(
         systemInstruction: { parts: [{ text: systemInstruction }] },
         contents,
         ...(tools ? { tools } : {}),
-        generationConfig: { temperature: 0.5, maxOutputTokens: 1200 },
+        generationConfig: { temperature: 0.5, maxOutputTokens: 4096, ...(model.includes("flash") ? { thinkingConfig: { thinkingBudget: 0 } } : {}) },
       }),
     },
   );

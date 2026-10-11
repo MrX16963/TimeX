@@ -533,6 +533,19 @@ function describeAuthError(error: unknown): string {
   return (details?.code ?? details?.message ?? "unknown").slice(0, 120);
 }
 
+async function readFunctionError(error: unknown): Promise<string> {
+  const context = (error as { context?: unknown })?.context;
+  if (context instanceof Response) {
+    try {
+      const body = (await context.clone().json()) as { error?: unknown };
+      if (typeof body.error === "string") return body.error.slice(0, 160);
+    } catch {
+      return "";
+    }
+  }
+  return "";
+}
+
 function App() {
   const [data, setData] = useState<AppData>(loadData);
   const [showSettings, setShowSettings] = useState(false);
@@ -1757,6 +1770,7 @@ function App() {
 
     try {
       let response: AssistantResponse | null = null;
+      let serviceDetail = "";
       let localResponse: Awaited<ReturnType<typeof respondAsMrX>> | null = null;
       const useConnectedAssistant = Boolean(
         user &&
@@ -1788,7 +1802,11 @@ function App() {
               },
             },
           );
-          if (error) throw error;
+          if (error) {
+            const detail = await readFunctionError(error);
+            serviceDetail = detail;
+            throw error;
+          }
           if (
             !assistantData ||
             typeof assistantData.reply !== "string" ||
@@ -1811,6 +1829,7 @@ function App() {
         } catch (error) {
           console.error("TimeX could not reach the configured assistant; using MrX locally.", error);
           setChatNotice(t("assistantLocalFallback"));
+          if (serviceDetail) setChatNotice(` (${serviceDetail})`);
         }
       }
 

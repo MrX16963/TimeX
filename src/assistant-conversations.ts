@@ -1,7 +1,7 @@
 import type { ChatMessage } from "./cloud";
 import { readChatMessages } from "./cloud";
 
-export type ChatMode = "chat" | "plan" | "advanced-plan";
+export type ChatMode = "chat" | "plan" | "advanced-plan" | "deepseek";
 
 export type AssistantConversation = {
   id: string;
@@ -77,7 +77,7 @@ export function saveConversationMessages(
 }
 
 export function isChatMode(value: unknown): value is ChatMode {
-  return value === "chat" || value === "plan" || value === "advanced-plan";
+  return value === "chat" || value === "plan" || value === "advanced-plan" || value === "deepseek";
 }
 
 function isConversationStore(value: unknown): value is ConversationStore {

@@ -18,6 +18,7 @@ export async function requestOpenRouter(
       Authorization: `Bearer ${apiKey}`,
       "HTTP-Referer": TIMEX_SITE_URL,
       "X-Title": "TimeX",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({

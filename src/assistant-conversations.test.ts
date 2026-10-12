@@ -18,10 +18,12 @@ describe("assistant conversation history", () => {
   it("creates separate conversations with a selected mode", () => {
     const first = createConversation("plan");
     const second = createConversation("advanced-plan");
+    const third = createConversation("deepseek");
 
     expect(first.id).not.toBe(second.id);
     expect(first.mode).toBe("plan");
     expect(second.mode).toBe("advanced-plan");
+    expect(third.mode).toBe("deepseek");
   });
 
   it("loads valid saved conversations and selects a valid active conversation", () => {

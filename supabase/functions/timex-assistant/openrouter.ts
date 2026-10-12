@@ -18,7 +18,7 @@ export async function requestOpenRouter(
       Authorization: `Bearer ${apiKey}`,
       "HTTP-Referer": TIMEX_SITE_URL,
       "X-Title": "TimeX",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "User-Agent": "TimeX/1.0 (+https://mrx16963.github.io/TimeX)",
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -33,6 +33,17 @@ export async function requestOpenRouter(
 
 export async function describeOpenRouterError(response: Response): Promise<string> {
   const body = await response.text();
+  const contentType = response.headers.get("content-type") ?? "";
+  const isHtml =
+    contentType.toLowerCase().includes("text/html") ||
+    /^\s*(?:<!doctype\s+html|<html\b)/i.test(body);
+  if (isHtml) {
+    const rayId = response.headers.get("cf-ray");
+    return rayId
+      ? `Cloudflare blocked the request before OpenRouter processed it (Ray ID: ${rayId}).`
+      : "Cloudflare returned an HTML block page before OpenRouter processed the request.";
+  }
+
   let detail = "";
   try {
     const parsed = JSON.parse(body) as { error?: { message?: unknown; code?: unknown } };

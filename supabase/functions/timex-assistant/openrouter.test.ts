@@ -26,7 +26,7 @@ describe("OpenRouter conversation request", () => {
       Authorization: `Bearer ${secret}`,
       "HTTP-Referer": "https://mrx16963.github.io/TimeX",
       "X-Title": "TimeX",
-      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+      "User-Agent": "TimeX/1.0 (+https://mrx16963.github.io/TimeX)",
       "Content-Type": "application/json",
     });
     expect(JSON.parse(String(init.body)).model).toBe("deepseek/deepseek-r1:free");
@@ -43,6 +43,22 @@ describe("OpenRouter conversation request", () => {
     );
     await expect(describeOpenRouterError(response)).resolves.toBe(
       "No endpoints found for this model (code 403)",
+    );
+  });
+
+  it("identifies Cloudflare HTML blocks and returns the Ray ID", async () => {
+    const response = new Response(
+      "<!DOCTYPE html><html><title>Forbidden</title></html>",
+      {
+        status: 403,
+        headers: {
+          "content-type": "text/html; charset=UTF-8",
+          "cf-ray": "abc123-IAD",
+        },
+      },
+    );
+    await expect(describeOpenRouterError(response)).resolves.toContain(
+      "Cloudflare blocked the request before OpenRouter processed it (Ray ID: abc123-IAD).",
     );
   });
 });

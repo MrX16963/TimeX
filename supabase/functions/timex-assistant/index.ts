@@ -121,46 +121,60 @@ Deno.serve(async (request) => {
     return jsonResponse(400, { error: "Choose a supported connected assistant mode." });
   }
   if (mode === "gemini") {
-    const geminiConversationKey = Deno.env.get("MrX_gemini_API_Key");
-    if (!geminiConversationKey) {
+    const openRouterKey =
+      Deno.env.get("OPENROUTER_API_KEY") ??
+      Deno.env.get("MrX_gemini_API_Key");
+    if (!openRouterKey) {
       return jsonResponse(503, {
-        error: "Gemini conversation is not configured. Add MrX_gemini_API_Key to Supabase Edge Function secrets.",
+        error: "Gemini via OpenRouter is not configured. Add OPENROUTER_API_KEY to Supabase Edge Function secrets.",
       });
     }
     try {
-      const geminiContents: GeminiContent[] = messages.map((message) => ({
-        role: message.role === "assistant" ? "model" : "user",
-        parts: [{ text: message.content }],
-      }));
-      const response = await fetchGemini(
-        geminiConversationKey,
-        Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash",
-        [
-          "You are MrX, TimeX's practical, warm, privacy-conscious planning companion.",
-          `Respond in ${body.language === "en" ? "English" : "Arabic"}, unless the user asks to switch.`,
-          "Answer naturally and concisely. Never claim to have created, saved, or changed tasks, plans, or notes; this conversation mode cannot perform app actions.",
-          "Do not invent current facts or claim web research. Be transparent when unsure.",
-        ].join(" "),
-        geminiContents,
-      );
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${openRouterKey}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://mrx16963.github.io/TimeX/",
+          "X-Title": "TimeX MrX",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.0-flash-exp:free",
+          messages: [
+            {
+              role: "system",
+              content: [
+                "You are MrX, TimeX's practical, warm, privacy-conscious planning companion.",
+                `Respond in ${body.language === "en" ? "English" : "Arabic"}, unless the user asks to switch.`,
+                "Answer naturally and concisely. Never claim to have created, saved, or changed tasks, plans, or notes; this conversation mode cannot perform app actions.",
+                "Do not invent current facts or claim web research. Be transparent when unsure.",
+              ].join(" "),
+            },
+            ...messages,
+          ],
+          temperature: 0.7,
+          max_tokens: 1500,
+          stream: false,
+        }),
+      });
       if (!response.ok) {
-        console.error("Gemini conversation request failed.", response.status, await response.text());
+        console.error("OpenRouter conversation request failed.", response.status, await response.text());
         return jsonResponse(502, {
           error: response.status === 429
-            ? "Gemini quota is exhausted for now. Please try again later."
-            : `Gemini rejected the request (${response.status}).`,
+            ? "OpenRouter quota is exhausted for now. Please try again later."
+            : `OpenRouter rejected the request (${response.status}).`,
         });
       }
       const payload = await response.json();
-      const reply = extractText(payload.candidates?.[0]?.content?.parts);
+      const reply = payload.choices?.[0]?.message?.content;
       if (typeof reply !== "string" || !reply.trim() || reply.length > 8000) {
-        console.error("Gemini returned an empty or oversized conversation response.");
-        return jsonResponse(502, { error: "MrX returned an invalid Gemini response." });
+        console.error("OpenRouter returned an empty or oversized conversation response.");
+        return jsonResponse(502, { error: "MrX returned an invalid OpenRouter response." });
       }
       return jsonResponse(200, { reply: reply.trim(), actions: [], sources: [] });
     } catch (error) {
-      console.error("Gemini conversation request failed.", error);
-      return jsonResponse(502, { error: "MrX could not reach Gemini. Please try again." });
+      console.error("OpenRouter conversation request failed.", error);
+      return jsonResponse(502, { error: "MrX could not reach OpenRouter. Please try again." });
     }
   }
   const apiKey = Deno.env.get("GEMINI_API_KEY");

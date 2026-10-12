@@ -219,8 +219,8 @@ const englishCopy = {
     emptyConversationHistory: "Your saved conversations will appear here.",
     deleteConversation: "Delete conversation",
     chatMode: "Conversation",
-    deepseekMode: "Conversation mode (DeepSeek)",
-    deepseekModeHint: "Natural conversation using the secured DeepSeek service.",
+    geminiMode: "Conversation mode (Gemini)",
+    geminiModeHint: "Natural conversation using the secured Gemini service.",
     planMode: "Plan mode",
     advancedPlanMode: "Advanced plan mode",
     chatModeHint: "Ask, reflect, or request a web search.",
@@ -420,8 +420,8 @@ const arabicCopy = {
     emptyConversationHistory: "ستظهر محادثاتك المحفوظة هنا.",
     deleteConversation: "حذف المحادثة",
     chatMode: "محادثة",
-    deepseekMode: "وضع المحادثة (DeepSeek)",
-    deepseekModeHint: "محادثة طبيعية عبر خدمة DeepSeek الآمنة.",
+    geminiMode: "وضع المحادثة (Gemini)",
+    geminiModeHint: "محادثة طبيعية عبر خدمة Gemini الآمنة.",
     planMode: "نمط الخطة",
     advancedPlanMode: "نمط الخطة المتقدمة",
     chatModeHint: "اسأل أو ناقش موضوعًا أو اطلب البحث على الويب.",
@@ -1779,7 +1779,7 @@ function App() {
       const useConnectedAssistant = Boolean(
         user &&
         supabase &&
-        (chatMode === "advanced-plan" || chatMode === "chat" || chatMode === "deepseek"),
+        (chatMode === "advanced-plan" || chatMode === "chat" || chatMode === "gemini" || chatMode === "deepseek"),
       );
       if (useConnectedAssistant && user && supabase) {
         try {
@@ -2999,7 +2999,7 @@ function App() {
                     aria-label={t("assistantMode")}
                   >
                     <option value="chat">{t("chatMode")}</option>
-                    <option value="deepseek">{t("deepseekMode")}</option>
+                    <option value="gemini">{t("geminiMode")}</option>
                     <option value="plan">{t("planMode")}</option>
                     <option value="advanced-plan">{t("advancedPlanMode")}</option>
                   </select>
@@ -3007,8 +3007,8 @@ function App() {
                 <p>
                   {chatMode === "advanced-plan"
                     ? t("advancedPlanModeHint")
-                    : chatMode === "deepseek"
-                      ? t("deepseekModeHint")
+                    : chatMode === "gemini" || chatMode === "deepseek"
+                      ? t("geminiModeHint")
                     : chatMode === "plan"
                       ? t("planModeHint")
                       : t("chatModeHint")}
@@ -3029,7 +3029,7 @@ function App() {
                               aria-current={conversation.id === activeConversation?.id ? "true" : undefined}
                               onClick={() => selectConversation(conversation)}
                             >
-                              <span>{conversation.title || t(conversation.mode === "advanced-plan" ? "advancedPlanMode" : conversation.mode === "deepseek" ? "deepseekMode" : conversation.mode === "plan" ? "planMode" : "chatMode")}</span>
+                              <span>{conversation.title || t(conversation.mode === "advanced-plan" ? "advancedPlanMode" : conversation.mode === "gemini" || conversation.mode === "deepseek" ? "geminiMode" : conversation.mode === "plan" ? "planMode" : "chatMode")}</span>
                               <small>{conversation.messages.length}</small>
                             </button>
                             <button

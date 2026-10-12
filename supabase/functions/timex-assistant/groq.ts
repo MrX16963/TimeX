@@ -21,8 +21,6 @@ export async function requestGroq(
       model: GROQ_MODEL,
       messages,
       temperature: 0.7,
-      max_tokens: 1500,
-      stream: false,
     }),
   });
 }
@@ -30,7 +28,10 @@ export async function requestGroq(
 export async function describeGroqError(response: Response): Promise<string> {
   const body = await response.text();
   const contentType = response.headers.get("content-type") ?? "";
-  if (contentType.toLowerCase().includes("text/html") || /^\s*<html\b/i.test(body)) {
+  if (
+    contentType.toLowerCase().includes("text/html") ||
+    /^\s*(?:<!doctype\s+html|<html\b)/i.test(body)
+  ) {
     return "Groq returned an HTML access-denied page instead of an API error.";
   }
 

@@ -143,7 +143,7 @@ Deno.serve(async (request) => {
       ]);
       if (!response.ok) {
         const providerError = await describeGroqError(response);
-        console.error("Groq conversation request failed.", response.status, providerError);
+        console.log("Groq API error response", response.status, providerError);
         return jsonResponse(502, {
           error: `Groq rejected the request (${response.status}): ${providerError}`,
         });

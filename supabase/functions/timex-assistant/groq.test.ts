@@ -24,7 +24,15 @@ describe("Groq conversation request", () => {
       Authorization: `Bearer ${secret}`,
       "Content-Type": "application/json",
     });
-    expect(JSON.parse(String(init.body)).model).toBe("llama-3.1-8b-instant");
+    const body = JSON.parse(String(init.body));
+    expect(body).toEqual({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: "You are MrX." },
+        { role: "user", content: "Hello" },
+      ],
+      temperature: 0.7,
+    });
     expect(String(init.body)).not.toContain(secret);
     expect(GROQ_CHAT_COMPLETIONS_URL).toBe(url);
     expect(GROQ_MODEL).toBe("llama-3.1-8b-instant");

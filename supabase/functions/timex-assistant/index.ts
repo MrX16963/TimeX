@@ -6,7 +6,7 @@ import {
   needsWebSearch,
   type GeminiContent,
 } from "./gemini.ts";
-import { describeOpenRouterError, requestOpenRouter } from "./openrouter.ts";
+import { describeGroqError, requestGroq } from "./groq.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -122,17 +122,14 @@ Deno.serve(async (request) => {
     return jsonResponse(400, { error: "Choose a supported connected assistant mode." });
   }
   if (mode === "gemini") {
-    const openRouterKey =
-      Deno.env.get("OPENROUTER_API_KEY") ||
-      Deno.env.get("DEEPSEEK_API_KEY") ||
-      Deno.env.get("MrX_gemini_API_Key");
-    if (!openRouterKey) {
+    const groqKey = Deno.env.get("GROQ_API_KEY");
+    if (!groqKey) {
       return jsonResponse(503, {
-        error: "OpenRouter is not configured. Add OPENROUTER_API_KEY to Supabase Edge Function secrets.",
+        error: "Groq is not configured. Add GROQ_API_KEY to Supabase Edge Function secrets.",
       });
     }
     try {
-      const response = await requestOpenRouter(openRouterKey, [
+      const response = await requestGroq(groqKey, [
         {
           role: "system",
           content: [
@@ -145,22 +142,22 @@ Deno.serve(async (request) => {
         ...messages,
       ]);
       if (!response.ok) {
-        const providerError = await describeOpenRouterError(response);
-        console.error("OpenRouter conversation request failed.", response.status, providerError);
+        const providerError = await describeGroqError(response);
+        console.error("Groq conversation request failed.", response.status, providerError);
         return jsonResponse(502, {
-          error: `OpenRouter rejected the request (${response.status}): ${providerError}`,
+          error: `Groq rejected the request (${response.status}): ${providerError}`,
         });
       }
       const payload = await response.json();
       const reply = payload.choices?.[0]?.message?.content;
       if (typeof reply !== "string" || !reply.trim() || reply.length > 8000) {
-        console.error("OpenRouter returned an empty or oversized conversation response.");
-        return jsonResponse(502, { error: "MrX returned an invalid OpenRouter response." });
+        console.error("Groq returned an empty or oversized conversation response.");
+        return jsonResponse(502, { error: "MrX returned an invalid Groq response." });
       }
       return jsonResponse(200, { reply: reply.trim(), actions: [], sources: [] });
     } catch (error) {
-      console.error("OpenRouter conversation request failed.", error);
-      return jsonResponse(502, { error: "MrX could not reach OpenRouter. Please try again." });
+      console.error("Groq conversation request failed.", error);
+      return jsonResponse(502, { error: "MrX could not reach Groq. Please try again." });
     }
   }
   const apiKey = Deno.env.get("GEMINI_API_KEY");

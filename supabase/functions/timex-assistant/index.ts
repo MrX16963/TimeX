@@ -6,6 +6,7 @@ import {
   needsWebSearch,
   type GeminiContent,
 } from "./gemini.ts";
+import { describeOpenRouterError, requestOpenRouter } from "./openrouter.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -123,46 +124,31 @@ Deno.serve(async (request) => {
   if (mode === "gemini") {
     const openRouterKey =
       Deno.env.get("OPENROUTER_API_KEY") ??
+      Deno.env.get("DEEPSEEK_API_KEY") ??
       Deno.env.get("MrX_gemini_API_Key");
     if (!openRouterKey) {
       return jsonResponse(503, {
-        error: "Gemini via OpenRouter is not configured. Add OPENROUTER_API_KEY to Supabase Edge Function secrets.",
+        error: "OpenRouter is not configured. Add OPENROUTER_API_KEY to Supabase Edge Function secrets.",
       });
     }
     try {
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${openRouterKey}`,
-          "Content-Type": "application/json",
-          "HTTP-Referer": "https://mrx16963.github.io/TimeX/",
-          "X-Title": "TimeX MrX",
+      const response = await requestOpenRouter(openRouterKey, [
+        {
+          role: "system",
+          content: [
+            "You are MrX, TimeX's practical, warm, privacy-conscious planning companion.",
+            `Respond in ${body.language === "en" ? "English" : "Arabic"}, unless the user asks to switch.`,
+            "Answer naturally and concisely. Never claim to have created, saved, or changed tasks, plans, or notes; this conversation mode cannot perform app actions.",
+            "Do not invent current facts or claim web research. Be transparent when unsure.",
+          ].join(" "),
         },
-        body: JSON.stringify({
-          model: "google/gemini-2.0-flash-exp:free",
-          messages: [
-            {
-              role: "system",
-              content: [
-                "You are MrX, TimeX's practical, warm, privacy-conscious planning companion.",
-                `Respond in ${body.language === "en" ? "English" : "Arabic"}, unless the user asks to switch.`,
-                "Answer naturally and concisely. Never claim to have created, saved, or changed tasks, plans, or notes; this conversation mode cannot perform app actions.",
-                "Do not invent current facts or claim web research. Be transparent when unsure.",
-              ].join(" "),
-            },
-            ...messages,
-          ],
-          temperature: 0.7,
-          max_tokens: 1500,
-          stream: false,
-        }),
-      });
+        ...messages,
+      ]);
       if (!response.ok) {
-        console.error("OpenRouter conversation request failed.", response.status, await response.text());
+        const providerError = await describeOpenRouterError(response);
+        console.error("OpenRouter conversation request failed.", response.status, providerError);
         return jsonResponse(502, {
-          error: response.status === 429
-            ? "OpenRouter quota is exhausted for now. Please try again later."
-            : `OpenRouter rejected the request (${response.status}).`,
+          error: `OpenRouter rejected the request (${response.status}): ${providerError}`,
         });
       }
       const payload = await response.json();

@@ -25,7 +25,7 @@ type TaskContext = {
   scheduledDate?: string;
 };
 
-type AssistantMode = "chat" | "advanced-plan" | "deepseek";
+type AssistantMode = "chat" | "advanced-plan" | "gemini";
 
 type GeminiToolCall = {
   name?: unknown;
@@ -109,60 +109,58 @@ Deno.serve(async (request) => {
     return jsonResponse(400, { error: "The chat contains an invalid or oversized message." });
   }
   const mode: AssistantMode =
-    body.mode === "advanced-plan" || body.mode === "deepseek" ? body.mode : "chat";
-  if (body.mode !== "advanced-plan" && body.mode !== "chat" && body.mode !== "deepseek") {
+    body.mode === "advanced-plan" ? "advanced-plan"
+      : body.mode === "gemini" || body.mode === "deepseek" ? "gemini"
+      : "chat";
+  if (
+    body.mode !== "advanced-plan" &&
+    body.mode !== "chat" &&
+    body.mode !== "gemini" &&
+    body.mode !== "deepseek"
+  ) {
     return jsonResponse(400, { error: "Choose a supported connected assistant mode." });
   }
-  if (mode === "deepseek") {
-    const deepseekKey = Deno.env.get("DEEPSEEK_API_KEY");
-    if (!deepseekKey) {
-      return jsonResponse(503, { error: "DeepSeek is not configured. Add DEEPSEEK_API_KEY to Supabase Edge Function secrets." });
+  if (mode === "gemini") {
+    const geminiConversationKey = Deno.env.get("MrX_gemini_API_Key");
+    if (!geminiConversationKey) {
+      return jsonResponse(503, {
+        error: "Gemini conversation is not configured. Add MrX_gemini_API_Key to Supabase Edge Function secrets.",
+      });
     }
     try {
-      const deepseekMessages = [
-        {
-          role: "system",
-          content: [
-            "You are MrX, TimeX's practical, warm, privacy-conscious planning companion.",
-            `Respond in ${body.language === "en" ? "English" : "Arabic"}, unless the user asks to switch.`,
-            "Answer naturally and concisely. Never claim to have created, saved, or changed tasks, plans, or notes; this conversation mode cannot perform app actions.",
-            "Do not invent current facts or claim web research. Be transparent when unsure.",
-          ].join(" "),
-        },
-        ...messages.map(({ role, content }) => ({ role, content })),
-      ];
-      const response = await fetch("https://api.deepseek.com/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${deepseekKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: Deno.env.get("DEEPSEEK_MODEL") || "deepseek-chat",
-          messages: deepseekMessages,
-          temperature: 0.7,
-          max_tokens: 1500,
-          stream: false,
-        }),
-      });
+      const geminiContents: GeminiContent[] = messages.map((message) => ({
+        role: message.role === "assistant" ? "model" : "user",
+        parts: [{ text: message.content }],
+      }));
+      const response = await fetchGemini(
+        geminiConversationKey,
+        Deno.env.get("GEMINI_MODEL") || "gemini-2.5-flash",
+        [
+          "You are MrX, TimeX's practical, warm, privacy-conscious planning companion.",
+          `Respond in ${body.language === "en" ? "English" : "Arabic"}, unless the user asks to switch.`,
+          "Answer naturally and concisely. Never claim to have created, saved, or changed tasks, plans, or notes; this conversation mode cannot perform app actions.",
+          "Do not invent current facts or claim web research. Be transparent when unsure.",
+        ].join(" "),
+        geminiContents,
+      );
       if (!response.ok) {
-        console.error("DeepSeek rejected the assistant request.", response.status, await response.text());
+        console.error("Gemini conversation request failed.", response.status, await response.text());
         return jsonResponse(502, {
           error: response.status === 429
-            ? "DeepSeek quota is exhausted for now. Please try again later."
-            : `DeepSeek rejected the request (${response.status}).`,
+            ? "Gemini quota is exhausted for now. Please try again later."
+            : `Gemini rejected the request (${response.status}).`,
         });
       }
       const payload = await response.json();
-      const reply = payload.choices?.[0]?.message?.content;
+      const reply = extractText(payload.candidates?.[0]?.content?.parts);
       if (typeof reply !== "string" || !reply.trim() || reply.length > 8000) {
-        console.error("DeepSeek returned an empty or oversized response.");
-        return jsonResponse(502, { error: "MrX returned an invalid DeepSeek response." });
+        console.error("Gemini returned an empty or oversized conversation response.");
+        return jsonResponse(502, { error: "MrX returned an invalid Gemini response." });
       }
       return jsonResponse(200, { reply: reply.trim(), actions: [], sources: [] });
     } catch (error) {
-      console.error("DeepSeek assistant request failed.", error);
-      return jsonResponse(502, { error: "MrX could not reach DeepSeek. Please try again." });
+      console.error("Gemini conversation request failed.", error);
+      return jsonResponse(502, { error: "MrX could not reach Gemini. Please try again." });
     }
   }
   const apiKey = Deno.env.get("GEMINI_API_KEY");

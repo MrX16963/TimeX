@@ -24,10 +24,10 @@ describe("Groq conversation request", () => {
       Authorization: `Bearer ${secret}`,
       "Content-Type": "application/json",
     });
-    expect(JSON.parse(String(init.body)).model).toBe("llama-3.3-70b-versatile");
+    expect(JSON.parse(String(init.body)).model).toBe("llama-3.1-8b-instant");
     expect(String(init.body)).not.toContain(secret);
     expect(GROQ_CHAT_COMPLETIONS_URL).toBe(url);
-    expect(GROQ_MODEL).toBe("llama-3.3-70b-versatile");
+    expect(GROQ_MODEL).toBe("llama-3.1-8b-instant");
   });
 
   it("returns JSON provider details and recognizes HTML blocks", async () => {

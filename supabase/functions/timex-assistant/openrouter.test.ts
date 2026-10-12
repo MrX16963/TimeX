@@ -26,6 +26,7 @@ describe("OpenRouter conversation request", () => {
       Authorization: `Bearer ${secret}`,
       "HTTP-Referer": "https://mrx16963.github.io/TimeX",
       "X-Title": "TimeX",
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
       "Content-Type": "application/json",
     });
     expect(JSON.parse(String(init.body)).model).toBe("deepseek/deepseek-r1:free");

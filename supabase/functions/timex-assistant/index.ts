@@ -123,8 +123,8 @@ Deno.serve(async (request) => {
   }
   if (mode === "gemini") {
     const openRouterKey =
-      Deno.env.get("OPENROUTER_API_KEY") ??
-      Deno.env.get("DEEPSEEK_API_KEY") ??
+      Deno.env.get("OPENROUTER_API_KEY") ||
+      Deno.env.get("DEEPSEEK_API_KEY") ||
       Deno.env.get("MrX_gemini_API_Key");
     if (!openRouterKey) {
       return jsonResponse(503, {

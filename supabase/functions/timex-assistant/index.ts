@@ -7,6 +7,15 @@ import {
   type GeminiContent,
 } from "./gemini.ts";
 import { describeGroqError, requestGroq } from "./groq.ts";
+import {
+  buildSystemPrompt,
+  clampReply,
+  isOutdatedClient,
+  updateNotice,
+  groqTemperature,
+  resolveGroqMode,
+  sanitizeContextData,
+} from "./modes.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -26,7 +35,7 @@ type TaskContext = {
   scheduledDate?: string;
 };
 
-type AssistantMode = "chat" | "advanced-plan" | "gemini";
+type AssistantMode = "chat" | "advanced-plan";
 
 type GeminiToolCall = {
   name?: unknown;
@@ -85,43 +94,61 @@ Deno.serve(async (request) => {
 
   let body: {
     messages?: unknown;
+    prompt?: unknown;
+    contextData?: unknown;
     language?: unknown;
     userName?: unknown;
     tasks?: unknown;
     mode?: unknown;
+    clientVersion?: unknown;
   };
   try {
     body = await request.json();
   } catch {
     return jsonResponse(400, { error: "The request body must be valid JSON." });
   }
-  if (!Array.isArray(body.messages) || body.messages.length === 0 || body.messages.length > 20) {
+  if (isOutdatedClient(body.clientVersion)) {
+    return jsonResponse(200, {
+      reply: updateNotice(body.language === "en" ? "en" : "ar"),
+      actions: [],
+      sources: [],
+    });
+  }
+  const rawMessages = Array.isArray(body.messages)
+    ? body.messages
+    : typeof body.prompt === "string"
+    ? [{ role: "user", content: body.prompt }]
+    : [];
+  if (rawMessages.length === 0 || rawMessages.length > 20) {
     return jsonResponse(400, { error: "Send between 1 and 20 chat messages." });
   }
-  const messages = body.messages.filter(isChatMessage).map((message) => ({
+  const messages = rawMessages.filter(isChatMessage).map((message) => ({
     role: message.role,
     content: message.content.trim(),
   }));
   if (
-    messages.length !== body.messages.length ||
+    messages.length !== rawMessages.length ||
     messages.some((message) => !message.content || message.content.length > 4000) ||
     messages.at(-1)?.role !== "user"
   ) {
     return jsonResponse(400, { error: "The chat contains an invalid or oversized message." });
   }
-  const mode: AssistantMode =
-    body.mode === "advanced-plan" ? "advanced-plan"
-      : body.mode === "gemini" || body.mode === "deepseek" ? "gemini"
-      : "chat";
-  if (
-    body.mode !== "advanced-plan" &&
-    body.mode !== "chat" &&
-    body.mode !== "gemini" &&
-    body.mode !== "deepseek"
-  ) {
+  const groqMode = resolveGroqMode(body.mode);
+  const mode: AssistantMode = body.mode === "advanced-plan" ? "advanced-plan" : "chat";
+  if (!groqMode && body.mode !== "advanced-plan" && body.mode !== "chat") {
     return jsonResponse(400, { error: "Choose a supported connected assistant mode." });
   }
-  if (mode === "gemini") {
+  const tasks = Array.isArray(body.tasks) ? body.tasks.filter(isTaskContext).slice(0, 30) : [];
+  const metadataName =
+    authData.user.user_metadata?.display_name ??
+    authData.user.user_metadata?.full_name ??
+    authData.user.email?.split("@")[0] ??
+    "";
+  const userName =
+    typeof body.userName === "string"
+      ? body.userName.slice(0, 100)
+      : String(metadataName).slice(0, 100);
+  if (groqMode) {
     const groqKey = Deno.env.get("GROQ_API_KEY");
     if (!groqKey) {
       return jsonResponse(503, {
@@ -132,15 +159,15 @@ Deno.serve(async (request) => {
       const response = await requestGroq(groqKey, [
         {
           role: "system",
-          content: [
-            "You are MrX, TimeX's practical, warm, privacy-conscious planning companion.",
-            `Respond in ${body.language === "en" ? "English" : "Arabic"}, unless the user asks to switch.`,
-            "Answer naturally and concisely. Never claim to have created, saved, or changed tasks, plans, or notes; this conversation mode cannot perform app actions.",
-            "Do not invent current facts or claim web research. Be transparent when unsure.",
-          ].join(" "),
+          content: buildSystemPrompt(groqMode, {
+            language: body.language === "en" ? "en" : "ar",
+            userName,
+            tasks,
+            contextData: sanitizeContextData(body.contextData),
+          }),
         },
         ...messages,
-      ]);
+      ], groqTemperature(groqMode));
       if (!response.ok) {
         const providerError = await describeGroqError(response);
         console.log("Groq API error response", response.status, providerError);
@@ -150,11 +177,11 @@ Deno.serve(async (request) => {
       }
       const payload = await response.json();
       const reply = payload.choices?.[0]?.message?.content;
-      if (typeof reply !== "string" || !reply.trim() || reply.length > 8000) {
-        console.error("Groq returned an empty or oversized conversation response.");
+      if (typeof reply !== "string" || !reply.trim()) {
+        console.error("Groq returned an empty conversation response.");
         return jsonResponse(502, { error: "MrX returned an invalid Groq response." });
       }
-      return jsonResponse(200, { reply: reply.trim(), actions: [], sources: [] });
+      return jsonResponse(200, { reply: clampReply(reply), actions: [], sources: [], mode: groqMode });
     } catch (error) {
       console.error("Groq conversation request failed.", error);
       return jsonResponse(502, { error: "MrX could not reach Groq. Please try again." });
@@ -166,16 +193,6 @@ Deno.serve(async (request) => {
   }
   const lastUserMessage = messages.at(-1)?.content ?? "";
   const searchRequest = mode === "advanced-plan" || needsWebSearch(lastUserMessage);
-  const tasks = Array.isArray(body.tasks) ? body.tasks.filter(isTaskContext).slice(0, 30) : [];
-  const metadataName =
-    authData.user.user_metadata?.display_name ??
-    authData.user.user_metadata?.full_name ??
-    authData.user.email?.split("@")[0] ??
-    "";
-  const userName =
-    typeof body.userName === "string"
-      ? body.userName.slice(0, 100)
-      : String(metadataName).slice(0, 100);
   const language = body.language === "en" ? "English" : "Arabic";
   const systemPrompt = [
     "You are MrX, TimeX's practical, warm, privacy-conscious planning companion.",

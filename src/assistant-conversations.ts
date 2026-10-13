@@ -1,7 +1,15 @@
 import type { ChatMessage } from "./cloud";
 import { readChatMessages } from "./cloud";
 
-export type ChatMode = "chat" | "plan" | "advanced-plan" | "gemini" | "deepseek";
+export type ChatMode =
+  | "chat"
+  | "groq"
+  | "mrx_search"
+  | "mrx_planner"
+  | "plan"
+  | "advanced-plan"
+  | "gemini"
+  | "deepseek";
 
 export type AssistantConversation = {
   id: string;
@@ -17,8 +25,10 @@ export type ConversationStore = {
   conversations: AssistantConversation[];
 };
 
-const MAX_CONVERSATIONS = 50;
+export const MAX_CONVERSATIONS = 15;
 const MAX_MESSAGES_PER_CONVERSATION = 100;
+const MAX_SEARCH_CONTEXT_CHARS = 3000;
+const CLOUD_SAFE_MODES: ChatMode[] = ["chat", "plan", "advanced-plan"];
 
 export function createConversation(mode: ChatMode = "chat"): AssistantConversation {
   const now = new Date().toISOString();
@@ -32,6 +42,42 @@ export function createConversation(mode: ChatMode = "chat"): AssistantConversati
   };
 }
 
+export function normalizeChatMode(value: unknown): ChatMode {
+  if (value === "gemini" || value === "deepseek") return "groq";
+  if (value === "advanced-plan") return "mrx_planner";
+  if (value === "plan") return "chat";
+  return isChatMode(value) ? value : "chat";
+}
+
+export function toCloudMode(mode: ChatMode): ChatMode {
+  return CLOUD_SAFE_MODES.includes(mode) ? mode : "chat";
+}
+
+export function recentConversations(
+  conversations: AssistantConversation[],
+): AssistantConversation[] {
+  return [...conversations]
+    .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+    .slice(0, MAX_CONVERSATIONS);
+}
+
+export function latestSearchContext(
+  conversations: AssistantConversation[],
+  excludeId?: string,
+): string {
+  for (const conversation of recentConversations(conversations)) {
+    if (conversation.id === excludeId || conversation.mode !== "mrx_search") continue;
+    const reply = [...conversation.messages]
+      .reverse()
+      .find((message) => message.role === "assistant" && message.content.trim());
+    if (reply) {
+      const topic = conversation.title ? `Topic: ${conversation.title}\n` : "";
+      return `${topic}${reply.content.trim()}`.slice(0, MAX_SEARCH_CONTEXT_CHARS);
+    }
+  }
+  return "";
+}
+
 export function createConversationStore(
   key: string,
   legacyKey?: string,
@@ -41,9 +87,11 @@ export function createConversationStore(
     if (saved) {
       const parsed: unknown = JSON.parse(saved);
       if (isConversationStore(parsed)) {
-        const conversations = parsed.conversations
-          .filter(isConversation)
-          .slice(0, MAX_CONVERSATIONS);
+        const conversations = recentConversations(
+          parsed.conversations
+            .filter(isConversation)
+            .map((item) => ({ ...item, mode: normalizeChatMode(item.mode) })),
+        );
         if (conversations.length) {
           const activeId = conversations.some((item) => item.id === parsed.activeId)
             ? parsed.activeId
@@ -78,7 +126,8 @@ export function saveConversationMessages(
 
 export function isChatMode(value: unknown): value is ChatMode {
   return value === "chat" || value === "plan" || value === "advanced-plan" ||
-    value === "gemini" || value === "deepseek";
+    value === "gemini" || value === "deepseek" || value === "groq" ||
+    value === "mrx_search" || value === "mrx_planner";
 }
 
 function isConversationStore(value: unknown): value is ConversationStore {

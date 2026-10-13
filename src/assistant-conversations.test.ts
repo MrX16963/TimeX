@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it } from "vitest";
 import {
   createConversation,
   createConversationStore,
+  latestSearchContext,
+  MAX_CONVERSATIONS,
+  normalizeChatMode,
   saveConversationMessages,
+  toCloudMode,
 } from "./assistant-conversations";
 
 describe("assistant conversation history", () => {
@@ -85,4 +89,56 @@ describe("assistant conversation history", () => {
     expect(saved.messages[0]?.id).toBe("message-5");
     expect(saved.title).toBe("Request 5");
   });
+
+  it("keeps only the 15 most recent conversations and migrates legacy modes", () => {
+    const conversations = Array.from({ length: 18 }, (_, index) => ({
+      ...createConversation(index === 0 ? "gemini" : "chat"),
+      updatedAt: new Date(2026, 9, 1, 0, index).toISOString(),
+    }));
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: {
+        localStorage: {
+          getItem: () => JSON.stringify({ activeId: conversations[17].id, conversations }),
+        },
+      },
+    });
+
+    const store = createConversationStore("timex-conversations");
+    expect(store.conversations).toHaveLength(MAX_CONVERSATIONS);
+    expect(store.conversations[0].id).toBe(conversations[17].id);
+    expect(store.conversations.some((item) => item.id === conversations[0].id)).toBe(false);
+    expect(normalizeChatMode("gemini")).toBe("groq");
+    expect(normalizeChatMode("deepseek")).toBe("groq");
+    expect(normalizeChatMode("advanced-plan")).toBe("mrx_planner");
+    expect(normalizeChatMode("plan")).toBe("chat");
+    expect(normalizeChatMode("mrx_search")).toBe("mrx_search");
+    expect(normalizeChatMode("nonsense")).toBe("chat");
+  });
+
+  it("stores new modes in the cloud as a database-safe value", () => {
+    expect(toCloudMode("groq")).toBe("chat");
+    expect(toCloudMode("mrx_planner")).toBe("chat");
+    expect(toCloudMode("plan")).toBe("plan");
+  });
+
+  it("passes the latest MrX Search answer to the planner as context", () => {
+    const search = {
+      ...createConversation("mrx_search"),
+      title: "Pomodoro research",
+      updatedAt: "2026-10-02T10:00:00.000Z",
+      messages: [
+        { id: "1", role: "user" as const, content: "Pomodoro?", created_at: "2026-10-02T10:00:00.000Z" },
+        { id: "2", role: "assistant" as const, content: "25-minute focus blocks.", created_at: "2026-10-02T10:00:01.000Z" },
+      ],
+    };
+    const planner = createConversation("mrx_planner");
+
+    expect(latestSearchContext([planner, search], planner.id)).toBe(
+      "Topic: Pomodoro research\n25-minute focus blocks.",
+    );
+    expect(latestSearchContext([planner], planner.id)).toBe("");
+    expect(latestSearchContext([search], search.id)).toBe("");
+  });
 });
+

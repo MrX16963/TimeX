@@ -1,6 +1,6 @@
 export const GROQ_CHAT_COMPLETIONS_URL =
   "https://api.groq.com/openai/v1/chat/completions";
-export const GROQ_MODEL = "llama-3.1-8b-instant";
+export const GROQ_MODEL = "openai/gpt-oss-20b";
 
 export type GroqMessage = {
   role: "system" | "user" | "assistant";

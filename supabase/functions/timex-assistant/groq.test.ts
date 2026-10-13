@@ -26,7 +26,7 @@ describe("Groq conversation request", () => {
     });
     const body = JSON.parse(String(init.body));
     expect(body).toEqual({
-      model: "llama-3.1-8b-instant",
+      model: "openai/gpt-oss-20b",
       messages: [
         { role: "system", content: "You are MrX." },
         { role: "user", content: "Hello" },
@@ -35,7 +35,7 @@ describe("Groq conversation request", () => {
     });
     expect(String(init.body)).not.toContain(secret);
     expect(GROQ_CHAT_COMPLETIONS_URL).toBe(url);
-    expect(GROQ_MODEL).toBe("llama-3.1-8b-instant");
+    expect(GROQ_MODEL).toBe("openai/gpt-oss-20b");
   });
 
   it("returns JSON provider details and recognizes HTML blocks", async () => {

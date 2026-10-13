@@ -94,7 +94,7 @@ export function buildSystemPrompt(mode: GroqAssistantMode, options: PromptOption
   return parts.join("\n\n");
 }
 
-export const MIN_CLIENT_VERSION = "1.0.12";
+export const MIN_CLIENT_VERSION = "1.0.16";
 export const UPDATE_URL = "https://mrx16963.github.io/TimeX/";
 
 export function isOutdatedClient(version: unknown): boolean {

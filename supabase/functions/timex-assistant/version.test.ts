@@ -4,8 +4,8 @@ import { isOutdatedClient, updateNotice, UPDATE_URL } from "./modes";
 describe("client version gate", () => {
   it("flags missing and older versions", () => {
     expect(isOutdatedClient(undefined)).toBe(true);
-    expect(isOutdatedClient("1.0.11")).toBe(true);
-    expect(isOutdatedClient("1.0.12")).toBe(false);
+    expect(isOutdatedClient("1.0.15")).toBe(true);
+    expect(isOutdatedClient("1.0.16")).toBe(false);
     expect(isOutdatedClient("1.1.0")).toBe(false);
   });
   it("links to the website", () => {

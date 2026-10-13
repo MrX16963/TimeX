@@ -883,36 +883,25 @@ function App() {
       };
     }
 
+    setData(loadDataForKey(accountStorageKey(user.id)));
+    setConversationStore(createConversationStore(
+      conversationStorageKey(user.id),
+      chatStorageKey(user.id),
+    ));
+
     void (async () => {
-      const [workspaceResult, profileResult, conversationsResult] = await Promise.all([
+      const [workspaceResult, profileResult] = await Promise.all([
         supabase
           .from("user_workspaces")
           .select("data")
           .eq("user_id", user.id)
           .maybeSingle(),
         supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
-        supabase
-          .from("assistant_conversations")
-          .select("id, title, mode, created_at, updated_at")
-          .eq("user_id", user.id)
-          .order("updated_at", { ascending: false })
-          .limit(MAX_CONVERSATIONS),
       ]);
-      const conversationIds = (conversationsResult.data ?? []).map((item) => item.id);
-      const messagesResult = conversationIds.length
-        ? await supabase
-            .from("assistant_messages")
-            .select("id, conversation_id, role, content, sources, created_at")
-            .eq("user_id", user.id)
-            .in("conversation_id", conversationIds)
-            .order("created_at", { ascending: true })
-            .limit(1000)
-        : { data: [], error: conversationsResult.error };
       if (!active) return;
 
-      if (workspaceResult.error || profileResult.error || conversationsResult.error || messagesResult.error) {
-        const error =
-          workspaceResult.error || profileResult.error || conversationsResult.error || messagesResult.error;
+      if (workspaceResult.error || profileResult.error) {
+        const error = workspaceResult.error || profileResult.error;
         console.error("TimeX could not load the private user workspace.", error);
         cloudLoadFailed.current = true;
         setCloudSyncFailed(true);
@@ -939,35 +928,66 @@ function App() {
           ? readAppData(JSON.stringify(savedWorkspace))
           : loadDataForKey(accountStorageKey(user.id)),
       );
-      const localStore = createConversationStore(
-        conversationStorageKey(user.id),
-        chatStorageKey(user.id),
-      );
-      const localModes = new Map(
-        localStore.conversations.map((conversation) => [conversation.id, conversation.mode]),
-      );
-      const cloudConversations = conversationsResult.error
-        ? []
-        : (conversationsResult.data ?? []).map((item) => {
-            const messages = ((messagesResult.data ?? []) as Array<
-              ChatMessage & { conversation_id: string }
-            >)
-              .filter((message) => message.conversation_id === item.id)
-              .slice(-100)
-              .map(({ conversation_id: _conversationId, ...message }) => message);
-            return {
-              id: item.id,
-              title: item.title,
-              mode: localModes.get(item.id) ?? normalizeChatMode(item.mode),
-              messages,
-              createdAt: item.created_at,
-              updatedAt: item.updated_at,
-            } satisfies AssistantConversation;
-          });
-      setConversationStore(cloudConversations.length
-        ? { activeId: cloudConversations[0].id, conversations: cloudConversations }
-        : localStore);
       setWorkspaceReady(true);
+
+      void (async () => {
+        const conversationsResult = await supabase
+          .from("assistant_conversations")
+          .select("id, title, mode, created_at, updated_at")
+          .eq("user_id", user.id)
+          .order("updated_at", { ascending: false })
+          .limit(MAX_CONVERSATIONS);
+        const conversationIds = (conversationsResult.data ?? []).map((item) => item.id);
+        const messagesResult = conversationIds.length
+          ? await supabase
+              .from("assistant_messages")
+              .select("id, conversation_id, role, content, sources, created_at")
+              .eq("user_id", user.id)
+              .in("conversation_id", conversationIds)
+              .order("created_at", { ascending: true })
+              .limit(1000)
+          : { data: [], error: conversationsResult.error };
+        if (!active) return;
+        if (conversationsResult.error || messagesResult.error) {
+          console.error(
+            "TimeX could not load cloud assistant conversations.",
+            conversationsResult.error || messagesResult.error,
+          );
+          setCloudSyncFailed(true);
+          return;
+        }
+
+        const localStore = createConversationStore(
+          conversationStorageKey(user.id),
+          chatStorageKey(user.id),
+        );
+        const localModes = new Map(
+          localStore.conversations.map((conversation) => [conversation.id, conversation.mode]),
+        );
+        const cloudConversations = (conversationsResult.data ?? []).map((item) => {
+          const messages = ((messagesResult.data ?? []) as Array<
+            ChatMessage & { conversation_id: string }
+          >)
+            .filter((message) => message.conversation_id === item.id)
+            .slice(-100)
+            .map(({ conversation_id: _conversationId, ...message }) => message);
+          return {
+            id: item.id,
+            title: item.title,
+            mode: localModes.get(item.id) ?? normalizeChatMode(item.mode),
+            messages,
+            createdAt: item.created_at,
+            updatedAt: item.updated_at,
+          } satisfies AssistantConversation;
+        });
+        setConversationStore(cloudConversations.length
+          ? { activeId: cloudConversations[0].id, conversations: cloudConversations }
+          : localStore);
+      })().catch((error: unknown) => {
+        if (!active) return;
+        console.error("TimeX could not load cloud assistant conversations.", error);
+        setCloudSyncFailed(true);
+      });
     })().catch((error: unknown) => {
       if (!active) return;
       console.error("TimeX could not load the private user workspace.", error);
@@ -2203,7 +2223,15 @@ function App() {
           </div>
         </header>
 
-        <div className="page-content">
+        <div
+          className="page-content"
+          aria-busy={!workspaceReady}
+          aria-disabled={!workspaceReady}
+          style={{ pointerEvents: workspaceReady ? "auto" : "none" }}
+          onKeyDown={(event) => {
+            if (!workspaceReady) event.preventDefault();
+          }}
+        >
           {guestRestricted && (
             <div className="chat-access-notice guest-banner">
               <span aria-hidden="true">ⓘ</span>
@@ -2221,13 +2249,13 @@ function App() {
               </button>
             </div>
           )}
-          {!workspaceReady ? (
+          {!workspaceReady && (
             <div className="workspace-loading" role="status" aria-live="polite">
               <span className="workspace-loading-spinner" aria-hidden="true" />
               <p>{t("loadingWorkspace")}</p>
             </div>
-          ) : (
-            <>
+          )}
+          <>
           {page === "today" && (
             <>
               <section className="welcome-block">
@@ -2487,7 +2515,7 @@ function App() {
                   <div className="focus-decoration focus-decoration-two" aria-hidden="true" />
                 </section>
               </div>
-            </>
+          </>
           )}
 
           {page === "calendar" && (
@@ -3174,7 +3202,7 @@ function App() {
                           </button>
                         ))}
                       </div>
-                    </>
+                  </>
                   )}
                   {chatMessages.map((message) => (
                     <article
@@ -3271,7 +3299,6 @@ function App() {
             </section>
           )}
             </>
-          )}
         </div>
         <footer className="app-footer">Created by MrX OSA</footer>
       </main>

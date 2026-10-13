@@ -87,4 +87,4 @@ Browser or native-app storage can be cleared by the user or system. With Supabas
 
 ## Assistant modes and version gate
 
-The assistant supports Groq modes groq, mrx_search and mrx_planner (request fields: mode, messages or prompt, optional contextData). The latest 15 conversations are kept on the device; new modes are stored in the cloud as chat. Clients send clientVersion; the function replies to missing or older versions (below 1.0.12) with an update notice linking to https://mrx16963.github.io/TimeX/.
+The assistant supports Groq modes groq, mrx_search and mrx_planner (request fields: mode, messages or prompt, optional contextData). The latest 15 conversations are kept on the device; new modes are stored in the cloud as chat. Clients send clientVersion; the function replies to missing or older versions (below 1.0.16) with an update notice linking to https://mrx16963.github.io/TimeX/.

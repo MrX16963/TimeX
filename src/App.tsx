@@ -3263,6 +3263,7 @@ function App() {
                   </button>
                 </form>
                 <p className="chat-compose-hint">{t("messageDraftHint")}</p>
+                </section>
               </div>
               </div>
             </section>

@@ -5420,3 +5420,174 @@ html[dir="rtl"] .chat-send {
     font-size: 15px;
   }
 }
+
+.assistant-page-chat {
+  display: flex;
+  min-height: 0;
+  height: 100%;
+  flex-direction: column;
+}
+
+.page-content:has(.assistant-page-chat) {
+  width: 100%;
+  max-width: none;
+  height: calc(100dvh - 78px);
+  padding: 10px clamp(12px, 2vw, 32px) 12px;
+}
+
+.assistant-page-chat > .page-heading {
+  display: none;
+}
+
+.assistant-page-chat .assistant-view-switch {
+  flex: 0 0 auto;
+  margin-block: 0 8px;
+}
+
+.assistant-page-chat .assistant-view-panel {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.assistant-page-chat .assistant-conversation-toolbar {
+  flex: 0 0 auto;
+  margin-block: 6px 8px;
+}
+
+.assistant-page-chat .assistant-history {
+  max-height: none;
+  flex: 0 0 auto;
+  margin-block-end: 8px;
+  padding: 9px 12px;
+}
+
+.assistant-page-chat .assistant-history h2 {
+  margin-block-end: 6px;
+}
+
+.assistant-page-chat .assistant-history ul {
+  display: flex;
+  gap: 7px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  padding-block-end: 3px;
+  scrollbar-width: thin;
+}
+
+.assistant-page-chat .assistant-history li {
+  min-width: 150px;
+  max-width: 230px;
+  flex: 0 0 auto;
+}
+
+.assistant-page-chat .assistant-history-item {
+  min-height: 43px;
+  padding-inline: 10px;
+}
+
+.assistant-page-chat .assistant-history-note {
+  margin-block: 4px 0;
+}
+
+.assistant-page-chat .assistant-chat-layout {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+}
+
+.assistant-page-chat .chat-panel {
+  width: 100%;
+  min-height: 420px;
+  max-height: none;
+  flex: 1;
+}
+
+@media (min-width: 641px) {
+  .assistant-page-chat {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .page-content:has(.assistant-page-chat) {
+    height: calc(100dvh - 140px - env(safe-area-inset-bottom));
+    min-height: 0;
+    padding: 8px 10px 6px;
+  }
+
+  .assistant-page-chat {
+    min-height: 0;
+    height: 100%;
+  }
+
+  .assistant-page-chat .assistant-view-switch {
+    gap: 6px;
+    margin-block: 0 6px;
+  }
+
+  .assistant-page-chat .assistant-view-switch button {
+    min-height: 34px;
+  }
+
+  .assistant-page-chat .assistant-conversation-toolbar {
+    gap: 6px;
+    margin-block: 4px 6px;
+  }
+
+  .assistant-page-chat .assistant-conversation-toolbar > p {
+    display: none;
+  }
+
+  .assistant-page-chat .assistant-mode-picker {
+    flex: 1 1 100%;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-block-end: 2px;
+  }
+
+  .assistant-page-chat .assistant-mode-chip {
+    flex: 0 0 auto;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .assistant-page-chat .assistant-history {
+    margin-block-end: 6px;
+    padding: 7px 9px;
+  }
+
+  .assistant-page-chat .assistant-history-note {
+    display: none;
+  }
+
+  .assistant-page-chat .assistant-history li {
+    min-width: 130px;
+    max-width: 190px;
+  }
+
+  .assistant-page-chat .assistant-history-item {
+    min-height: 39px;
+  }
+
+  .assistant-page-chat .assistant-chat-layout .chat-panel {
+    min-height: 0;
+    height: 100%;
+    flex: 1 1 auto;
+  }
+
+  .assistant-page-chat .chat-header {
+    min-height: 52px;
+    padding: 7px 10px;
+  }
+
+  .assistant-page-chat .chat-privacy {
+    padding: 6px 10px;
+  }
+
+  .assistant-page-chat .chat-compose-hint {
+    display: none;
+  }
+}

@@ -2964,7 +2964,7 @@ function App() {
           )}
 
           {page === "assistant" && assistantView === "plans" && (
-            <section className="content-page assistant-page">
+            <section className="content-page assistant-page assistant-page-chat">
               <div className="page-heading">
                 <div>
                   <span className="eyebrow">{t("assistantChat")}</span>
@@ -3130,8 +3130,7 @@ function App() {
                 </div>
                 <p>{t(modeHintKeys[modeIdOf(chatMode)])}</p>
               </div>
-              <div className="assistant-chat-layout">
-                <aside className="assistant-history">
+              <aside className="assistant-history">
                   <h2>{t("conversationHistory")}</h2>
                   {conversationStore.conversations.length ? (
                     <ul>
@@ -3166,7 +3165,8 @@ function App() {
                   <p className="assistant-history-note">
                     {t("historyLimitNote").replace("{count}", String(MAX_CONVERSATIONS))}
                   </p>
-                </aside>
+              </aside>
+              <div className="assistant-chat-layout">
                 <section className="chat-panel">
                 <div className="chat-header">
                   <span className="chat-avatar" aria-hidden="true">✳</span>

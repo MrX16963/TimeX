@@ -3184,28 +3184,30 @@ function App() {
                       {message.role === "assistant" && (
                         <span className="message-avatar" aria-hidden="true">✳</span>
                       )}
-                      <p>{message.content}</p>
-                      {message.sources?.length ? (
-                        <ul className="assistant-sources" aria-label={t("assistantSources")}>
-                          {message.sources.map((source) => (
-                            <li key={source.url}>
-                              <a href={source.url} target="_blank" rel="noreferrer">
-                                {source.title}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                      {message.role === "assistant" && (
-                        <div className="chat-message-actions">
-                          <button type="button" onClick={() => void copyAssistantMessage(message.content)}>
-                            {t("copyMessage")}
-                          </button>
-                          <button type="button" onClick={() => saveMessageAsNote(message.content)}>
-                            {t("saveAsNote")}
-                          </button>
-                        </div>
-                      )}
+                      <div className="chat-message-content">
+                        <p>{message.content}</p>
+                        {message.sources?.length ? (
+                          <ul className="assistant-sources" aria-label={t("assistantSources")}>
+                            {message.sources.map((source) => (
+                              <li key={source.url}>
+                                <a href={source.url} target="_blank" rel="noreferrer">
+                                  {source.title}
+                                </a>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : null}
+                        {message.role === "assistant" && (
+                          <div className="chat-message-actions">
+                            <button type="button" onClick={() => void copyAssistantMessage(message.content)}>
+                              {t("copyMessage")}
+                            </button>
+                            <button type="button" onClick={() => saveMessageAsNote(message.content)}>
+                              {t("saveAsNote")}
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </article>
                   ))}
                   {chatPending && (

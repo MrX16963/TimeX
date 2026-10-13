@@ -5323,3 +5323,100 @@ html[dir="rtl"] .chat-send {
 .chat-message-actions { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
 .chat-message-actions button { padding: 0.2rem 0.6rem; border: 1px solid var(--line, #d9d9e3); border-radius: 8px; background: transparent; color: inherit; font-size: 0.78rem; cursor: pointer; }
 .chat-compose textarea { flex: 1; min-height: 2.75rem; max-height: 9rem; resize: none; padding: 0.7rem 0.9rem; border: 1px solid var(--line, #d9d9e3); border-radius: 14px; background: transparent; color: inherit; font: inherit; }
+
+/* Give the conversation more room and use a calmer, Gemini-inspired reading layout. */
+.assistant-chat-layout {
+  grid-template-columns: minmax(190px, 0.42fr) minmax(0, 2.2fr);
+}
+
+.assistant-chat-layout .chat-panel {
+  min-height: min(760px, calc(100dvh - 190px));
+  max-height: min(820px, calc(100dvh - 120px));
+}
+
+.chat-transcript {
+  gap: 24px;
+  padding: clamp(20px, 3vw, 36px);
+}
+
+.chat-message {
+  width: 100%;
+  max-width: min(100%, 920px);
+  gap: 14px;
+}
+
+.assistant-message {
+  align-items: flex-start;
+}
+
+.assistant-message .chat-message-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.chat-message-content > p {
+  margin: 0;
+  color: var(--text);
+  font-size: clamp(15px, 1.15vw, 17px);
+  line-height: 1.9;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.assistant-message .chat-message-content > p {
+  padding: 2px 0;
+  background: transparent;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.user-message .chat-message-content {
+  max-width: min(88%, 760px);
+  padding: 13px 18px;
+  border-radius: 22px 22px 5px 22px;
+  background: var(--surface-muted);
+}
+
+.user-message .chat-message-content > p {
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.assistant-message .message-avatar {
+  width: 32px;
+  height: 32px;
+  margin-top: 1px;
+  border-radius: 50%;
+  font-size: 15px;
+}
+
+.chat-message-actions {
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.chat-message-actions button {
+  padding: 6px 10px;
+}
+
+@media (max-width: 700px) {
+  .assistant-chat-layout .chat-panel {
+    min-height: max(500px, calc(100dvh - 330px));
+    max-height: none;
+  }
+
+  .chat-transcript {
+    padding: 18px 14px;
+  }
+
+  .chat-message {
+    gap: 10px;
+  }
+
+  .chat-message-content > p,
+  .user-message .chat-message-content > p {
+    font-size: 15px;
+  }
+}

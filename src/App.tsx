@@ -59,437 +59,469 @@ import { isDoubleBackPress } from "./back-navigation";
 import { deleteVoiceRecording, readVoiceRecording, saveVoiceRecording } from "./voice-notes";
 
 const englishCopy = {
-    appName: "TimeX",
-    tagline: "Make room for what matters.",
-    today: "Today",
-    calendar: "Schedule",
-    calendarIntro: "A clear view of your day, one hour at a time.",
-    todayButton: "Today",
-    previousDay: "Previous day",
-    nextDay: "Next day",
-    calendarTasks: "Scheduled tasks",
-    calendarEmpty: "Nothing planned for this day.",
-    calendarEmptySub: "Add a task with a time to see it on your daily schedule.",
-    scheduledTaskPlaceholder: "What needs a place in your day?",
-    addScheduledTask: "Add to schedule",
-    scheduledDate: "Date",
-    startTime: "Starts",
-    endTime: "Ends",
-    reminder: "Reminder",
-    taskColor: "Task color",
-    chooseTaskColor: "Choose task color",
-    weekOverview: "Week overview",
-    noReminder: "No reminder",
-    reminderBefore: "{minutes} min before",
-    reminderPermissionDenied: "Task saved, but notifications are blocked. Allow notifications in your device settings.",
-    reminderUnsupported: "Task saved. Notifications are unavailable in this browser.",
-    reminderScheduleFailed: "Could not schedule this reminder. Check your notification settings.",
-    timeRangeInvalid: "Choose an end time later than the start time.",
-    scheduleTask: "Add date, time & reminder",
-    unscheduledCount: "{count} tasks have no scheduled time.",
-    taskReminder: "Task reminder",
-    reminderBackgroundHint: "Android reminders can arrive while the app is closed. Browsers need TimeX to stay open.",
-    matrix: "Priority matrix",
-    notes: "Notes",
-    planner: "Plan a goal",
-    todayLabel: "YOUR DAY, WITH INTENTION",
-    greeting: "A little progress adds up.",
-    greetingSub: "Choose one thing that matters and begin there.",
-    focus: "Focus session",
-    focusSub: "One thing at a time. You've got this.",
-    focusWork: "Focus",
-    focusBreak: "Break",
-    pomodoroPresets: "Pomodoro presets",
-    pomodoroCustom: "Custom session",
-    workMinutes: "Focus minutes",
-    breakMinutes: "Break minutes",
-    applyTimer: "Apply timer",
-    startBreak: "Start break",
-    startFocus: "Start focus",
-    start: "Start focus",
-    pause: "Pause",
-    resume: "Resume",
-    reset: "Reset",
-    sessionDone: "Focus session complete. Take a mindful break.",
-    tasks: "Your tasks",
-    tasksSub: "Keep it simple. Keep it moving.",
-    addTask: "Add a task",
-    taskPlaceholder: "What would you like to get done?",
-    add: "Add",
-    emptyTasks: "A fresh start.",
-    emptyTasksSub: "Add a task above to give your day some direction.",
-    important: "Important",
-    urgent: "Urgent",
-    unprioritized: "Unprioritized",
-    markDone: "Mark task complete",
-    markOpen: "Mark task incomplete",
-    deleteTask: "Delete task",
-    completed: "Completed",
-    remaining: "In progress",
-    points: "Momentum points",
-    earned: "+10 points. Nice work!",
-    priorities: "Make your priorities visible",
-    matrixIntro: "Sort your tasks by importance and urgency to decide what deserves your attention.",
-    doNow: "Do now",
-    schedule: "Schedule",
-    delegate: "Delegate",
-    eliminate: "Eliminate",
-    doNowHint: "Important + urgent",
-    scheduleHint: "Important, not urgent",
-    delegateHint: "Urgent, not important",
-    eliminateHint: "Neither important nor urgent",
-    allCaughtUp: "Nothing here just yet.",
-    notesIntro: "A quiet place for ideas, reminders, and everything you want to remember.",
-    newNote: "New note",
-    noteTitle: "Note title",
-    noteBody: "Start writing...",
-    noteEmpty: "Your notes are just for you. Create one to get started.",
-    deleteNote: "Delete note",
-    voiceNotes: "Voice notes",
-    recordVoiceNote: "Record voice note",
-    stopRecording: "Stop recording",
-    recordingVoiceNote: "Recording…",
-    voiceNoteUnsupported: "Voice recording is not supported on this device.",
-    microphonePermissionDenied: "Microphone access was not granted. Allow it in your device settings and try again.",
-    voiceNoteSaveFailed: "Could not save the voice note. Check device storage and try again.",
-    deleteVoiceNote: "Delete voice note",
-    plannerIntro: "Turn a big intention into a few small, doable next steps.",
-    goalLabel: "What would you like to make progress on?",
-    goalPlaceholder: "e.g. Prepare for my certification exam",
-    makePlan: "Build my plan",
-    assistantNote: "MrX's offline plan builder turns a goal into small, actionable steps.",
-    plannerResearching: "Creating plan…",
-    planResearchLabel: "Research notes",
-    planSteps: "A gentle place to start",
-    addPlanTasks: "Add steps to my tasks",
-    planAdded: "Steps added to your task list.",
-    pastPlans: "Your plans",
-    noPlans: "Your plans will appear here when you create one.",
-    theme: "Change theme",
-    themeLight: "Comfort · pearl",
-    themeMidnight: "Arctic · blue",
-    themeSage: "Forest · emerald",
-    themeLavender: "Amethyst · violet",
-    themeCustom: "My accent",
-    themeSelection: "Choose your colors",
-    themeCustomColor: "Choose a favorite color",
-    themePaletteHint: "A black canvas with a gentle silver glow.",
-    language: "Language",
-    switchLanguage: "العربية",
-    storageWarning: "This browser could not save your changes. Check your storage settings and try again.",
-    dismiss: "Dismiss",
-    taskAdded: "Task added.",
-    noteCreated: "A new note is ready.",
-    pointsHint: "Earn points each time you complete a task.",
-    savedOnDevice: "Saved on this device",
-    deletePlan: "Delete plan",
-    close: "Close",
-    saveNoteHint: "Notes save automatically",
-    installApp: "Install app",
-    installTitle: "Take TimeX with you",
-    installHelp: "Install TimeX from your browser menu to use it like an app. Your saved tasks and notes stay on this device.",
-    installDesktop: "On a computer, choose “Install app” or “Install TimeX” from the browser menu or address bar.",
-    installAndroid: "On Android, open the browser menu and choose “Install app” or “Add to Home screen.”",
-    installApple: "On iPhone or iPad, open this page in Safari, tap Share, then choose “Add to Home Screen.”",
-    installFailed: "The browser could not start installation. Try the install option in its menu instead.",
-    settings: "Settings",
-    settingsTitle: "Personalize TimeX",
-    assistantPlans: "My plans",
-    privacy: "Privacy",
-    account: "Account",
-    signIn: "Sign in",
-    signOut: "Sign out",
-    welcomeWithName: "Welcome, {name}. A little progress adds up.",
-    accountHelp: "Sign in to keep your private workspace in sync across your devices.",
-    accountNotConfigured: "Email, Google, GitHub, and X sign-in use Supabase Auth, but the public Supabase client key is not configured for this build yet. MrX remains available locally.",
-    displayName: "Your name",
-    email: "Email address",
-    password: "Password",
-    createAccount: "Create account",
-    haveAccount: "Already have an account? Sign in",
-    needAccount: "New to TimeX? Create an account",
-    continueGoogle: "Continue with Google",
-    continueGithub: "Continue with GitHub",
-    continueX: "Continue with X",
-    guestGateTitle: "Welcome to TimeX",
-    guestGateBody: "Sign in to save tasks, plan with MrX, and sync across your devices, or continue as a guest.",
-    continueAsGuest: "Continue as guest",
-    guestLocked: "Sign in to add tasks and use the MrX assistant.",
-    guestBanner: "You are browsing as a guest. Sign in to add tasks and use the MrX assistant.",
-    accountError: "We couldn't complete that account request. Check your details and try again.",
-    confirmationSent: "Check your email to confirm your account, then sign in.",
-    emailNotConfirmed: "Your email isn't confirmed yet. We re-sent the confirmation link; open it, then sign in.",
-    invalidCredentials: "Incorrect email or password.",
-    emailRateLimited: "Too many emails were sent. Wait a few minutes and try again.",
-    greetingName: "Hello {name}, I'm MrX. I can help turn goals into steps, add tasks, and save notes.",
-    assistantChat: "MrX · planning companion",
-    assistantTab: "Assistant",
-    assistantChatSub: "MrX helps turn goals into plans, tasks, and notes.",
-    localAssistantLabel: "Offline mode",
-    newConversation: "New chat",
-    conversationHistory: "Chat history",
-    assistantMode: "Assistant mode",
-    emptyConversationHistory: "Your saved conversations will appear here.",
-    deleteConversation: "Delete conversation",
-    chatMode: "Conversation",
-    geminiMode: "Quick chat (Groq)",
-    geminiModeHint: "Fast general answers and a personal assistant, powered by Groq.",
-    searchMode: "MrX Search",
-    searchModeHint: "Facts, analysis, and sorted details. Wikipedia sources are attached when found.",
-    plannerMode: "MrX Planner",
-    plannerModeHint: "Combines your goals, tasks, and earlier research into a clear schedule.",
-    modeOffline: "Offline MrX",
-    historyLimitNote: "Last {count} chats are kept on this device.",
-    chatStartersTitle: "Try one of these",
-    copyMessage: "Copy",
-    copiedMessage: "Copied",
-    saveAsNote: "Save as note",
-    savedAsNote: "Saved to notes",
-    messageDraftHint: "Enter to send · Shift+Enter for a new line",
-    modeLabelGroq: "Quick chat",
-    modeLabelSearch: "Search",
-    modeLabelPlanner: "Planner",
-    modeLabelOffline: "Offline",
-    planMode: "Plan mode",
-    advancedPlanMode: "Advanced plan mode",
-    chatModeHint: "Ask, reflect, or request a web search.",
-    planModeHint: "Create and refine plans offline without web search.",
-    advancedPlanModeHint: "Research with Google Search and create cited plans.",
-    assistantChatPlaceholder: "What would you like to talk through?",
-    sendMessage: "Send message",
-    signInForChat: "Sign in to sync your chat and use connected AI. MrX's built-in planner also works without an account.",
-    configureForChat: "MrX's built-in planner works without an API key. Sign-in, cloud sync, and connected AI require Supabase setup.",
-    mrxLocalMode: "Chat and Plan mode work offline. Choose Advanced Plan mode or ask MrX to search Google for current information and cited sources.",
-    assistantLocalFallback: "The connected AI service is unavailable, so MrX's built-in offline planner replied instead.",
-    assistantSources: "Sources",
-    pressAgainToExit: "Press back again to exit TimeX.",
-    assistantChatError: "I couldn't reach the planning assistant. Check its server configuration and try again.",
-    chatSavingError: "Your workspace is saved, but a chat message couldn't be synced.",
-    cloudSyncError: "Cloud sync is temporarily unavailable. Your changes are saved on this device.",
-    accountStatus: "Your account",
-    localWorkspace: "Local workspace",
-    cloudWorkspace: "Private cloud workspace",
-    loadingWorkspace: "Loading your private workspace…",
-    authenticationRequired: "Create an account or sign in to sync your own workspace across devices.",
-    signInSuccessful: "Welcome back.",
-    assistantPrivacy: "Regular chat and Plan mode run on this device. Google searches and Advanced Plan mode send your request to Gemini when the service is configured; cited source links are shown with the reply.",
+  appName: "TimeX",
+  tagline: "Make room for what matters.",
+  today: "Today",
+  calendar: "Schedule",
+  calendarIntro: "A clear view of your day, one hour at a time.",
+  todayButton: "Today",
+  previousDay: "Previous day",
+  nextDay: "Next day",
+  calendarTasks: "Scheduled tasks",
+  calendarEmpty: "Nothing planned for this day.",
+  calendarEmptySub: "Add a task with a time to see it on your daily schedule.",
+  scheduledTaskPlaceholder: "What needs a place in your day?",
+  addScheduledTask: "Add to schedule",
+  scheduledDate: "Date",
+  startTime: "Starts",
+  endTime: "Ends",
+  reminder: "Reminder",
+  taskColor: "Task color",
+  chooseTaskColor: "Choose task color",
+  weekOverview: "Week overview",
+  noReminder: "No reminder",
+  reminderBefore: "{minutes} min before",
+  reminderPermissionDenied:
+    "Task saved, but notifications are blocked. Allow notifications in your device settings.",
+  reminderUnsupported: "Task saved. Notifications are unavailable in this browser.",
+  reminderScheduleFailed: "Could not schedule this reminder. Check your notification settings.",
+  timeRangeInvalid: "Choose an end time later than the start time.",
+  scheduleTask: "Add date, time & reminder",
+  unscheduledCount: "{count} tasks have no scheduled time.",
+  taskReminder: "Task reminder",
+  reminderBackgroundHint:
+    "Android reminders can arrive while the app is closed. Browsers need TimeX to stay open.",
+  matrix: "Priority matrix",
+  notes: "Notes",
+  planner: "Plan a goal",
+  todayLabel: "YOUR DAY, WITH INTENTION",
+  greeting: "A little progress adds up.",
+  greetingSub: "Choose one thing that matters and begin there.",
+  focus: "Focus session",
+  focusSub: "One thing at a time. You've got this.",
+  focusWork: "Focus",
+  focusBreak: "Break",
+  pomodoroPresets: "Pomodoro presets",
+  pomodoroCustom: "Custom session",
+  workMinutes: "Focus minutes",
+  breakMinutes: "Break minutes",
+  applyTimer: "Apply timer",
+  startBreak: "Start break",
+  startFocus: "Start focus",
+  start: "Start focus",
+  pause: "Pause",
+  resume: "Resume",
+  reset: "Reset",
+  sessionDone: "Focus session complete. Take a mindful break.",
+  tasks: "Your tasks",
+  tasksSub: "Keep it simple. Keep it moving.",
+  addTask: "Add a task",
+  taskPlaceholder: "What would you like to get done?",
+  add: "Add",
+  emptyTasks: "A fresh start.",
+  emptyTasksSub: "Add a task above to give your day some direction.",
+  important: "Important",
+  urgent: "Urgent",
+  unprioritized: "Unprioritized",
+  markDone: "Mark task complete",
+  markOpen: "Mark task incomplete",
+  deleteTask: "Delete task",
+  completed: "Completed",
+  remaining: "In progress",
+  points: "Momentum points",
+  earned: "+10 points. Nice work!",
+  priorities: "Make your priorities visible",
+  matrixIntro: "Sort your tasks by importance and urgency to decide what deserves your attention.",
+  doNow: "Do now",
+  schedule: "Schedule",
+  delegate: "Delegate",
+  eliminate: "Eliminate",
+  doNowHint: "Important + urgent",
+  scheduleHint: "Important, not urgent",
+  delegateHint: "Urgent, not important",
+  eliminateHint: "Neither important nor urgent",
+  allCaughtUp: "Nothing here just yet.",
+  notesIntro: "A quiet place for ideas, reminders, and everything you want to remember.",
+  newNote: "New note",
+  noteTitle: "Note title",
+  noteBody: "Start writing...",
+  noteEmpty: "Your notes are just for you. Create one to get started.",
+  deleteNote: "Delete note",
+  voiceNotes: "Voice notes",
+  recordVoiceNote: "Record voice note",
+  stopRecording: "Stop recording",
+  recordingVoiceNote: "Recording…",
+  voiceNoteUnsupported: "Voice recording is not supported on this device.",
+  microphonePermissionDenied:
+    "Microphone access was not granted. Allow it in your device settings and try again.",
+  voiceNoteSaveFailed: "Could not save the voice note. Check device storage and try again.",
+  deleteVoiceNote: "Delete voice note",
+  plannerIntro: "Turn a big intention into a few small, doable next steps.",
+  goalLabel: "What would you like to make progress on?",
+  goalPlaceholder: "e.g. Prepare for my certification exam",
+  makePlan: "Build my plan",
+  assistantNote: "MrX's offline plan builder turns a goal into small, actionable steps.",
+  plannerResearching: "Creating plan…",
+  planResearchLabel: "Research notes",
+  planSteps: "A gentle place to start",
+  addPlanTasks: "Add steps to my tasks",
+  planAdded: "Steps added to your task list.",
+  pastPlans: "Your plans",
+  noPlans: "Your plans will appear here when you create one.",
+  theme: "Change theme",
+  themeLight: "Comfort · pearl",
+  themeMidnight: "Arctic · blue",
+  themeSage: "Forest · emerald",
+  themeLavender: "Amethyst · violet",
+  themeCustom: "My accent",
+  themeSelection: "Choose your colors",
+  themeCustomColor: "Choose a favorite color",
+  themePaletteHint: "A black canvas with a gentle silver glow.",
+  language: "Language",
+  switchLanguage: "العربية",
+  storageWarning:
+    "This browser could not save your changes. Check your storage settings and try again.",
+  dismiss: "Dismiss",
+  taskAdded: "Task added.",
+  noteCreated: "A new note is ready.",
+  pointsHint: "Earn points each time you complete a task.",
+  savedOnDevice: "Saved on this device",
+  deletePlan: "Delete plan",
+  close: "Close",
+  saveNoteHint: "Notes save automatically",
+  installApp: "Install app",
+  installTitle: "Take TimeX with you",
+  installHelp:
+    "Install TimeX from your browser menu to use it like an app. Your saved tasks and notes stay on this device.",
+  installDesktop:
+    "On a computer, choose “Install app” or “Install TimeX” from the browser menu or address bar.",
+  installAndroid:
+    "On Android, open the browser menu and choose “Install app” or “Add to Home screen.”",
+  installApple:
+    "On iPhone or iPad, open this page in Safari, tap Share, then choose “Add to Home Screen.”",
+  installFailed:
+    "The browser could not start installation. Try the install option in its menu instead.",
+  settings: "Settings",
+  settingsTitle: "Personalize TimeX",
+  assistantPlans: "My plans",
+  privacy: "Privacy",
+  account: "Account",
+  signIn: "Sign in",
+  signOut: "Sign out",
+  welcomeWithName: "Welcome, {name}. A little progress adds up.",
+  accountHelp: "Sign in to keep your private workspace in sync across your devices.",
+  accountNotConfigured:
+    "Email, Google, GitHub, and X sign-in use Supabase Auth, but the public Supabase client key is not configured for this build yet. MrX remains available locally.",
+  displayName: "Your name",
+  email: "Email address",
+  password: "Password",
+  createAccount: "Create account",
+  haveAccount: "Already have an account? Sign in",
+  needAccount: "New to TimeX? Create an account",
+  continueGoogle: "Continue with Google",
+  continueGithub: "Continue with GitHub",
+  continueX: "Continue with X",
+  guestGateTitle: "Welcome to TimeX",
+  guestGateBody:
+    "Sign in to save tasks, plan with MrX, and sync across your devices, or continue as a guest.",
+  continueAsGuest: "Continue as guest",
+  guestLocked: "Sign in to add tasks and use the MrX assistant.",
+  guestBanner: "You are browsing as a guest. Sign in to add tasks and use the MrX assistant.",
+  accountError: "We couldn't complete that account request. Check your details and try again.",
+  confirmationSent: "Check your email to confirm your account, then sign in.",
+  emailNotConfirmed:
+    "Your email isn't confirmed yet. We re-sent the confirmation link; open it, then sign in.",
+  invalidCredentials: "Incorrect email or password.",
+  emailRateLimited: "Too many emails were sent. Wait a few minutes and try again.",
+  greetingName:
+    "Hello {name}, I'm MrX. I can help turn goals into steps, add tasks, and save notes.",
+  assistantChat: "MrX · planning companion",
+  assistantTab: "Assistant",
+  assistantChatSub: "MrX helps turn goals into plans, tasks, and notes.",
+  localAssistantLabel: "Offline mode",
+  newConversation: "New chat",
+  conversationHistory: "Chat history",
+  assistantMode: "Assistant mode",
+  emptyConversationHistory: "Your saved conversations will appear here.",
+  deleteConversation: "Delete conversation",
+  chatMode: "Conversation",
+  geminiMode: "Quick chat (Groq)",
+  geminiModeHint: "Fast general answers and a personal assistant, powered by Groq.",
+  searchMode: "MrX Search",
+  searchModeHint: "Facts, analysis, and sorted details. Wikipedia sources are attached when found.",
+  plannerMode: "MrX Planner",
+  plannerModeHint: "Combines your goals, tasks, and earlier research into a clear schedule.",
+  modeOffline: "Offline MrX",
+  historyLimitNote: "Last {count} chats are kept on this device.",
+  chatStartersTitle: "Try one of these",
+  copyMessage: "Copy",
+  copiedMessage: "Copied",
+  saveAsNote: "Save as note",
+  savedAsNote: "Saved to notes",
+  messageDraftHint: "Enter to send · Shift+Enter for a new line",
+  modeLabelGroq: "Quick chat",
+  modeLabelSearch: "Search",
+  modeLabelPlanner: "Planner",
+  modeLabelOffline: "Offline",
+  planMode: "Plan mode",
+  advancedPlanMode: "Advanced plan mode",
+  chatModeHint: "Ask, reflect, or request a web search.",
+  planModeHint: "Create and refine plans offline without web search.",
+  advancedPlanModeHint: "Research with Google Search and create cited plans.",
+  assistantChatPlaceholder: "What would you like to talk through?",
+  sendMessage: "Send message",
+  signInForChat:
+    "Sign in to sync your chat and use connected AI. MrX's built-in planner also works without an account.",
+  configureForChat:
+    "MrX's built-in planner works without an API key. Sign-in, cloud sync, and connected AI require Supabase setup.",
+  mrxLocalMode:
+    "Chat and Plan mode work offline. Choose Advanced Plan mode or ask MrX to search Google for current information and cited sources.",
+  assistantLocalFallback:
+    "The connected AI service is unavailable, so MrX's built-in offline planner replied instead.",
+  assistantSources: "Sources",
+  pressAgainToExit: "Press back again to exit TimeX.",
+  assistantChatError:
+    "I couldn't reach the planning assistant. Check its server configuration and try again.",
+  chatSavingError: "Your workspace is saved, but a chat message couldn't be synced.",
+  cloudSyncError: "Cloud sync is temporarily unavailable. Your changes are saved on this device.",
+  accountStatus: "Your account",
+  localWorkspace: "Local workspace",
+  cloudWorkspace: "Private cloud workspace",
+  loadingWorkspace: "Loading your private workspace…",
+  authenticationRequired: "Create an account or sign in to sync your own workspace across devices.",
+  signInSuccessful: "Welcome back.",
+  assistantPrivacy:
+    "Regular chat and Plan mode run on this device. Google searches and Advanced Plan mode send your request to Gemini when the service is configured; cited source links are shown with the reply.",
 };
 
 const arabicCopy = {
-    appName: "TimeX",
-    tagline: "اترك مساحة لما يهمك.",
-    today: "اليوم",
-    calendar: "الجدول",
-    calendarIntro: "نظرة واضحة على يومك، ساعةً بساعة.",
-    todayButton: "اليوم",
-    previousDay: "اليوم السابق",
-    nextDay: "اليوم التالي",
-    calendarTasks: "المهام المجدولة",
-    calendarEmpty: "لا توجد مهام مخططة لهذا اليوم.",
-    calendarEmptySub: "أضف مهمة وحدّد وقتها لتظهر في جدولك اليومي.",
-    scheduledTaskPlaceholder: "ما المهمة التي تريد إدراجها في يومك؟",
-    addScheduledTask: "أضف إلى الجدول",
-    scheduledDate: "التاريخ",
-    startTime: "البدء",
-    endTime: "الانتهاء",
-    reminder: "التذكير",
-    taskColor: "لون المهمة",
-    chooseTaskColor: "اختر لون المهمة",
-    weekOverview: "أيام الأسبوع",
-    noReminder: "دون تذكير",
-    reminderBefore: "قبل {minutes} دقيقة",
-    reminderPermissionDenied: "حُفظت المهمة، لكن الإشعارات محظورة. اسمح بها من إعدادات جهازك.",
-    reminderUnsupported: "حُفظت المهمة. الإشعارات غير متاحة في هذا المتصفح.",
-    reminderScheduleFailed: "تعذّر ضبط التذكير. تحقق من إعدادات الإشعارات.",
-    timeRangeInvalid: "اختر وقت انتهاء بعد وقت البدء.",
-    scheduleTask: "إضافة تاريخ ووقت وتذكير",
-    unscheduledCount: "لديك {count} مهام دون وقت محدد.",
-    taskReminder: "تذكير بمهمة",
-    reminderBackgroundHint: "تعمل تذكيرات أندرويد حتى عند إغلاق التطبيق. يحتاج المتصفح إلى بقاء TimeX مفتوحًا.",
-    matrix: "مصفوفة الأولويات",
-    notes: "ملاحظاتي",
-    planner: "خطّط لهدف",
-    todayLabel: "يومك، بوعي",
-    greeting: "كل تقدّم صغير يصنع فرقًا.",
-    greetingSub: "اختر أمرًا واحدًا مهمًا وابدأ به.",
-    focus: "جلسة تركيز",
-    focusSub: "شيء واحد في كل مرة. أنت قادر.",
-    focusWork: "تركيز",
-    focusBreak: "استراحة",
-    pomodoroPresets: "قوالب بومودورو",
-    pomodoroCustom: "جلسة مخصّصة",
-    workMinutes: "دقائق التركيز",
-    breakMinutes: "دقائق الاستراحة",
-    applyTimer: "تطبيق المؤقت",
-    startBreak: "ابدأ الاستراحة",
-    startFocus: "ابدأ التركيز",
-    start: "ابدأ التركيز",
-    pause: "إيقاف مؤقت",
-    resume: "متابعة",
-    reset: "إعادة",
-    sessionDone: "اكتملت جلسة التركيز. خذ استراحة هادئة.",
-    tasks: "مهامي",
-    tasksSub: "بسّط يومك، وخذ خطوة.",
-    addTask: "أضف مهمة",
-    taskPlaceholder: "ما الذي ترغب في إنجازه؟",
-    add: "إضافة",
-    emptyTasks: "بداية جديدة.",
-    emptyTasksSub: "أضف مهمة أعلاه لتمنح يومك اتجاهًا.",
-    important: "مهم",
-    urgent: "عاجل",
-    unprioritized: "بلا أولوية",
-    markDone: "إكمال المهمة",
-    markOpen: "إعادة فتح المهمة",
-    deleteTask: "حذف المهمة",
-    completed: "مكتملة",
-    remaining: "قيد الإنجاز",
-    points: "نقاط التقدّم",
-    earned: "أُضيفت ١٠ نقاط. أحسنت!",
-    priorities: "رتّب أولوياتك بوضوح",
-    matrixIntro: "صنّف مهامك حسب الأهمية والاستعجال لتعرف ما يستحق انتباهك.",
-    doNow: "أنجز الآن",
-    schedule: "خطّط لوقت",
-    delegate: "فوّض",
-    eliminate: "استبعد",
-    doNowHint: "مهم وعاجل",
-    scheduleHint: "مهم، غير عاجل",
-    delegateHint: "عاجل، غير مهم",
-    eliminateHint: "غير مهم وغير عاجل",
-    allCaughtUp: "لا توجد مهام هنا بعد.",
-    notesIntro: "مساحة هادئة لأفكارك وتذكيراتك وكل ما تريد الاحتفاظ به.",
-    newNote: "ملاحظة جديدة",
-    noteTitle: "عنوان الملاحظة",
-    noteBody: "ابدأ الكتابة...",
-    noteEmpty: "ملاحظاتك لك وحدك. أنشئ ملاحظة للبدء.",
-    deleteNote: "حذف الملاحظة",
-    voiceNotes: "ملاحظات صوتية",
-    recordVoiceNote: "تسجيل ملاحظة صوتية",
-    stopRecording: "إيقاف التسجيل",
-    recordingVoiceNote: "جارٍ التسجيل…",
-    voiceNoteUnsupported: "تسجيل الملاحظات الصوتية غير مدعوم على هذا الجهاز.",
-    microphonePermissionDenied: "لم يُسمح بالوصول للميكروفون. اسمح به من إعدادات الجهاز ثم حاول مجددًا.",
-    voiceNoteSaveFailed: "تعذّر حفظ الملاحظة الصوتية. تحقق من مساحة الجهاز ثم حاول مجددًا.",
-    deleteVoiceNote: "حذف الملاحظة الصوتية",
-    plannerIntro: "حوّل ما تطمح إليه إلى خطوات صغيرة قابلة للتنفيذ.",
-    goalLabel: "ما الهدف الذي ترغب في التقدّم نحوه؟",
-    goalPlaceholder: "مثال: الاستعداد لاختبار الشهادة المهنية",
-    makePlan: "أنشئ خطتي",
-    assistantNote: "ينشئ مخطّط MrX دون اتصال خطة عملية ويقسّم الهدف إلى خطوات صغيرة قابلة للتنفيذ.",
-    plannerResearching: "جارٍ إنشاء الخطة…",
-    planResearchLabel: "معلومات البحث",
-    planSteps: "خطوة هادئة للبدء",
-    addPlanTasks: "أضف الخطوات إلى مهامي",
-    planAdded: "أُضيفت الخطوات إلى مهامك.",
-    pastPlans: "خططي",
-    noPlans: "ستظهر خططك هنا بعد إنشاء أول خطة.",
-    theme: "تغيير المظهر",
-    themeLight: "الوضع المريح",
-    themeMidnight: "قطبي · أزرق",
-    themeSage: "غابة · زمردي",
-    themeLavender: "جمشت · بنفسجي",
-    themeCustom: "لوني المفضّل",
-    themeSelection: "اختر ألوانك",
-    themeCustomColor: "اختر لونك المفضّل",
-    themePaletteHint: "خلفية سوداء يتخلّلها وهج فضي هادئ.",
-    language: "اللغة",
-    switchLanguage: "English",
-    storageWarning: "تعذّر على هذا المتصفح حفظ التغييرات. تحقق من إعدادات التخزين ثم حاول مجددًا.",
-    dismiss: "إغلاق",
-    taskAdded: "أُضيفت المهمة.",
-    noteCreated: "ملاحظتك الجديدة جاهزة.",
-    pointsHint: "اجمع النقاط كلما أتممت مهمة.",
-    savedOnDevice: "محفوظ على هذا الجهاز",
-    deletePlan: "حذف الخطة",
-    close: "إغلاق",
-    saveNoteHint: "تُحفظ الملاحظات تلقائيًا",
-    installApp: "تثبيت التطبيق",
-    installTitle: "TimeX معك أينما ذهبت",
-    installHelp: "ثبّت TimeX من قائمة المتصفح لاستخدامه كتطبيق. تبقى مهامك وملاحظاتك المحفوظة على هذا الجهاز.",
-    installDesktop: "على الكمبيوتر، اختر «تثبيت التطبيق» أو «تثبيت TimeX» من قائمة المتصفح أو شريط العنوان.",
-    installAndroid: "على أندرويد، افتح قائمة المتصفح واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».",
-    installApple: "على iPhone أو iPad، افتح الصفحة في Safari، واضغط «مشاركة»، ثم «إضافة إلى الشاشة الرئيسية».",
-    installFailed: "تعذّر بدء التثبيت. جرّب خيار التثبيت من قائمة المتصفح.",
-    settings: "الإعدادات",
-    settingsTitle: "خصّص TimeX",
-    assistantPlans: "خططي",
-    privacy: "الخصوصية",
-    account: "الحساب",
-    signIn: "تسجيل الدخول",
-    signOut: "تسجيل الخروج",
-    welcomeWithName: "أهلًا {name}، كل تقدّم صغير يصنع فرقًا.",
-    accountHelp: "سجّل الدخول لمزامنة مساحتك الخاصة بين أجهزتك.",
-    accountNotConfigured: "يُرسل تسجيل البريد وGoogle وGitHub وX إلى Supabase Auth، لكن مفتاح Supabase العام غير مضبوط في هذه النسخة بعد. يظل MrX متاحًا محليًا.",
-    displayName: "اسمك",
-    email: "البريد الإلكتروني",
-    password: "كلمة المرور",
-    createAccount: "إنشاء حساب",
-    haveAccount: "لديك حساب بالفعل؟ سجّل الدخول",
-    needAccount: "جديد في TimeX؟ أنشئ حسابًا",
-    continueGoogle: "المتابعة باستخدام Google",
-    continueGithub: "المتابعة باستخدام GitHub",
-    continueX: "المتابعة باستخدام X",
-    guestGateTitle: "مرحبًا بك في TimeX",
-    guestGateBody: "سجّل الدخول لحفظ مهامك والتخطيط مع MrX والمزامنة بين أجهزتك، أو تابع كضيف.",
-    continueAsGuest: "المتابعة كضيف",
-    guestLocked: "سجّل الدخول لإضافة المهام واستخدام مساعد MrX.",
-    guestBanner: "أنت تتصفح كضيف. سجّل الدخول لإضافة المهام واستخدام مساعد MrX.",
-    accountError: "تعذّر إكمال طلب الحساب. تحقق من بياناتك ثم حاول مجددًا.",
-    confirmationSent: "تحقق من بريدك لتأكيد حسابك ثم سجّل الدخول.",
-    emailNotConfirmed: "بريدك لم يُؤكَّد بعد. أعدنا إرسال رابط التأكيد؛ افتحه ثم سجّل الدخول.",
-    invalidCredentials: "البريد أو كلمة المرور غير صحيحة.",
-    emailRateLimited: "أُرسلت رسائل كثيرة. انتظر بضع دقائق ثم حاول مجددًا.",
-    greetingName: "مرحبًا {name}، أنا MrX. أساعدك في تحويل الأهداف إلى خطوات وإضافة المهام وحفظ الملاحظات.",
-    assistantChat: "MrX · مساعد التخطيط",
-    assistantTab: "المساعد",
-    assistantChatSub: "يساعدك MrX في تحويل الأهداف إلى خطط ومهام وملاحظات.",
-    localAssistantLabel: "وضع دون اتصال",
-    newConversation: "محادثة جديدة",
-    conversationHistory: "سجل المحادثات",
-    assistantMode: "نمط المساعد",
-    emptyConversationHistory: "ستظهر محادثاتك المحفوظة هنا.",
-    deleteConversation: "حذف المحادثة",
-    chatMode: "محادثة",
-    geminiMode: "محادثة سريعة (Groq)",
-    geminiModeHint: "إجابات عامة سريعة ومساعد شخصي بواسطة Groq.",
-    searchMode: "بحث MrX",
-    searchModeHint: "حقائق وتحليل وتفاصيل مصنّفة، مع إرفاق مصادر ويكيبيديا عند توفرها.",
-    plannerMode: "مخطط MrX",
-    plannerModeHint: "يدمج أهدافك ومهامك ونتائج البحث السابقة في جدول واضح.",
-    modeOffline: "MrX دون اتصال",
-    historyLimitNote: "يُحفظ آخر {count} محادثة على هذا الجهاز.",
-    chatStartersTitle: "جرّب أحد هذه الأمثلة",
-    copyMessage: "نسخ",
-    copiedMessage: "تم النسخ",
-    saveAsNote: "حفظ كملاحظة",
-    savedAsNote: "حُفظت في الملاحظات",
-    messageDraftHint: "Enter للإرسال · Shift+Enter لسطر جديد",
-    modeLabelGroq: "سريعة",
-    modeLabelSearch: "بحث",
-    modeLabelPlanner: "مخطط",
-    modeLabelOffline: "محلي",
-    planMode: "نمط الخطة",
-    advancedPlanMode: "نمط الخطة المتقدمة",
-    chatModeHint: "اسأل أو ناقش موضوعًا أو اطلب البحث على الويب.",
-    planModeHint: "أنشئ الخطط ونقّحها محليًا دون بحث ويب.",
-    advancedPlanModeHint: "ابحث عبر Google وأنشئ خططًا مدعومة بمصادر.",
-    assistantChatPlaceholder: "ما الموضوع الذي ترغب في مناقشته؟",
-    sendMessage: "إرسال الرسالة",
-    signInForChat: "سجّل الدخول لمزامنة محادثتك واستخدام الذكاء الاصطناعي المتصل. ويعمل مخطّط MrX المدمج دون حساب أيضًا.",
-    configureForChat: "يعمل مخطّط MrX المدمج دون مفتاح API. يتطلب تسجيل الدخول والمزامنة والذكاء الاصطناعي المتصل إعداد Supabase.",
-    mrxLocalMode: "تعمل المحادثة ونمط الخطة دون اتصال. اختر نمط الخطة المتقدمة أو اطلب من MrX البحث في Google عن أحدث المعلومات والمصادر.",
-    assistantLocalFallback: "خدمة الذكاء الاصطناعي المتصلة غير متاحة، لذا أجابك مخطّط MrX المحلي المدمج.",
-    assistantSources: "المصادر",
-    pressAgainToExit: "اضغط زر الرجوع مرة أخرى للخروج من TimeX.",
-    assistantChatError: "تعذّر الاتصال بمساعد التخطيط. تحقق من إعداد الخادم ثم حاول مجددًا.",
-    chatSavingError: "حُفظت مساحتك، لكن تعذّرت مزامنة رسالة من المحادثة.",
-    cloudSyncError: "المزامنة السحابية غير متاحة مؤقتًا. حُفظت تغييراتك على هذا الجهاز.",
-    accountStatus: "حسابك",
-    localWorkspace: "مساحة محلية",
-    cloudWorkspace: "مساحة سحابية خاصة",
-    loadingWorkspace: "جارٍ تحميل مساحتك الخاصة…",
-    authenticationRequired: "أنشئ حسابًا أو سجّل الدخول لمزامنة مساحتك الخاصة بين الأجهزة.",
-    signInSuccessful: "أهلًا بعودتك.",
-    assistantPrivacy: "تعمل المحادثات العادية ونمط الخطة على جهازك. تُرسل طلبات البحث ونمط الخطة المتقدمة إلى Gemini عند إعداد الخدمة، وتظهر روابط المصادر مع الرد.",
+  appName: "TimeX",
+  tagline: "اترك مساحة لما يهمك.",
+  today: "اليوم",
+  calendar: "الجدول",
+  calendarIntro: "نظرة واضحة على يومك، ساعةً بساعة.",
+  todayButton: "اليوم",
+  previousDay: "اليوم السابق",
+  nextDay: "اليوم التالي",
+  calendarTasks: "المهام المجدولة",
+  calendarEmpty: "لا توجد مهام مخططة لهذا اليوم.",
+  calendarEmptySub: "أضف مهمة وحدّد وقتها لتظهر في جدولك اليومي.",
+  scheduledTaskPlaceholder: "ما المهمة التي تريد إدراجها في يومك؟",
+  addScheduledTask: "أضف إلى الجدول",
+  scheduledDate: "التاريخ",
+  startTime: "البدء",
+  endTime: "الانتهاء",
+  reminder: "التذكير",
+  taskColor: "لون المهمة",
+  chooseTaskColor: "اختر لون المهمة",
+  weekOverview: "أيام الأسبوع",
+  noReminder: "دون تذكير",
+  reminderBefore: "قبل {minutes} دقيقة",
+  reminderPermissionDenied: "حُفظت المهمة، لكن الإشعارات محظورة. اسمح بها من إعدادات جهازك.",
+  reminderUnsupported: "حُفظت المهمة. الإشعارات غير متاحة في هذا المتصفح.",
+  reminderScheduleFailed: "تعذّر ضبط التذكير. تحقق من إعدادات الإشعارات.",
+  timeRangeInvalid: "اختر وقت انتهاء بعد وقت البدء.",
+  scheduleTask: "إضافة تاريخ ووقت وتذكير",
+  unscheduledCount: "لديك {count} مهام دون وقت محدد.",
+  taskReminder: "تذكير بمهمة",
+  reminderBackgroundHint:
+    "تعمل تذكيرات أندرويد حتى عند إغلاق التطبيق. يحتاج المتصفح إلى بقاء TimeX مفتوحًا.",
+  matrix: "مصفوفة الأولويات",
+  notes: "ملاحظاتي",
+  planner: "خطّط لهدف",
+  todayLabel: "يومك، بوعي",
+  greeting: "كل تقدّم صغير يصنع فرقًا.",
+  greetingSub: "اختر أمرًا واحدًا مهمًا وابدأ به.",
+  focus: "جلسة تركيز",
+  focusSub: "شيء واحد في كل مرة. أنت قادر.",
+  focusWork: "تركيز",
+  focusBreak: "استراحة",
+  pomodoroPresets: "قوالب بومودورو",
+  pomodoroCustom: "جلسة مخصّصة",
+  workMinutes: "دقائق التركيز",
+  breakMinutes: "دقائق الاستراحة",
+  applyTimer: "تطبيق المؤقت",
+  startBreak: "ابدأ الاستراحة",
+  startFocus: "ابدأ التركيز",
+  start: "ابدأ التركيز",
+  pause: "إيقاف مؤقت",
+  resume: "متابعة",
+  reset: "إعادة",
+  sessionDone: "اكتملت جلسة التركيز. خذ استراحة هادئة.",
+  tasks: "مهامي",
+  tasksSub: "بسّط يومك، وخذ خطوة.",
+  addTask: "أضف مهمة",
+  taskPlaceholder: "ما الذي ترغب في إنجازه؟",
+  add: "إضافة",
+  emptyTasks: "بداية جديدة.",
+  emptyTasksSub: "أضف مهمة أعلاه لتمنح يومك اتجاهًا.",
+  important: "مهم",
+  urgent: "عاجل",
+  unprioritized: "بلا أولوية",
+  markDone: "إكمال المهمة",
+  markOpen: "إعادة فتح المهمة",
+  deleteTask: "حذف المهمة",
+  completed: "مكتملة",
+  remaining: "قيد الإنجاز",
+  points: "نقاط التقدّم",
+  earned: "أُضيفت ١٠ نقاط. أحسنت!",
+  priorities: "رتّب أولوياتك بوضوح",
+  matrixIntro: "صنّف مهامك حسب الأهمية والاستعجال لتعرف ما يستحق انتباهك.",
+  doNow: "أنجز الآن",
+  schedule: "خطّط لوقت",
+  delegate: "فوّض",
+  eliminate: "استبعد",
+  doNowHint: "مهم وعاجل",
+  scheduleHint: "مهم، غير عاجل",
+  delegateHint: "عاجل، غير مهم",
+  eliminateHint: "غير مهم وغير عاجل",
+  allCaughtUp: "لا توجد مهام هنا بعد.",
+  notesIntro: "مساحة هادئة لأفكارك وتذكيراتك وكل ما تريد الاحتفاظ به.",
+  newNote: "ملاحظة جديدة",
+  noteTitle: "عنوان الملاحظة",
+  noteBody: "ابدأ الكتابة...",
+  noteEmpty: "ملاحظاتك لك وحدك. أنشئ ملاحظة للبدء.",
+  deleteNote: "حذف الملاحظة",
+  voiceNotes: "ملاحظات صوتية",
+  recordVoiceNote: "تسجيل ملاحظة صوتية",
+  stopRecording: "إيقاف التسجيل",
+  recordingVoiceNote: "جارٍ التسجيل…",
+  voiceNoteUnsupported: "تسجيل الملاحظات الصوتية غير مدعوم على هذا الجهاز.",
+  microphonePermissionDenied:
+    "لم يُسمح بالوصول للميكروفون. اسمح به من إعدادات الجهاز ثم حاول مجددًا.",
+  voiceNoteSaveFailed: "تعذّر حفظ الملاحظة الصوتية. تحقق من مساحة الجهاز ثم حاول مجددًا.",
+  deleteVoiceNote: "حذف الملاحظة الصوتية",
+  plannerIntro: "حوّل ما تطمح إليه إلى خطوات صغيرة قابلة للتنفيذ.",
+  goalLabel: "ما الهدف الذي ترغب في التقدّم نحوه؟",
+  goalPlaceholder: "مثال: الاستعداد لاختبار الشهادة المهنية",
+  makePlan: "أنشئ خطتي",
+  assistantNote: "ينشئ مخطّط MrX دون اتصال خطة عملية ويقسّم الهدف إلى خطوات صغيرة قابلة للتنفيذ.",
+  plannerResearching: "جارٍ إنشاء الخطة…",
+  planResearchLabel: "معلومات البحث",
+  planSteps: "خطوة هادئة للبدء",
+  addPlanTasks: "أضف الخطوات إلى مهامي",
+  planAdded: "أُضيفت الخطوات إلى مهامك.",
+  pastPlans: "خططي",
+  noPlans: "ستظهر خططك هنا بعد إنشاء أول خطة.",
+  theme: "تغيير المظهر",
+  themeLight: "الوضع المريح",
+  themeMidnight: "قطبي · أزرق",
+  themeSage: "غابة · زمردي",
+  themeLavender: "جمشت · بنفسجي",
+  themeCustom: "لوني المفضّل",
+  themeSelection: "اختر ألوانك",
+  themeCustomColor: "اختر لونك المفضّل",
+  themePaletteHint: "خلفية سوداء يتخلّلها وهج فضي هادئ.",
+  language: "اللغة",
+  switchLanguage: "English",
+  storageWarning: "تعذّر على هذا المتصفح حفظ التغييرات. تحقق من إعدادات التخزين ثم حاول مجددًا.",
+  dismiss: "إغلاق",
+  taskAdded: "أُضيفت المهمة.",
+  noteCreated: "ملاحظتك الجديدة جاهزة.",
+  pointsHint: "اجمع النقاط كلما أتممت مهمة.",
+  savedOnDevice: "محفوظ على هذا الجهاز",
+  deletePlan: "حذف الخطة",
+  close: "إغلاق",
+  saveNoteHint: "تُحفظ الملاحظات تلقائيًا",
+  installApp: "تثبيت التطبيق",
+  installTitle: "TimeX معك أينما ذهبت",
+  installHelp:
+    "ثبّت TimeX من قائمة المتصفح لاستخدامه كتطبيق. تبقى مهامك وملاحظاتك المحفوظة على هذا الجهاز.",
+  installDesktop:
+    "على الكمبيوتر، اختر «تثبيت التطبيق» أو «تثبيت TimeX» من قائمة المتصفح أو شريط العنوان.",
+  installAndroid:
+    "على أندرويد، افتح قائمة المتصفح واختر «تثبيت التطبيق» أو «إضافة إلى الشاشة الرئيسية».",
+  installApple:
+    "على iPhone أو iPad، افتح الصفحة في Safari، واضغط «مشاركة»، ثم «إضافة إلى الشاشة الرئيسية».",
+  installFailed: "تعذّر بدء التثبيت. جرّب خيار التثبيت من قائمة المتصفح.",
+  settings: "الإعدادات",
+  settingsTitle: "خصّص TimeX",
+  assistantPlans: "خططي",
+  privacy: "الخصوصية",
+  account: "الحساب",
+  signIn: "تسجيل الدخول",
+  signOut: "تسجيل الخروج",
+  welcomeWithName: "أهلًا {name}، كل تقدّم صغير يصنع فرقًا.",
+  accountHelp: "سجّل الدخول لمزامنة مساحتك الخاصة بين أجهزتك.",
+  accountNotConfigured:
+    "يُرسل تسجيل البريد وGoogle وGitHub وX إلى Supabase Auth، لكن مفتاح Supabase العام غير مضبوط في هذه النسخة بعد. يظل MrX متاحًا محليًا.",
+  displayName: "اسمك",
+  email: "البريد الإلكتروني",
+  password: "كلمة المرور",
+  createAccount: "إنشاء حساب",
+  haveAccount: "لديك حساب بالفعل؟ سجّل الدخول",
+  needAccount: "جديد في TimeX؟ أنشئ حسابًا",
+  continueGoogle: "المتابعة باستخدام Google",
+  continueGithub: "المتابعة باستخدام GitHub",
+  continueX: "المتابعة باستخدام X",
+  guestGateTitle: "مرحبًا بك في TimeX",
+  guestGateBody: "سجّل الدخول لحفظ مهامك والتخطيط مع MrX والمزامنة بين أجهزتك، أو تابع كضيف.",
+  continueAsGuest: "المتابعة كضيف",
+  guestLocked: "سجّل الدخول لإضافة المهام واستخدام مساعد MrX.",
+  guestBanner: "أنت تتصفح كضيف. سجّل الدخول لإضافة المهام واستخدام مساعد MrX.",
+  accountError: "تعذّر إكمال طلب الحساب. تحقق من بياناتك ثم حاول مجددًا.",
+  confirmationSent: "تحقق من بريدك لتأكيد حسابك ثم سجّل الدخول.",
+  emailNotConfirmed: "بريدك لم يُؤكَّد بعد. أعدنا إرسال رابط التأكيد؛ افتحه ثم سجّل الدخول.",
+  invalidCredentials: "البريد أو كلمة المرور غير صحيحة.",
+  emailRateLimited: "أُرسلت رسائل كثيرة. انتظر بضع دقائق ثم حاول مجددًا.",
+  greetingName:
+    "مرحبًا {name}، أنا MrX. أساعدك في تحويل الأهداف إلى خطوات وإضافة المهام وحفظ الملاحظات.",
+  assistantChat: "MrX · مساعد التخطيط",
+  assistantTab: "المساعد",
+  assistantChatSub: "يساعدك MrX في تحويل الأهداف إلى خطط ومهام وملاحظات.",
+  localAssistantLabel: "وضع دون اتصال",
+  newConversation: "محادثة جديدة",
+  conversationHistory: "سجل المحادثات",
+  assistantMode: "نمط المساعد",
+  emptyConversationHistory: "ستظهر محادثاتك المحفوظة هنا.",
+  deleteConversation: "حذف المحادثة",
+  chatMode: "محادثة",
+  geminiMode: "محادثة سريعة (Groq)",
+  geminiModeHint: "إجابات عامة سريعة ومساعد شخصي بواسطة Groq.",
+  searchMode: "بحث MrX",
+  searchModeHint: "حقائق وتحليل وتفاصيل مصنّفة، مع إرفاق مصادر ويكيبيديا عند توفرها.",
+  plannerMode: "مخطط MrX",
+  plannerModeHint: "يدمج أهدافك ومهامك ونتائج البحث السابقة في جدول واضح.",
+  modeOffline: "MrX دون اتصال",
+  historyLimitNote: "يُحفظ آخر {count} محادثة على هذا الجهاز.",
+  chatStartersTitle: "جرّب أحد هذه الأمثلة",
+  copyMessage: "نسخ",
+  copiedMessage: "تم النسخ",
+  saveAsNote: "حفظ كملاحظة",
+  savedAsNote: "حُفظت في الملاحظات",
+  messageDraftHint: "Enter للإرسال · Shift+Enter لسطر جديد",
+  modeLabelGroq: "سريعة",
+  modeLabelSearch: "بحث",
+  modeLabelPlanner: "مخطط",
+  modeLabelOffline: "محلي",
+  planMode: "نمط الخطة",
+  advancedPlanMode: "نمط الخطة المتقدمة",
+  chatModeHint: "اسأل أو ناقش موضوعًا أو اطلب البحث على الويب.",
+  planModeHint: "أنشئ الخطط ونقّحها محليًا دون بحث ويب.",
+  advancedPlanModeHint: "ابحث عبر Google وأنشئ خططًا مدعومة بمصادر.",
+  assistantChatPlaceholder: "ما الموضوع الذي ترغب في مناقشته؟",
+  sendMessage: "إرسال الرسالة",
+  signInForChat:
+    "سجّل الدخول لمزامنة محادثتك واستخدام الذكاء الاصطناعي المتصل. ويعمل مخطّط MrX المدمج دون حساب أيضًا.",
+  configureForChat:
+    "يعمل مخطّط MrX المدمج دون مفتاح API. يتطلب تسجيل الدخول والمزامنة والذكاء الاصطناعي المتصل إعداد Supabase.",
+  mrxLocalMode:
+    "تعمل المحادثة ونمط الخطة دون اتصال. اختر نمط الخطة المتقدمة أو اطلب من MrX البحث في Google عن أحدث المعلومات والمصادر.",
+  assistantLocalFallback:
+    "خدمة الذكاء الاصطناعي المتصلة غير متاحة، لذا أجابك مخطّط MrX المحلي المدمج.",
+  assistantSources: "المصادر",
+  pressAgainToExit: "اضغط زر الرجوع مرة أخرى للخروج من TimeX.",
+  assistantChatError: "تعذّر الاتصال بمساعد التخطيط. تحقق من إعداد الخادم ثم حاول مجددًا.",
+  chatSavingError: "حُفظت مساحتك، لكن تعذّرت مزامنة رسالة من المحادثة.",
+  cloudSyncError: "المزامنة السحابية غير متاحة مؤقتًا. حُفظت تغييراتك على هذا الجهاز.",
+  accountStatus: "حسابك",
+  localWorkspace: "مساحة محلية",
+  cloudWorkspace: "مساحة سحابية خاصة",
+  loadingWorkspace: "جارٍ تحميل مساحتك الخاصة…",
+  authenticationRequired: "أنشئ حسابًا أو سجّل الدخول لمزامنة مساحتك الخاصة بين الأجهزة.",
+  signInSuccessful: "أهلًا بعودتك.",
+  assistantPrivacy:
+    "تعمل المحادثات العادية ونمط الخطة على جهازك. تُرسل طلبات البحث ونمط الخطة المتقدمة إلى Gemini عند إعداد الخدمة، وتظهر روابط المصادر مع الرد.",
 } satisfies Record<keyof typeof englishCopy, string>;
 
 const copy = {
@@ -533,7 +565,7 @@ function makeId(): string {
 function getContrastTextColor(hex: string): string {
   const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
   const luminance = channels
-    .map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
+    .map((channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4))
     .reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
   return (luminance + 0.05) / 0.05 >= 1.05 / (luminance + 0.05) ? "#08090b" : "#ffffff";
 }
@@ -661,18 +693,19 @@ function App() {
   const [authError, setAuthError] = useState("");
   const [authNotice, setAuthNotice] = useState("");
   const [conversationStore, setConversationStore] = useState<ConversationStore>(() =>
-    createConversationStore("timex-conversations:local", "timex-chat"),
+    createConversationStore("timex-conversations:local", "timex-chat")
   );
   const [chatInput, setChatInput] = useState("");
   const [chatPending, setChatPending] = useState(false);
   const [chatError, setChatError] = useState("");
   const [chatNotice, setChatNotice] = useState("");
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
-  const [appInstalled, setAppInstalled] = useState(() =>
-    Capacitor.isNativePlatform() ||
-    window.timexExternal !== undefined ||
-    window.matchMedia("(display-mode: standalone)").matches ||
-    (navigator as Navigator & { standalone?: boolean }).standalone === true,
+  const [appInstalled, setAppInstalled] = useState(
+    () =>
+      Capacitor.isNativePlatform() ||
+      window.timexExternal !== undefined ||
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as Navigator & { standalone?: boolean }).standalone === true
   );
   const [showInstallHelp, setShowInstallHelp] = useState(false);
   const installCloseRef = useRef<HTMLButtonElement>(null);
@@ -682,14 +715,13 @@ function App() {
   const isArabic = lang === "ar";
   const t = (key: CopyKey) => copy[lang][key];
   const userName = getDisplayName(user);
-  const activeConversation = conversationStore.conversations.find(
-    (conversation) => conversation.id === conversationStore.activeId,
-  ) ?? conversationStore.conversations[0];
+  const activeConversation =
+    conversationStore.conversations.find(
+      (conversation) => conversation.id === conversationStore.activeId
+    ) ?? conversationStore.conversations[0];
   const chatMessages = activeConversation?.messages ?? [];
   const chatMode = activeConversation?.mode ?? "chat";
-  const greeting = userName
-    ? t("welcomeWithName").replace("{name}", userName)
-    : t("greeting");
+  const greeting = userName ? t("welcomeWithName").replace("{name}", userName) : t("greeting");
   const chatEndRef = useRef<HTMLDivElement>(null);
   const authCloseRef = useRef<HTMLButtonElement>(null);
   const activeUserId = useRef<string | null>(null);
@@ -706,7 +738,11 @@ function App() {
     if (url.searchParams.get("account") !== "1") return;
     setShowAccount(true);
     url.searchParams.delete("account");
-    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
+    window.history.replaceState(
+      window.history.state,
+      "",
+      `${url.pathname}${url.search}${url.hash}`
+    );
   }, []);
 
   useEffect(() => {
@@ -797,10 +833,7 @@ function App() {
     const client = supabase;
     if (!client) return;
 
-    async function completeNativeOAuth(
-      url: string,
-      authClient: NonNullable<typeof supabase>,
-    ) {
+    async function completeNativeOAuth(url: string, authClient: NonNullable<typeof supabase>) {
       if (
         !url.startsWith("com.mrxosa.timex://login-callback") &&
         !url.startsWith("timex://login-callback")
@@ -873,10 +906,9 @@ function App() {
 
     if (!user) {
       setData(loadDataForKey(accountStorageKey(undefined)));
-      setConversationStore(createConversationStore(
-        conversationStorageKey(undefined),
-        chatStorageKey(undefined),
-      ));
+      setConversationStore(
+        createConversationStore(conversationStorageKey(undefined), chatStorageKey(undefined))
+      );
       setWorkspaceReady(true);
       return () => {
         active = false;
@@ -885,11 +917,7 @@ function App() {
 
     void (async () => {
       const [workspaceResult, profileResult, conversationsResult] = await Promise.all([
-        supabase
-          .from("user_workspaces")
-          .select("data")
-          .eq("user_id", user.id)
-          .maybeSingle(),
+        supabase.from("user_workspaces").select("data").eq("user_id", user.id).maybeSingle(),
         supabase.from("profiles").select("display_name").eq("id", user.id).maybeSingle(),
         supabase
           .from("assistant_conversations")
@@ -910,9 +938,17 @@ function App() {
         : { data: [], error: conversationsResult.error };
       if (!active) return;
 
-      if (workspaceResult.error || profileResult.error || conversationsResult.error || messagesResult.error) {
+      if (
+        workspaceResult.error ||
+        profileResult.error ||
+        conversationsResult.error ||
+        messagesResult.error
+      ) {
         const error =
-          workspaceResult.error || profileResult.error || conversationsResult.error || messagesResult.error;
+          workspaceResult.error ||
+          profileResult.error ||
+          conversationsResult.error ||
+          messagesResult.error;
         console.error("TimeX could not load the private user workspace.", error);
         cloudLoadFailed.current = true;
         setCloudSyncFailed(true);
@@ -929,7 +965,7 @@ function App() {
                   display_name: displayName,
                 },
               }
-            : current,
+            : current
         );
       }
 
@@ -937,21 +973,21 @@ function App() {
       setData(
         savedWorkspace
           ? readAppData(JSON.stringify(savedWorkspace))
-          : loadDataForKey(accountStorageKey(user.id)),
+          : loadDataForKey(accountStorageKey(user.id))
       );
       const localStore = createConversationStore(
         conversationStorageKey(user.id),
-        chatStorageKey(user.id),
+        chatStorageKey(user.id)
       );
       const localModes = new Map(
-        localStore.conversations.map((conversation) => [conversation.id, conversation.mode]),
+        localStore.conversations.map((conversation) => [conversation.id, conversation.mode])
       );
       const cloudConversations = conversationsResult.error
         ? []
         : (conversationsResult.data ?? []).map((item) => {
-            const messages = ((messagesResult.data ?? []) as Array<
-              ChatMessage & { conversation_id: string }
-            >)
+            const messages = (
+              (messagesResult.data ?? []) as Array<ChatMessage & { conversation_id: string }>
+            )
               .filter((message) => message.conversation_id === item.id)
               .slice(-100)
               .map(({ conversation_id: _conversationId, ...message }) => message);
@@ -964,9 +1000,11 @@ function App() {
               updatedAt: item.updated_at,
             } satisfies AssistantConversation;
           });
-      setConversationStore(cloudConversations.length
-        ? { activeId: cloudConversations[0].id, conversations: cloudConversations }
-        : localStore);
+      setConversationStore(
+        cloudConversations.length
+          ? { activeId: cloudConversations[0].id, conversations: cloudConversations }
+          : localStore
+      );
       setWorkspaceReady(true);
     })().catch((error: unknown) => {
       if (!active) return;
@@ -974,10 +1012,9 @@ function App() {
       cloudLoadFailed.current = true;
       setCloudSyncFailed(true);
       setData(loadDataForKey(accountStorageKey(user.id)));
-      setConversationStore(createConversationStore(
-        conversationStorageKey(user.id),
-        chatStorageKey(user.id),
-      ));
+      setConversationStore(
+        createConversationStore(conversationStorageKey(user.id), chatStorageKey(user.id))
+      );
       setWorkspaceReady(true);
     });
 
@@ -1019,7 +1056,7 @@ function App() {
           currentWorkspaceData.current = remoteData;
           setData(remoteData);
           setCloudSyncFailed(false);
-        },
+        }
       )
       .subscribe((status, error) => {
         if (!active || status === "SUBSCRIBED") return;
@@ -1093,7 +1130,7 @@ function App() {
         .from("user_workspaces")
         .upsert(
           { user_id: user.id, data, updated_at: new Date().toISOString() },
-          { onConflict: "user_id" },
+          { onConflict: "user_id" }
         )
         .then(({ error }) => {
           if (error) {
@@ -1127,7 +1164,7 @@ function App() {
     try {
       window.localStorage.setItem(
         conversationStorageKey(user?.id),
-        JSON.stringify(conversationStore),
+        JSON.stringify(conversationStore)
       );
     } catch {
       setStorageFailed(true);
@@ -1140,10 +1177,9 @@ function App() {
     const conversations = conversationStore.conversations;
     if (!conversations.length) return;
     let active = true;
-    void Promise.all(conversations.map((conversation) =>
-      client
-        .from("assistant_conversations")
-        .upsert(
+    void Promise.all(
+      conversations.map((conversation) =>
+        client.from("assistant_conversations").upsert(
           {
             id: conversation.id,
             user_id: user.id,
@@ -1152,9 +1188,10 @@ function App() {
             created_at: conversation.createdAt,
             updated_at: conversation.updatedAt,
           },
-          { onConflict: "id" },
-        ),
-    )).then((results) => {
+          { onConflict: "id" }
+        )
+      )
+    ).then((results) => {
       if (!active) return;
       const error = results.find((result) => result.error)?.error;
       if (error) {
@@ -1192,20 +1229,26 @@ function App() {
     }
     let active = true;
     const urls: string[] = [];
-    void Promise.all(recordings.map(async (recording) => {
-      const blob = await readVoiceRecording(recording.id);
-      return blob ? [recording.id, URL.createObjectURL(blob)] as const : null;
-    })).then((entries) => {
-      if (!active) {
-        entries.forEach((entry) => entry && URL.revokeObjectURL(entry[1]));
-        return;
-      }
-      const nextUrls = Object.fromEntries(entries.filter((entry): entry is readonly [string, string] => entry !== null));
-      urls.push(...Object.values(nextUrls));
-      setVoiceUrls(nextUrls);
-    }).catch((error: unknown) => {
-      console.error("TimeX could not load voice notes.", error);
-    });
+    void Promise.all(
+      recordings.map(async (recording) => {
+        const blob = await readVoiceRecording(recording.id);
+        return blob ? ([recording.id, URL.createObjectURL(blob)] as const) : null;
+      })
+    )
+      .then((entries) => {
+        if (!active) {
+          entries.forEach((entry) => entry && URL.revokeObjectURL(entry[1]));
+          return;
+        }
+        const nextUrls = Object.fromEntries(
+          entries.filter((entry): entry is readonly [string, string] => entry !== null)
+        );
+        urls.push(...Object.values(nextUrls));
+        setVoiceUrls(nextUrls);
+      })
+      .catch((error: unknown) => {
+        console.error("TimeX could not load voice notes.", error);
+      });
     return () => {
       active = false;
       urls.forEach((url) => URL.revokeObjectURL(url));
@@ -1226,16 +1269,13 @@ function App() {
       setData((current) => ({
         ...current,
         tasks: current.tasks.map((task) =>
-          task.id === taskId ? { ...task, reminderSentAt: Date.now() } : task,
+          task.id === taskId ? { ...task, reminderSentAt: Date.now() } : task
         ),
       }));
     });
   }, [data.tasks, lang]);
 
-  const openTasks = useMemo(
-    () => data.tasks.filter((task) => !task.completed),
-    [data.tasks],
-  );
+  const openTasks = useMemo(() => data.tasks.filter((task) => !task.completed), [data.tasks]);
   const completedCount = data.tasks.filter((task) => task.completed).length;
   const calendarTasks = data.tasks.filter((task) => task.scheduledDate === calendarDate);
   const calendarLayout = layoutCalendarTasks(calendarTasks);
@@ -1250,9 +1290,8 @@ function App() {
   }).format(selectedCalendarDate);
   const minutes = String(Math.floor(secondsLeft / 60)).padStart(2, "0");
   const seconds = String(secondsLeft % 60).padStart(2, "0");
-  const timerDuration = (pomodoroPhase === "work"
-    ? data.pomodoro.workMinutes
-    : data.pomodoro.breakMinutes) * 60;
+  const timerDuration =
+    (pomodoroPhase === "work" ? data.pomodoro.workMinutes : data.pomodoro.breakMinutes) * 60;
 
   function notify(message: string) {
     setToast(message);
@@ -1280,12 +1319,7 @@ function App() {
     setGuestChosen(true);
   }
 
-  function addTask(
-    title: string,
-    important = false,
-    urgent = false,
-    schedule?: TaskSchedule,
-  ) {
+  function addTask(title: string, important = false, urgent = false, schedule?: TaskSchedule) {
     if (blockGuest()) return;
     const trimmed = title.trim();
     if (!trimmed) return;
@@ -1327,9 +1361,7 @@ function App() {
       notify(t("timeRangeInvalid"));
       return;
     }
-    const permission = schedule?.reminderMinutes != null
-      ? await checkReminderPermission()
-      : null;
+    const permission = schedule?.reminderMinutes != null ? await checkReminderPermission() : null;
     addTask(taskTitle, taskImportant, taskUrgent, schedule);
     setTaskTitle("");
     setTaskImportant(false);
@@ -1346,9 +1378,7 @@ function App() {
       notify(t("timeRangeInvalid"));
       return;
     }
-    const permission = calendarReminder !== null
-      ? await checkReminderPermission()
-      : null;
+    const permission = calendarReminder !== null ? await checkReminderPermission() : null;
     addTask(calendarTaskTitle, false, false, {
       scheduledDate: calendarDate,
       startTime: calendarStartTime,
@@ -1370,14 +1400,18 @@ function App() {
     if (reminder !== null) {
       const permission = await checkReminderPermission();
       if (permission !== "granted") {
-        notify(t(permission === "unsupported" ? "reminderUnsupported" : "reminderPermissionDenied"));
+        notify(
+          t(permission === "unsupported" ? "reminderUnsupported" : "reminderPermissionDenied")
+        );
         return;
       }
     }
     setData((current) => ({
       ...current,
       tasks: current.tasks.map((task) =>
-        task.id === taskId ? { ...task, reminderMinutes: reminder, reminderSentAt: undefined } : task,
+        task.id === taskId
+          ? { ...task, reminderMinutes: reminder, reminderSentAt: undefined }
+          : task
       ),
     }));
   }
@@ -1385,14 +1419,21 @@ function App() {
   function updateTaskColor(taskId: string, color: string) {
     setData((current) => ({
       ...current,
-      tasks: current.tasks.map((task) => task.id === taskId ? { ...task, color } : task),
+      tasks: current.tasks.map((task) => (task.id === taskId ? { ...task, color } : task)),
     }));
   }
 
   function formatCalendarTime(time: string): string {
     const [hour, minute] = time.split(":").map(Number);
-    return new Intl.DateTimeFormat(lang, { hour: "numeric", minute: "2-digit" })
-      .format(new Date(selectedCalendarDate.getFullYear(), selectedCalendarDate.getMonth(), selectedCalendarDate.getDate(), hour, minute));
+    return new Intl.DateTimeFormat(lang, { hour: "numeric", minute: "2-digit" }).format(
+      new Date(
+        selectedCalendarDate.getFullYear(),
+        selectedCalendarDate.getMonth(),
+        selectedCalendarDate.getDate(),
+        hour,
+        minute
+      )
+    );
   }
 
   function formatHour(hour: number): string {
@@ -1407,7 +1448,7 @@ function App() {
       ...current,
       points: completing ? current.points + 10 : current.points,
       tasks: current.tasks.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task,
+        task.id === taskId ? { ...task, completed: !task.completed } : task
       ),
     }));
     if (completing) notify(t("earned"));
@@ -1435,9 +1476,7 @@ function App() {
     setData((current) => ({
       ...current,
       notes: current.notes.map((note) =>
-        note.id === noteId
-          ? { ...note, ...updates, updatedAt: Date.now() }
-          : note,
+        note.id === noteId ? { ...note, ...updates, updatedAt: Date.now() } : note
       ),
     }));
   }
@@ -1473,9 +1512,9 @@ function App() {
     const nextPhase = pomodoroPhase === "work" ? "break" : "work";
     setRunning(false);
     setPomodoroPhase(nextPhase);
-    setSecondsLeft((nextPhase === "work"
-      ? data.pomodoro.workMinutes
-      : data.pomodoro.breakMinutes) * 60);
+    setSecondsLeft(
+      (nextPhase === "work" ? data.pomodoro.workMinutes : data.pomodoro.breakMinutes) * 60
+    );
   }
 
   async function startVoiceRecording(noteId: string) {
@@ -1493,7 +1532,10 @@ function App() {
         if (event.data.size > 0) recordingChunksRef.current.push(event.data);
       };
       recorder.onstop = () => {
-        const durationSeconds = Math.max(1, Math.round((Date.now() - recordingStartedAtRef.current) / 1000));
+        const durationSeconds = Math.max(
+          1,
+          Math.round((Date.now() - recordingStartedAtRef.current) / 1000)
+        );
         const mimeType = recorder.mimeType || "audio/webm";
         const blob = new Blob(recordingChunksRef.current, { type: mimeType });
         stream.getTracks().forEach((track) => track.stop());
@@ -1507,9 +1549,11 @@ function App() {
           mimeType,
         };
         void saveVoiceRecording(audio.id, blob)
-          .then(() => updateNote(noteId, {
-            audio: [...(data.notes.find((note) => note.id === noteId)?.audio ?? []), audio],
-          }))
+          .then(() =>
+            updateNote(noteId, {
+              audio: [...(data.notes.find((note) => note.id === noteId)?.audio ?? []), audio],
+            })
+          )
           .catch((error: unknown) => {
             console.error("TimeX could not save a voice note.", error);
             notify(t("voiceNoteSaveFailed"));
@@ -1529,10 +1573,13 @@ function App() {
 
   function removeVoiceNote(noteId: string, audioId: string) {
     void deleteVoiceRecording(audioId)
-      .then(() => updateNote(noteId, {
-        audio: (data.notes.find((note) => note.id === noteId)?.audio ?? [])
-          .filter((audio) => audio.id !== audioId),
-      }))
+      .then(() =>
+        updateNote(noteId, {
+          audio: (data.notes.find((note) => note.id === noteId)?.audio ?? []).filter(
+            (audio) => audio.id !== audioId
+          ),
+        })
+      )
       .catch((error: unknown) => {
         console.error("TimeX could not delete a voice note.", error);
         notify(t("voiceNoteSaveFailed"));
@@ -1696,21 +1743,19 @@ function App() {
     setAuthPending(false);
   }
 
-  async function storeAssistantConversation(
-    conversation: AssistantConversation,
-    userId: string,
-  ) {
+  async function storeAssistantConversation(conversation: AssistantConversation, userId: string) {
     if (!supabase) return;
-    const { error } = await supabase
-      .from("assistant_conversations")
-      .upsert({
+    const { error } = await supabase.from("assistant_conversations").upsert(
+      {
         id: conversation.id,
         user_id: userId,
         title: conversation.title.slice(0, 100),
         mode: toCloudMode(conversation.mode),
         created_at: conversation.createdAt,
         updated_at: conversation.updatedAt,
-      }, { onConflict: "id" });
+      },
+      { onConflict: "id" }
+    );
     if (error) {
       console.error("TimeX could not sync a private assistant conversation.", error);
       setCloudSyncFailed(true);
@@ -1720,19 +1765,17 @@ function App() {
   async function storeAssistantMessage(
     message: ChatMessage,
     userId: string,
-    conversationId: string,
+    conversationId: string
   ) {
     if (!supabase) return;
-    const { error } = await supabase
-      .from("assistant_messages")
-      .insert({
-        id: message.id,
-        user_id: userId,
-        conversation_id: conversationId,
-        role: message.role,
-        content: message.content,
-        sources: message.sources ?? [],
-      });
+    const { error } = await supabase.from("assistant_messages").insert({
+      id: message.id,
+      user_id: userId,
+      conversation_id: conversationId,
+      role: message.role,
+      content: message.content,
+      sources: message.sources ?? [],
+    });
     if (error) {
       console.error("TimeX could not sync a private assistant message.", error);
       setCloudSyncFailed(true);
@@ -1740,13 +1783,16 @@ function App() {
   }
 
   function updateActiveConversation(
-    update: (conversation: AssistantConversation) => AssistantConversation,
+    update: (conversation: AssistantConversation) => AssistantConversation
   ) {
     setConversationStore((current) => {
       const active = current.conversations.find((item) => item.id === current.activeId);
       if (!active) {
         const created = update(createConversation());
-        return { activeId: created.id, conversations: [created, ...current.conversations].slice(0, MAX_CONVERSATIONS) };
+        return {
+          activeId: created.id,
+          conversations: [created, ...current.conversations].slice(0, MAX_CONVERSATIONS),
+        };
       }
       const updated = update(active);
       return {
@@ -1837,9 +1883,7 @@ function App() {
       let serviceDetail = "";
       let localResponse: Awaited<ReturnType<typeof respondAsMrX>> | null = null;
       const useConnectedAssistant = Boolean(
-        user &&
-        supabase &&
-        (isConnectedMode(chatMode) || chatMode === "advanced-plan"),
+        user && supabase && (isConnectedMode(chatMode) || chatMode === "advanced-plan")
       );
       if (useConnectedAssistant && user && supabase) {
         try {
@@ -1852,7 +1896,10 @@ function App() {
               webSources = [{ title: lookup.title, url: lookup.url }];
             }
           } else if (chatMode === "mrx_planner") {
-            contextData = latestSearchContext(conversationStore.conversations, activeConversationId);
+            contextData = latestSearchContext(
+              conversationStore.conversations,
+              activeConversationId
+            );
           }
           const { data: assistantData, error } = await supabase.functions.invoke<AssistantResponse>(
             "timex-assistant",
@@ -1877,7 +1924,7 @@ function App() {
                     scheduledDate,
                   })),
               },
-            },
+            }
           );
           if (error) {
             const detail = await readFunctionError(error);
@@ -1897,33 +1944,42 @@ function App() {
                     !source ||
                     typeof source.title !== "string" ||
                     typeof source.url !== "string" ||
-                    !source.url.startsWith("https://"),
+                    !source.url.startsWith("https://")
                 )))
           ) {
             throw new Error("The configured assistant returned an invalid response.");
           }
-          response = webSources?.length && !assistantData.sources?.length
-            ? { ...assistantData, sources: webSources }
-            : assistantData;
+          response =
+            webSources?.length && !assistantData.sources?.length
+              ? { ...assistantData, sources: webSources }
+              : assistantData;
         } catch (error) {
-          console.error("TimeX could not reach the configured assistant; using MrX locally.", error);
+          console.error(
+            "TimeX could not reach the configured assistant; using MrX locally.",
+            error
+          );
           setChatNotice(
             serviceDetail
               ? `${t("assistantLocalFallback")} (${serviceDetail})`
-              : t("assistantLocalFallback"),
+              : t("assistantLocalFallback")
           );
         }
       }
 
       if (!response && !localResponse) {
-        localResponse = await respondAsMrX(content, lang, {
-          tasks: data.tasks,
-          plans: data.plans,
-          userName,
-          researchUnavailable:
-            (chatMode === "advanced-plan" || isResearchRequest(content)) && !response,
-          history: conversation.slice(0, -1).slice(-12),
-        }, chatMode);
+        localResponse = await respondAsMrX(
+          content,
+          lang,
+          {
+            tasks: data.tasks,
+            plans: data.plans,
+            userName,
+            researchUnavailable:
+              (chatMode === "advanced-plan" || isResearchRequest(content)) && !response,
+            history: conversation.slice(0, -1).slice(-12),
+          },
+          chatMode
+        );
       }
       const assistantMessage: ChatMessage = {
         id: createLocalId(),
@@ -1936,10 +1992,7 @@ function App() {
       };
       if (!assistantMessage.content) throw new Error("MrX returned an empty response.");
       const completeMessages = [...conversation, assistantMessage].slice(-100);
-      const completedConversation = saveConversationMessages(
-        savedConversation,
-        completeMessages,
-      );
+      const completedConversation = saveConversationMessages(savedConversation, completeMessages);
       updateActiveConversation(() => completedConversation);
       if (user && supabase) {
         void storeAssistantMessage(assistantMessage, user.id, activeConversationId);
@@ -1963,9 +2016,7 @@ function App() {
   }
 
   function saveMessageAsNote(text: string) {
-    applyAssistantActions([
-      { type: "note", title: text.split("\n")[0].slice(0, 100), body: text },
-    ]);
+    applyAssistantActions([{ type: "note", title: text.split("\n")[0].slice(0, 100), body: text }]);
     setChatNotice(t("savedAsNote"));
   }
 
@@ -1999,7 +2050,7 @@ function App() {
         };
         setData((current) => {
           const existingTitles = new Set(
-            current.tasks.map((task) => task.title.trim().toLocaleLowerCase()),
+            current.tasks.map((task) => task.title.trim().toLocaleLowerCase())
           );
           const newTasks = steps
             .filter((step) => !existingTitles.has(step.trim().toLocaleLowerCase()))
@@ -2056,10 +2107,15 @@ function App() {
 
   function handleSwipeStart(event: React.TouchEvent) {
     const target = event.target as HTMLElement;
-    const blocked = target.closest("input, textarea, select, audio, [contenteditable], .modal, [role='dialog']");
+    const blocked = target.closest(
+      "input, textarea, select, audio, [contenteditable], .modal, [role='dialog']"
+    );
     let scrollable: HTMLElement | null = target;
     while (scrollable && scrollable !== event.currentTarget) {
-      if (scrollable.scrollWidth > scrollable.clientWidth + 4 && getComputedStyle(scrollable).overflowX !== "visible") {
+      if (
+        scrollable.scrollWidth > scrollable.clientWidth + 4 &&
+        getComputedStyle(scrollable).overflowX !== "visible"
+      ) {
         swipeStart.current = null;
         return;
       }
@@ -2102,7 +2158,11 @@ function App() {
             <span className="task-scheduled-tag">
               <span aria-hidden="true">◷</span>
               {task.scheduledDate !== getLocalDateKey(new Date()) && (
-                <span>{new Intl.DateTimeFormat(lang, { month: "short", day: "numeric" }).format(dateFromKey(task.scheduledDate))}</span>
+                <span>
+                  {new Intl.DateTimeFormat(lang, { month: "short", day: "numeric" }).format(
+                    dateFromKey(task.scheduledDate)
+                  )}
+                </span>
               )}
               {formatCalendarTime(task.startTime)}–{formatCalendarTime(task.endTime)}
             </span>
@@ -2132,10 +2192,12 @@ function App() {
   return (
     <div
       className={`app-shell theme-${data.theme}`}
-      style={{
-        "--user-accent": data.accentColor,
-        "--user-accent-ink": getContrastTextColor(data.accentColor),
-      } as CSSProperties}
+      style={
+        {
+          "--user-accent": data.accentColor,
+          "--user-accent-ink": getContrastTextColor(data.accentColor),
+        } as CSSProperties
+      }
     >
       <aside className="sidebar">
         <a className="brand" href="#today" onClick={() => setPage("today")}>
@@ -2156,7 +2218,9 @@ function App() {
                 setPage(item.id);
               }}
             >
-              <span className="nav-icon" aria-hidden="true">{item.icon}</span>
+              <span className="nav-icon" aria-hidden="true">
+                {item.icon}
+              </span>
               <span>{t(item.label)}</span>
               {item.id === "today" && openTasks.length > 0 && (
                 <span className="nav-count">{openTasks.length}</span>
@@ -2167,11 +2231,15 @@ function App() {
 
         <div className="sidebar-bottom">
           <div className="sidebar-motivation">
-            <span className="motivation-icon" aria-hidden="true">✦</span>
+            <span className="motivation-icon" aria-hidden="true">
+              ✦
+            </span>
             <p>{t("pointsHint")}</p>
           </div>
           <div className="profile-row">
-            <div className="profile-avatar" aria-hidden="true">{userName ? userName[0].toUpperCase() : "ت"}</div>
+            <div className="profile-avatar" aria-hidden="true">
+              {userName ? userName[0].toUpperCase() : "ت"}
+            </div>
             <div>
               <strong>{userName || (isArabic ? "مساحتي" : "My space")}</strong>
               <span>{user?.email || t("savedOnDevice")}</span>
@@ -2228,1046 +2296,1217 @@ function App() {
             </div>
           ) : (
             <>
-          {page === "today" && (
-            <>
-              <section className="welcome-block">
-                <div>
-                  <span className="eyebrow">{t("todayLabel")}</span>
-                  <h1>{greeting}</h1>
-                  <p>{t("greetingSub")}</p>
-                </div>
-                <div className="date-illustration" aria-hidden="true">
-                  <span className="sun-orbit">✳</span>
-                  <span className="orbit-dot" />
-                </div>
-              </section>
-
-              <section className="stats-grid" aria-label={t("tasks")}>
-                <article className="stat-card">
-                  <span className="stat-icon stat-icon-lilac" aria-hidden="true">◷</span>
-                  <span className="stat-label">{t("remaining")}</span>
-                  <strong className="stat-number">{openTasks.length}</strong>
-                </article>
-                <article className="stat-card">
-                  <span className="stat-icon stat-icon-mint" aria-hidden="true">✓</span>
-                  <span className="stat-label">{t("completed")}</span>
-                  <strong className="stat-number">{completedCount}</strong>
-                </article>
-                <article className="stat-card">
-                  <span className="stat-icon stat-icon-peach" aria-hidden="true">✦</span>
-                  <span className="stat-label">{t("points")}</span>
-                  <strong className="stat-number">{data.points}</strong>
-                </article>
-              </section>
-
-              <div className="dashboard-grid">
-                <section className="panel task-panel">
-                  <div className="panel-heading">
+              {page === "today" && (
+                <>
+                  <section className="welcome-block">
                     <div>
-                      <h2>{t("tasks")}</h2>
-                      <p>{t("tasksSub")}</p>
+                      <span className="eyebrow">{t("todayLabel")}</span>
+                      <h1>{greeting}</h1>
+                      <p>{t("greetingSub")}</p>
                     </div>
-                    <span className="heading-count">{openTasks.length.toString().padStart(2, "0")}</span>
-                  </div>
-                  <form className="task-form" onSubmit={submitTask}>
-                    <label className="visually-hidden" htmlFor="new-task-title">{t("taskPlaceholder")}</label>
-                    <input
-                      id="new-task-title"
-                      value={taskTitle}
-                      onChange={(event) => setTaskTitle(event.target.value)}
-                      placeholder={t("taskPlaceholder")}
-                      maxLength={160}
-                    />
-                    <button className="primary-button add-button" type="submit" disabled={!taskTitle.trim()}>
-                      <span aria-hidden="true">＋</span>
-                      <span>{t("add")}</span>
-                    </button>
-                  </form>
-                  <button
-                    className="task-schedule-toggle"
-                    type="button"
-                    aria-expanded={taskScheduleOpen}
-                    aria-controls="task-schedule-fields"
-                    onClick={() => setTaskScheduleOpen((open) => !open)}
-                  >
-                    <span aria-hidden="true">◷</span>{t("scheduleTask")}
-                  </button>
-                  {taskScheduleOpen && (
-                    <div className="schedule-fields" id="task-schedule-fields">
-                      <label>
-                        <span>{t("scheduledDate")}</span>
-                        <input
-                          type="date"
-                          value={taskScheduledDate}
-                          onChange={(event) => setTaskScheduledDate(event.target.value)}
-                          required
-                        />
-                      </label>
-                      <label>
-                        <span>{t("startTime")}</span>
-                        <input
-                          type="time"
-                          value={taskStartTime}
-                          onChange={(event) => setTaskStartTime(event.target.value)}
-                          required
-                        />
-                      </label>
-                      <label>
-                        <span>{t("endTime")}</span>
-                        <input
-                          type="time"
-                          value={taskEndTime}
-                          onChange={(event) => setTaskEndTime(event.target.value)}
-                          required
-                        />
-                      </label>
-                      <label>
-                        <span>{t("reminder")}</span>
-                        <select
-                          value={taskReminder ?? "none"}
-                          onChange={(event) =>
-                            setTaskReminder(event.target.value === "none" ? null : Number(event.target.value))
-                          }
-                        >
-                          <option value="none">{t("noReminder")}</option>
-                          {[5, 10, 15, 30, 60].map((reminder) => (
-                            <option value={reminder} key={reminder}>
-                              {t("reminderBefore").replace("{minutes}", String(reminder))}
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      <label className="task-color-field">
-                        <span>{t("taskColor")}</span>
-                        <input
-                          type="color"
-                          aria-label={t("chooseTaskColor")}
-                          value={taskColor}
-                          onChange={(event) => setTaskColor(event.target.value)}
-                        />
-                      </label>
+                    <div className="date-illustration" aria-hidden="true">
+                      <span className="sun-orbit">✳</span>
+                      <span className="orbit-dot" />
                     </div>
-                  )}
-                  <div className="task-options">
-                    <label className="check-label">
-                      <input
-                        type="checkbox"
-                        checked={taskImportant}
-                        onChange={(event) => setTaskImportant(event.target.checked)}
-                      />
-                      <span className="tiny-dot important-dot" />
-                      {t("important")}
-                    </label>
-                    <label className="check-label">
-                      <input
-                        type="checkbox"
-                        checked={taskUrgent}
-                        onChange={(event) => setTaskUrgent(event.target.checked)}
-                      />
-                      <span className="tiny-dot urgent-dot" />
-                      {t("urgent")}
-                    </label>
-                  </div>
-                  {data.tasks.length ? (
-                    <ul className="task-list">
-                      {[...data.tasks]
-                        .sort((a, b) => Number(a.completed) - Number(b.completed) || b.createdAt - a.createdAt)
-                        .map(renderTask)}
-                    </ul>
-                  ) : (
-                    <div className="empty-state compact-empty">
-                      <span className="empty-spark" aria-hidden="true">✳</span>
-                      <strong>{t("emptyTasks")}</strong>
-                      <p>{t("emptyTasksSub")}</p>
-                    </div>
-                  )}
-                </section>
+                  </section>
 
-                <section className="panel focus-panel">
-                  <div className="focus-topline">
-                    <span className="focus-icon" aria-hidden="true">◷</span>
-                    <span className="eyebrow">
-                      {t("focus")} · {pomodoroPhase === "work" ? t("focusWork") : t("focusBreak")}
-                    </span>
-                  </div>
-                  <h2>{t("focusSub")}</h2>
-                  <div className="pomodoro-presets" aria-label={t("pomodoroPresets")}>
-                    {[
-                      { workMinutes: 25, breakMinutes: 5 },
-                      { workMinutes: 50, breakMinutes: 10 },
-                      { workMinutes: 75, breakMinutes: 15 },
-                    ].map((preset) => {
-                      const selected = data.pomodoro.workMinutes === preset.workMinutes &&
-                        data.pomodoro.breakMinutes === preset.breakMinutes;
-                      return (
+                  <section className="stats-grid" aria-label={t("tasks")}>
+                    <article className="stat-card">
+                      <span className="stat-icon stat-icon-lilac" aria-hidden="true">
+                        ◷
+                      </span>
+                      <span className="stat-label">{t("remaining")}</span>
+                      <strong className="stat-number">{openTasks.length}</strong>
+                    </article>
+                    <article className="stat-card">
+                      <span className="stat-icon stat-icon-mint" aria-hidden="true">
+                        ✓
+                      </span>
+                      <span className="stat-label">{t("completed")}</span>
+                      <strong className="stat-number">{completedCount}</strong>
+                    </article>
+                    <article className="stat-card">
+                      <span className="stat-icon stat-icon-peach" aria-hidden="true">
+                        ✦
+                      </span>
+                      <span className="stat-label">{t("points")}</span>
+                      <strong className="stat-number">{data.points}</strong>
+                    </article>
+                  </section>
+
+                  <div className="dashboard-grid">
+                    <section className="panel task-panel">
+                      <div className="panel-heading">
+                        <div>
+                          <h2>{t("tasks")}</h2>
+                          <p>{t("tasksSub")}</p>
+                        </div>
+                        <span className="heading-count">
+                          {openTasks.length.toString().padStart(2, "0")}
+                        </span>
+                      </div>
+                      <form className="task-form" onSubmit={submitTask}>
+                        <label className="visually-hidden" htmlFor="new-task-title">
+                          {t("taskPlaceholder")}
+                        </label>
+                        <input
+                          id="new-task-title"
+                          value={taskTitle}
+                          onChange={(event) => setTaskTitle(event.target.value)}
+                          placeholder={t("taskPlaceholder")}
+                          maxLength={160}
+                        />
                         <button
-                          className={`pomodoro-preset${selected ? " selected" : ""}`}
-                          type="button"
-                          key={`${preset.workMinutes}-${preset.breakMinutes}`}
-                          onClick={() => setPomodoroDurations(preset.workMinutes, preset.breakMinutes)}
+                          className="primary-button add-button"
+                          type="submit"
+                          disabled={!taskTitle.trim()}
                         >
-                          {preset.workMinutes} / {preset.breakMinutes}
+                          <span aria-hidden="true">＋</span>
+                          <span>{t("add")}</span>
                         </button>
+                      </form>
+                      <button
+                        className="task-schedule-toggle"
+                        type="button"
+                        aria-expanded={taskScheduleOpen}
+                        aria-controls="task-schedule-fields"
+                        onClick={() => setTaskScheduleOpen((open) => !open)}
+                      >
+                        <span aria-hidden="true">◷</span>
+                        {t("scheduleTask")}
+                      </button>
+                      {taskScheduleOpen && (
+                        <div className="schedule-fields" id="task-schedule-fields">
+                          <label>
+                            <span>{t("scheduledDate")}</span>
+                            <input
+                              type="date"
+                              value={taskScheduledDate}
+                              onChange={(event) => setTaskScheduledDate(event.target.value)}
+                              required
+                            />
+                          </label>
+                          <label>
+                            <span>{t("startTime")}</span>
+                            <input
+                              type="time"
+                              value={taskStartTime}
+                              onChange={(event) => setTaskStartTime(event.target.value)}
+                              required
+                            />
+                          </label>
+                          <label>
+                            <span>{t("endTime")}</span>
+                            <input
+                              type="time"
+                              value={taskEndTime}
+                              onChange={(event) => setTaskEndTime(event.target.value)}
+                              required
+                            />
+                          </label>
+                          <label>
+                            <span>{t("reminder")}</span>
+                            <select
+                              value={taskReminder ?? "none"}
+                              onChange={(event) =>
+                                setTaskReminder(
+                                  event.target.value === "none" ? null : Number(event.target.value)
+                                )
+                              }
+                            >
+                              <option value="none">{t("noReminder")}</option>
+                              {[5, 10, 15, 30, 60].map((reminder) => (
+                                <option value={reminder} key={reminder}>
+                                  {t("reminderBefore").replace("{minutes}", String(reminder))}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+                          <label className="task-color-field">
+                            <span>{t("taskColor")}</span>
+                            <input
+                              type="color"
+                              aria-label={t("chooseTaskColor")}
+                              value={taskColor}
+                              onChange={(event) => setTaskColor(event.target.value)}
+                            />
+                          </label>
+                        </div>
+                      )}
+                      <div className="task-options">
+                        <label className="check-label">
+                          <input
+                            type="checkbox"
+                            checked={taskImportant}
+                            onChange={(event) => setTaskImportant(event.target.checked)}
+                          />
+                          <span className="tiny-dot important-dot" />
+                          {t("important")}
+                        </label>
+                        <label className="check-label">
+                          <input
+                            type="checkbox"
+                            checked={taskUrgent}
+                            onChange={(event) => setTaskUrgent(event.target.checked)}
+                          />
+                          <span className="tiny-dot urgent-dot" />
+                          {t("urgent")}
+                        </label>
+                      </div>
+                      {data.tasks.length ? (
+                        <ul className="task-list">
+                          {[...data.tasks]
+                            .sort(
+                              (a, b) =>
+                                Number(a.completed) - Number(b.completed) ||
+                                b.createdAt - a.createdAt
+                            )
+                            .map(renderTask)}
+                        </ul>
+                      ) : (
+                        <div className="empty-state compact-empty">
+                          <span className="empty-spark" aria-hidden="true">
+                            ✳
+                          </span>
+                          <strong>{t("emptyTasks")}</strong>
+                          <p>{t("emptyTasksSub")}</p>
+                        </div>
+                      )}
+                    </section>
+
+                    <section className="panel focus-panel">
+                      <div className="focus-topline">
+                        <span className="focus-icon" aria-hidden="true">
+                          ◷
+                        </span>
+                        <span className="eyebrow">
+                          {t("focus")} ·{" "}
+                          {pomodoroPhase === "work" ? t("focusWork") : t("focusBreak")}
+                        </span>
+                      </div>
+                      <h2>{t("focusSub")}</h2>
+                      <div className="pomodoro-presets" aria-label={t("pomodoroPresets")}>
+                        {[
+                          { workMinutes: 25, breakMinutes: 5 },
+                          { workMinutes: 50, breakMinutes: 10 },
+                          { workMinutes: 75, breakMinutes: 15 },
+                        ].map((preset) => {
+                          const selected =
+                            data.pomodoro.workMinutes === preset.workMinutes &&
+                            data.pomodoro.breakMinutes === preset.breakMinutes;
+                          return (
+                            <button
+                              className={`pomodoro-preset${selected ? " selected" : ""}`}
+                              type="button"
+                              key={`${preset.workMinutes}-${preset.breakMinutes}`}
+                              onClick={() =>
+                                setPomodoroDurations(preset.workMinutes, preset.breakMinutes)
+                              }
+                            >
+                              {preset.workMinutes} / {preset.breakMinutes}
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <div
+                        className="timer-face"
+                        role="timer"
+                        aria-label={`${minutes}:${seconds}`}
+                        aria-live="off"
+                      >
+                        <span>{minutes}</span>
+                        <span className="timer-separator">:</span>
+                        <span>{seconds}</span>
+                      </div>
+                      <div className="timer-track" aria-hidden="true">
+                        <span
+                          style={{
+                            width: `${((timerDuration - secondsLeft) / timerDuration) * 100}%`,
+                          }}
+                        />
+                      </div>
+                      {secondsLeft === 0 && (
+                        <p className="timer-finished">
+                          {t("sessionDone")}{" "}
+                          <button
+                            type="button"
+                            className="text-button"
+                            onClick={switchPomodoroPhase}
+                          >
+                            {pomodoroPhase === "work" ? t("startBreak") : t("startFocus")}
+                          </button>
+                        </p>
+                      )}
+                      <div className="timer-controls">
+                        <button
+                          className="primary-button timer-start"
+                          type="button"
+                          onClick={() => {
+                            if (secondsLeft === 0) setSecondsLeft(timerDuration);
+                            setRunning((current) => !current);
+                          }}
+                        >
+                          <span aria-hidden="true">{running ? "Ⅱ" : "▶"}</span>
+                          {running
+                            ? t("pause")
+                            : secondsLeft === timerDuration || secondsLeft === 0
+                              ? t("start")
+                              : t("resume")}
+                        </button>
+                        <button
+                          className="timer-reset"
+                          type="button"
+                          onClick={() => {
+                            setRunning(false);
+                            setSecondsLeft(timerDuration);
+                          }}
+                        >
+                          {t("reset")}
+                        </button>
+                      </div>
+                      <form className="pomodoro-custom" onSubmit={applyCustomPomodoro}>
+                        <span>{t("pomodoroCustom")}</span>
+                        <label>
+                          <span>{t("workMinutes")}</span>
+                          <input
+                            type="number"
+                            min="1"
+                            max="180"
+                            value={pomodoroWorkInput}
+                            onChange={(event) => setPomodoroWorkInput(event.target.value)}
+                          />
+                        </label>
+                        <label>
+                          <span>{t("breakMinutes")}</span>
+                          <input
+                            type="number"
+                            min="1"
+                            max="60"
+                            value={pomodoroBreakInput}
+                            onChange={(event) => setPomodoroBreakInput(event.target.value)}
+                          />
+                        </label>
+                        <button className="text-button" type="submit">
+                          {t("applyTimer")}
+                        </button>
+                      </form>
+                      <div className="focus-decoration focus-decoration-one" aria-hidden="true" />
+                      <div className="focus-decoration focus-decoration-two" aria-hidden="true" />
+                    </section>
+                  </div>
+                </>
+              )}
+
+              {page === "calendar" && (
+                <section className="content-page calendar-page">
+                  <header className="page-heading calendar-page-heading">
+                    <div>
+                      <span className="eyebrow">{t("calendar")}</span>
+                      <h1>{calendarDateLabel}</h1>
+                      <p>{t("calendarIntro")}</p>
+                    </div>
+                    <div className="calendar-day-switcher" aria-label={t("calendar")}>
+                      <button
+                        className="calendar-nav-button"
+                        type="button"
+                        aria-label={t("previousDay")}
+                        onClick={() => setCalendarDay(-1)}
+                      >
+                        ‹
+                      </button>
+                      <button
+                        className="calendar-today-button"
+                        type="button"
+                        onClick={() => setCalendarDate(getLocalDateKey(new Date()))}
+                      >
+                        {t("todayButton")}
+                      </button>
+                      <button
+                        className="calendar-nav-button"
+                        type="button"
+                        aria-label={t("nextDay")}
+                        onClick={() => setCalendarDay(1)}
+                      >
+                        ›
+                      </button>
+                    </div>
+                  </header>
+
+                  <section className="panel calendar-add-panel">
+                    <div className="calendar-add-heading">
+                      <div>
+                        <span className="calendar-add-icon" aria-hidden="true">
+                          ＋
+                        </span>
+                        <h2>{t("addScheduledTask")}</h2>
+                      </div>
+                      <span>{calendarDateLabel}</span>
+                    </div>
+                    <form className="calendar-add-form" onSubmit={submitCalendarTask}>
+                      <label className="visually-hidden" htmlFor="calendar-task-title">
+                        {t("scheduledTaskPlaceholder")}
+                      </label>
+                      <input
+                        id="calendar-task-title"
+                        value={calendarTaskTitle}
+                        onChange={(event) => setCalendarTaskTitle(event.target.value)}
+                        placeholder={t("scheduledTaskPlaceholder")}
+                        maxLength={160}
+                        required
+                      />
+                      <div className="calendar-add-times">
+                        <label>
+                          <span>{t("startTime")}</span>
+                          <input
+                            type="time"
+                            value={calendarStartTime}
+                            onChange={(event) => setCalendarStartTime(event.target.value)}
+                            required
+                          />
+                        </label>
+                        <label>
+                          <span>{t("endTime")}</span>
+                          <input
+                            type="time"
+                            value={calendarEndTime}
+                            onChange={(event) => setCalendarEndTime(event.target.value)}
+                            required
+                          />
+                        </label>
+                        <label>
+                          <span>{t("reminder")}</span>
+                          <select
+                            value={calendarReminder ?? "none"}
+                            onChange={(event) =>
+                              setCalendarReminder(
+                                event.target.value === "none" ? null : Number(event.target.value)
+                              )
+                            }
+                          >
+                            <option value="none">{t("noReminder")}</option>
+                            {[5, 10, 15, 30, 60].map((reminder) => (
+                              <option value={reminder} key={reminder}>
+                                {t("reminderBefore").replace("{minutes}", String(reminder))}
+                              </option>
+                            ))}
+                          </select>
+                        </label>
+                        <label className="task-color-field">
+                          <span>{t("taskColor")}</span>
+                          <input
+                            type="color"
+                            aria-label={t("chooseTaskColor")}
+                            value={calendarTaskColor}
+                            onChange={(event) => setCalendarTaskColor(event.target.value)}
+                          />
+                        </label>
+                        <button
+                          className="primary-button calendar-add-button"
+                          type="submit"
+                          disabled={!calendarTaskTitle.trim()}
+                        >
+                          <span aria-hidden="true">＋</span>
+                          {t("addScheduledTask")}
+                        </button>
+                      </div>
+                    </form>
+                    {unscheduledCount > 0 && (
+                      <p className="calendar-unscheduled-note">
+                        {t("unscheduledCount").replace("{count}", String(unscheduledCount))}
+                      </p>
+                    )}
+                    <p className="calendar-unscheduled-note">{t("reminderBackgroundHint")}</p>
+                  </section>
+
+                  <section className="panel calendar-panel">
+                    <header className="calendar-panel-heading">
+                      <div>
+                        <h2>{t("calendarTasks")}</h2>
+                        <p>{calendarDateLabel}</p>
+                      </div>
+                      <span className="heading-count">
+                        {calendarTasks.length.toString().padStart(2, "0")}
+                      </span>
+                    </header>
+                    <div className="calendar-scroll">
+                      <div className="calendar-time-grid">
+                        <div className="calendar-hours" aria-hidden="true">
+                          {Array.from({ length: 24 }, (_, hour) => (
+                            <span key={hour}>{formatHour(hour)}</span>
+                          ))}
+                        </div>
+                        <div className="calendar-day-track">
+                          {Array.from({ length: 24 }, (_, hour) => (
+                            <span
+                              className="calendar-hour-line"
+                              key={hour}
+                              style={{ top: `${hour * 64}px` }}
+                              aria-hidden="true"
+                            />
+                          ))}
+                          {calendarLayout.map(
+                            ({ task, column, columns, startMinutes, durationMinutes }) => {
+                              const quadrant = getQuadrant(task);
+                              const columnWidth = 100 / columns;
+                              return (
+                                <article
+                                  className={`calendar-event${task.completed ? " calendar-event-complete" : ""}`}
+                                  key={task.id}
+                                  style={
+                                    {
+                                      "--event-color": task.color ?? "#6a9cff",
+                                      top: `${startMinutes * (64 / 60)}px`,
+                                      height: `${Math.max(32, durationMinutes * (64 / 60))}px`,
+                                      insetInlineStart: `calc(${column * columnWidth}% + 5px)`,
+                                      width: `calc(${columnWidth}% - 10px)`,
+                                    } as CSSProperties
+                                  }
+                                >
+                                  <button
+                                    className={`calendar-event-check${task.completed ? " checked" : ""}`}
+                                    type="button"
+                                    aria-label={task.completed ? t("markOpen") : t("markDone")}
+                                    onClick={() => toggleTask(task.id)}
+                                  >
+                                    {task.completed ? "✓" : ""}
+                                  </button>
+                                  <div className="calendar-event-copy">
+                                    <strong>{task.title}</strong>
+                                    <span>
+                                      {formatCalendarTime(task.startTime)} –{" "}
+                                      {formatCalendarTime(task.endTime)}
+                                    </span>
+                                    <select
+                                      className="calendar-event-reminder-select"
+                                      aria-label={`${t("reminder")} — ${task.title}`}
+                                      value={task.reminderMinutes ?? "none"}
+                                      onChange={(event) =>
+                                        void updateTaskReminder(
+                                          task.id,
+                                          event.target.value === "none"
+                                            ? null
+                                            : Number(event.target.value)
+                                        )
+                                      }
+                                    >
+                                      <option value="none">{t("noReminder")}</option>
+                                      {[5, 10, 15, 30, 60].map((reminder) => (
+                                        <option value={reminder} key={reminder}>
+                                          {t("reminderBefore").replace(
+                                            "{minutes}",
+                                            String(reminder)
+                                          )}
+                                        </option>
+                                      ))}
+                                    </select>
+                                    <span className={`priority-tag priority-${quadrant}`}>
+                                      {task.important && task.urgent
+                                        ? `${t("important")} · ${t("urgent")}`
+                                        : task.important
+                                          ? t("important")
+                                          : task.urgent
+                                            ? t("urgent")
+                                            : t("unprioritized")}
+                                    </span>
+                                  </div>
+                                  <div className="calendar-event-actions">
+                                    <input
+                                      className="calendar-event-color"
+                                      type="color"
+                                      aria-label={`${t("chooseTaskColor")} — ${task.title}`}
+                                      value={task.color ?? "#6a9cff"}
+                                      onChange={(event) =>
+                                        updateTaskColor(task.id, event.target.value)
+                                      }
+                                    />
+                                    <button
+                                      className="icon-button calendar-event-delete"
+                                      type="button"
+                                      aria-label={t("deleteTask")}
+                                      onClick={() => deleteTask(task.id)}
+                                    >
+                                      ×
+                                    </button>
+                                  </div>
+                                </article>
+                              );
+                            }
+                          )}
+                          {calendarTasks.length === 0 && (
+                            <div className="empty-state calendar-empty">
+                              <span className="empty-spark" aria-hidden="true">
+                                ◷
+                              </span>
+                              <strong>{t("calendarEmpty")}</strong>
+                              <p>{t("calendarEmptySub")}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <nav className="calendar-week-strip" aria-label={t("weekOverview")}>
+                      {calendarWeek.map((dateKey) => {
+                        const date = dateFromKey(dateKey);
+                        const tasksForDate = data.tasks.filter(
+                          (task) => task.scheduledDate === dateKey
+                        );
+                        const fullDate = new Intl.DateTimeFormat(lang, {
+                          weekday: "long",
+                          month: "long",
+                          day: "numeric",
+                        }).format(date);
+                        return (
+                          <button
+                            className={`calendar-week-day${dateKey === calendarDate ? " selected" : ""}`}
+                            type="button"
+                            key={dateKey}
+                            aria-label={fullDate}
+                            aria-pressed={dateKey === calendarDate}
+                            onClick={() => setCalendarDate(dateKey)}
+                          >
+                            <span className="calendar-week-weekday">
+                              {new Intl.DateTimeFormat(lang, { weekday: "short" }).format(date)}
+                            </span>
+                            <strong>{date.getDate()}</strong>
+                            <span className="calendar-week-markers" aria-hidden="true">
+                              {tasksForDate.slice(0, 3).map((task) => (
+                                <i
+                                  key={task.id}
+                                  style={{ backgroundColor: task.color ?? "var(--accent)" }}
+                                />
+                              ))}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </nav>
+                  </section>
+                </section>
+              )}
+
+              {page === "matrix" && (
+                <section className="content-page">
+                  <div className="page-heading">
+                    <div>
+                      <span className="eyebrow">{t("matrix")}</span>
+                      <h1>{t("priorities")}</h1>
+                      <p>{t("matrixIntro")}</p>
+                    </div>
+                  </div>
+                  <div className="matrix-grid">
+                    {[
+                      { title: "doNow", hint: "doNowHint", quadrant: 0, tone: "coral" },
+                      { title: "schedule", hint: "scheduleHint", quadrant: 1, tone: "violet" },
+                      { title: "delegate", hint: "delegateHint", quadrant: 2, tone: "amber" },
+                      { title: "eliminate", hint: "eliminateHint", quadrant: 3, tone: "blue" },
+                    ].map((item, index) => {
+                      const quadrantTasks = openTasks.filter(
+                        (task) => getQuadrant(task) === item.quadrant
+                      );
+                      return (
+                        <article className={`matrix-card matrix-${item.tone}`} key={item.title}>
+                          <header>
+                            <div className="matrix-card-title">
+                              <span className="matrix-number">0{index + 1}</span>
+                              <div>
+                                <h2>{t(item.title as CopyKey)}</h2>
+                                <p>{t(item.hint as CopyKey)}</p>
+                              </div>
+                            </div>
+                            <span className="matrix-count">{quadrantTasks.length}</span>
+                          </header>
+                          {quadrantTasks.length ? (
+                            <ul className="task-list matrix-task-list">
+                              {quadrantTasks.map(renderTask)}
+                            </ul>
+                          ) : (
+                            <p className="matrix-empty">{t("allCaughtUp")}</p>
+                          )}
+                        </article>
                       );
                     })}
                   </div>
-                  <div
-                    className="timer-face"
-                    role="timer"
-                    aria-label={`${minutes}:${seconds}`}
-                    aria-live="off"
+                  <form
+                    className="matrix-quick-add"
+                    onSubmit={(event) => {
+                      event.preventDefault();
+                      addTask(matrixTaskTitle);
+                      setMatrixTaskTitle("");
+                    }}
                   >
-                    <span>{minutes}</span>
-                    <span className="timer-separator">:</span>
-                    <span>{seconds}</span>
-                  </div>
-                  <div className="timer-track" aria-hidden="true">
-                    <span style={{ width: `${((timerDuration - secondsLeft) / timerDuration) * 100}%` }} />
-                  </div>
-                  {secondsLeft === 0 && (
-                    <p className="timer-finished">
-                      {t("sessionDone")}{" "}
-                      <button type="button" className="text-button" onClick={switchPomodoroPhase}>
-                        {pomodoroPhase === "work" ? t("startBreak") : t("startFocus")}
-                      </button>
-                    </p>
-                  )}
-                  <div className="timer-controls">
+                    <span className="quick-add-mark" aria-hidden="true">
+                      ＋
+                    </span>
+                    <div>
+                      <strong>{t("addTask")}</strong>
+                      <label className="visually-hidden" htmlFor="matrix-add-task">
+                        {t("taskPlaceholder")}
+                      </label>
+                      <input
+                        id="matrix-add-task"
+                        className="matrix-quick-input"
+                        value={matrixTaskTitle}
+                        onChange={(event) => setMatrixTaskTitle(event.target.value)}
+                        placeholder={t("taskPlaceholder")}
+                        maxLength={160}
+                      />
+                    </div>
                     <button
-                      className="primary-button timer-start"
-                      type="button"
-                      onClick={() => {
-                        if (secondsLeft === 0) setSecondsLeft(timerDuration);
-                        setRunning((current) => !current);
-                      }}
-                    >
-                      <span aria-hidden="true">{running ? "Ⅱ" : "▶"}</span>
-                      {running
-                        ? t("pause")
-                        : secondsLeft === timerDuration || secondsLeft === 0
-                          ? t("start")
-                          : t("resume")}
-                    </button>
-                    <button
-                      className="timer-reset"
-                      type="button"
-                      onClick={() => {
-                        setRunning(false);
-                        setSecondsLeft(timerDuration);
-                      }}
-                    >
-                      {t("reset")}
-                    </button>
-                  </div>
-                  <form className="pomodoro-custom" onSubmit={applyCustomPomodoro}>
-                    <span>{t("pomodoroCustom")}</span>
-                    <label>
-                      <span>{t("workMinutes")}</span>
-                      <input
-                        type="number"
-                        min="1"
-                        max="180"
-                        value={pomodoroWorkInput}
-                        onChange={(event) => setPomodoroWorkInput(event.target.value)}
-                      />
-                    </label>
-                    <label>
-                      <span>{t("breakMinutes")}</span>
-                      <input
-                        type="number"
-                        min="1"
-                        max="60"
-                        value={pomodoroBreakInput}
-                        onChange={(event) => setPomodoroBreakInput(event.target.value)}
-                      />
-                    </label>
-                    <button className="text-button" type="submit">{t("applyTimer")}</button>
-                  </form>
-                  <div className="focus-decoration focus-decoration-one" aria-hidden="true" />
-                  <div className="focus-decoration focus-decoration-two" aria-hidden="true" />
-                </section>
-              </div>
-            </>
-          )}
-
-          {page === "calendar" && (
-            <section className="content-page calendar-page">
-              <header className="page-heading calendar-page-heading">
-                <div>
-                  <span className="eyebrow">{t("calendar")}</span>
-                  <h1>{calendarDateLabel}</h1>
-                  <p>{t("calendarIntro")}</p>
-                </div>
-                <div className="calendar-day-switcher" aria-label={t("calendar")}>
-                  <button
-                    className="calendar-nav-button"
-                    type="button"
-                    aria-label={t("previousDay")}
-                    onClick={() => setCalendarDay(-1)}
-                  >
-                    ‹
-                  </button>
-                  <button
-                    className="calendar-today-button"
-                    type="button"
-                    onClick={() => setCalendarDate(getLocalDateKey(new Date()))}
-                  >
-                    {t("todayButton")}
-                  </button>
-                  <button
-                    className="calendar-nav-button"
-                    type="button"
-                    aria-label={t("nextDay")}
-                    onClick={() => setCalendarDay(1)}
-                  >
-                    ›
-                  </button>
-                </div>
-              </header>
-
-              <section className="panel calendar-add-panel">
-                <div className="calendar-add-heading">
-                  <div>
-                    <span className="calendar-add-icon" aria-hidden="true">＋</span>
-                    <h2>{t("addScheduledTask")}</h2>
-                  </div>
-                  <span>{calendarDateLabel}</span>
-                </div>
-                <form className="calendar-add-form" onSubmit={submitCalendarTask}>
-                  <label className="visually-hidden" htmlFor="calendar-task-title">
-                    {t("scheduledTaskPlaceholder")}
-                  </label>
-                  <input
-                    id="calendar-task-title"
-                    value={calendarTaskTitle}
-                    onChange={(event) => setCalendarTaskTitle(event.target.value)}
-                    placeholder={t("scheduledTaskPlaceholder")}
-                    maxLength={160}
-                    required
-                  />
-                  <div className="calendar-add-times">
-                    <label>
-                      <span>{t("startTime")}</span>
-                      <input
-                        type="time"
-                        value={calendarStartTime}
-                        onChange={(event) => setCalendarStartTime(event.target.value)}
-                        required
-                      />
-                    </label>
-                    <label>
-                      <span>{t("endTime")}</span>
-                      <input
-                        type="time"
-                        value={calendarEndTime}
-                        onChange={(event) => setCalendarEndTime(event.target.value)}
-                        required
-                      />
-                    </label>
-                    <label>
-                      <span>{t("reminder")}</span>
-                      <select
-                        value={calendarReminder ?? "none"}
-                        onChange={(event) =>
-                          setCalendarReminder(event.target.value === "none" ? null : Number(event.target.value))
-                        }
-                      >
-                        <option value="none">{t("noReminder")}</option>
-                        {[5, 10, 15, 30, 60].map((reminder) => (
-                          <option value={reminder} key={reminder}>
-                            {t("reminderBefore").replace("{minutes}", String(reminder))}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="task-color-field">
-                      <span>{t("taskColor")}</span>
-                      <input
-                        type="color"
-                        aria-label={t("chooseTaskColor")}
-                        value={calendarTaskColor}
-                        onChange={(event) => setCalendarTaskColor(event.target.value)}
-                      />
-                    </label>
-                    <button
-                      className="primary-button calendar-add-button"
+                      className="primary-button"
                       type="submit"
-                      disabled={!calendarTaskTitle.trim()}
+                      disabled={!matrixTaskTitle.trim()}
                     >
-                      <span aria-hidden="true">＋</span>{t("addScheduledTask")}
-                    </button>
-                  </div>
-                </form>
-                {unscheduledCount > 0 && (
-                  <p className="calendar-unscheduled-note">
-                    {t("unscheduledCount").replace("{count}", String(unscheduledCount))}
-                  </p>
-                )}
-                <p className="calendar-unscheduled-note">{t("reminderBackgroundHint")}</p>
-              </section>
-
-              <section className="panel calendar-panel">
-                <header className="calendar-panel-heading">
-                  <div>
-                    <h2>{t("calendarTasks")}</h2>
-                    <p>{calendarDateLabel}</p>
-                  </div>
-                  <span className="heading-count">
-                    {calendarTasks.length.toString().padStart(2, "0")}
-                  </span>
-                </header>
-                <div className="calendar-scroll">
-                  <div className="calendar-time-grid">
-                    <div className="calendar-hours" aria-hidden="true">
-                      {Array.from({ length: 24 }, (_, hour) => (
-                        <span key={hour}>{formatHour(hour)}</span>
-                      ))}
-                    </div>
-                    <div className="calendar-day-track">
-                      {Array.from({ length: 24 }, (_, hour) => (
-                        <span
-                          className="calendar-hour-line"
-                          key={hour}
-                          style={{ top: `${hour * 64}px` }}
-                          aria-hidden="true"
-                        />
-                      ))}
-                      {calendarLayout.map(({ task, column, columns, startMinutes, durationMinutes }) => {
-                        const quadrant = getQuadrant(task);
-                        const columnWidth = 100 / columns;
-                        return (
-                          <article
-                            className={`calendar-event${task.completed ? " calendar-event-complete" : ""}`}
-                            key={task.id}
-                            style={{
-                              "--event-color": task.color ?? "#6a9cff",
-                              top: `${startMinutes * (64 / 60)}px`,
-                              height: `${Math.max(32, durationMinutes * (64 / 60))}px`,
-                              insetInlineStart: `calc(${column * columnWidth}% + 5px)`,
-                              width: `calc(${columnWidth}% - 10px)`,
-                            } as CSSProperties}
-                          >
-                            <button
-                              className={`calendar-event-check${task.completed ? " checked" : ""}`}
-                              type="button"
-                              aria-label={task.completed ? t("markOpen") : t("markDone")}
-                              onClick={() => toggleTask(task.id)}
-                            >
-                              {task.completed ? "✓" : ""}
-                            </button>
-                            <div className="calendar-event-copy">
-                              <strong>{task.title}</strong>
-                              <span>{formatCalendarTime(task.startTime)} – {formatCalendarTime(task.endTime)}</span>
-                              <select
-                                className="calendar-event-reminder-select"
-                                aria-label={`${t("reminder")} — ${task.title}`}
-                                value={task.reminderMinutes ?? "none"}
-                                onChange={(event) =>
-                                  void updateTaskReminder(
-                                    task.id,
-                                    event.target.value === "none" ? null : Number(event.target.value),
-                                  )
-                                }
-                              >
-                                <option value="none">{t("noReminder")}</option>
-                                {[5, 10, 15, 30, 60].map((reminder) => (
-                                  <option value={reminder} key={reminder}>
-                                    {t("reminderBefore").replace("{minutes}", String(reminder))}
-                                  </option>
-                                ))}
-                              </select>
-                              <span className={`priority-tag priority-${quadrant}`}>
-                                {task.important && task.urgent
-                                  ? `${t("important")} · ${t("urgent")}`
-                                  : task.important
-                                    ? t("important")
-                                    : task.urgent
-                                      ? t("urgent")
-                                      : t("unprioritized")}
-                              </span>
-                            </div>
-                            <div className="calendar-event-actions">
-                              <input
-                                className="calendar-event-color"
-                                type="color"
-                                aria-label={`${t("chooseTaskColor")} — ${task.title}`}
-                                value={task.color ?? "#6a9cff"}
-                                onChange={(event) => updateTaskColor(task.id, event.target.value)}
-                              />
-                              <button
-                                className="icon-button calendar-event-delete"
-                                type="button"
-                                aria-label={t("deleteTask")}
-                                onClick={() => deleteTask(task.id)}
-                              >
-                                ×
-                              </button>
-                            </div>
-                          </article>
-                        );
-                      })}
-                      {calendarTasks.length === 0 && (
-                        <div className="empty-state calendar-empty">
-                          <span className="empty-spark" aria-hidden="true">◷</span>
-                          <strong>{t("calendarEmpty")}</strong>
-                          <p>{t("calendarEmptySub")}</p>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-                <nav className="calendar-week-strip" aria-label={t("weekOverview")}>
-                  {calendarWeek.map((dateKey) => {
-                    const date = dateFromKey(dateKey);
-                    const tasksForDate = data.tasks.filter((task) => task.scheduledDate === dateKey);
-                    const fullDate = new Intl.DateTimeFormat(lang, {
-                      weekday: "long",
-                      month: "long",
-                      day: "numeric",
-                    }).format(date);
-                    return (
-                      <button
-                        className={`calendar-week-day${dateKey === calendarDate ? " selected" : ""}`}
-                        type="button"
-                        key={dateKey}
-                        aria-label={fullDate}
-                        aria-pressed={dateKey === calendarDate}
-                        onClick={() => setCalendarDate(dateKey)}
-                      >
-                        <span className="calendar-week-weekday">
-                          {new Intl.DateTimeFormat(lang, { weekday: "short" }).format(date)}
-                        </span>
-                        <strong>{date.getDate()}</strong>
-                        <span className="calendar-week-markers" aria-hidden="true">
-                          {tasksForDate.slice(0, 3).map((task) => (
-                            <i key={task.id} style={{ backgroundColor: task.color ?? "var(--accent)" }} />
-                          ))}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </nav>
-              </section>
-            </section>
-          )}
-
-          {page === "matrix" && (
-            <section className="content-page">
-              <div className="page-heading">
-                <div>
-                  <span className="eyebrow">{t("matrix")}</span>
-                  <h1>{t("priorities")}</h1>
-                  <p>{t("matrixIntro")}</p>
-                </div>
-              </div>
-              <div className="matrix-grid">
-                {[
-                  { title: "doNow", hint: "doNowHint", quadrant: 0, tone: "coral" },
-                  { title: "schedule", hint: "scheduleHint", quadrant: 1, tone: "violet" },
-                  { title: "delegate", hint: "delegateHint", quadrant: 2, tone: "amber" },
-                  { title: "eliminate", hint: "eliminateHint", quadrant: 3, tone: "blue" },
-                ].map((item, index) => {
-                  const quadrantTasks = openTasks.filter((task) => getQuadrant(task) === item.quadrant);
-                  return (
-                    <article className={`matrix-card matrix-${item.tone}`} key={item.title}>
-                      <header>
-                        <div className="matrix-card-title">
-                          <span className="matrix-number">0{index + 1}</span>
-                          <div>
-                            <h2>{t(item.title as CopyKey)}</h2>
-                            <p>{t(item.hint as CopyKey)}</p>
-                          </div>
-                        </div>
-                        <span className="matrix-count">{quadrantTasks.length}</span>
-                      </header>
-                      {quadrantTasks.length ? (
-                        <ul className="task-list matrix-task-list">{quadrantTasks.map(renderTask)}</ul>
-                      ) : (
-                        <p className="matrix-empty">{t("allCaughtUp")}</p>
-                      )}
-                    </article>
-                  );
-                })}
-              </div>
-              <form
-                className="matrix-quick-add"
-                onSubmit={(event) => {
-                  event.preventDefault();
-                  addTask(matrixTaskTitle);
-                  setMatrixTaskTitle("");
-                }}
-              >
-                <span className="quick-add-mark" aria-hidden="true">＋</span>
-                <div>
-                  <strong>{t("addTask")}</strong>
-                  <label className="visually-hidden" htmlFor="matrix-add-task">{t("taskPlaceholder")}</label>
-                  <input
-                    id="matrix-add-task"
-                    className="matrix-quick-input"
-                    value={matrixTaskTitle}
-                    onChange={(event) => setMatrixTaskTitle(event.target.value)}
-                    placeholder={t("taskPlaceholder")}
-                    maxLength={160}
-                  />
-                </div>
-                <button className="primary-button" type="submit" disabled={!matrixTaskTitle.trim()}>
-                  {t("add")}
-                </button>
-              </form>
-            </section>
-          )}
-
-          {page === "notes" && (
-            <section className="content-page">
-              <div className="page-heading page-heading-action">
-                <div>
-                  <span className="eyebrow">{t("notes")}</span>
-                  <h1>{t("notesIntro")}</h1>
-                  <p>{t("saveNoteHint")}</p>
-                </div>
-                <button className="primary-button" type="button" onClick={createNote}>
-                  <span aria-hidden="true">＋</span>{t("newNote")}
-                </button>
-              </div>
-              {data.notes.length ? (
-                <div className="notes-grid">
-                  {data.notes.map((note, index) => (
-                    <article className={`note-card note-card-${index % 3}`} key={note.id}>
-                      <div className="note-card-top">
-                        <span className="note-mark" aria-hidden="true">✳</span>
-                        <button
-                          className="icon-button"
-                          type="button"
-                          aria-label={t("deleteNote")}
-                          onClick={() =>
-                            {
-                              void Promise.all((note.audio ?? []).map((audio) =>
-                                deleteVoiceRecording(audio.id),
-                              )).catch((error: unknown) => {
-                                console.error("TimeX could not delete voice notes.", error);
-                              });
-                              setData((current) => ({
-                                ...current,
-                                notes: current.notes.filter((item) => item.id !== note.id),
-                              }));
-                            }
-                          }
-                        >
-                          ×
-                        </button>
-                      </div>
-                      <label className="visually-hidden" htmlFor={`note-title-${note.id}`}>{t("noteTitle")}</label>
-                      <input
-                        id={`note-title-${note.id}`}
-                        className="note-title-input"
-                        value={note.title}
-                        placeholder={t("noteTitle")}
-                        maxLength={100}
-                        onChange={(event) => updateNote(note.id, { title: event.target.value })}
-                      />
-                      <label className="visually-hidden" htmlFor={`note-body-${note.id}`}>{t("noteBody")}</label>
-                      <textarea
-                        id={`note-body-${note.id}`}
-                        value={note.body}
-                        placeholder={t("noteBody")}
-                        maxLength={3000}
-                        onChange={(event) => updateNote(note.id, { body: event.target.value })}
-                      />
-                      <section className="voice-notes" aria-label={t("voiceNotes")}>
-                        <div className="voice-notes-heading">
-                          <span>{t("voiceNotes")}</span>
-                          {recordingNoteId === note.id ? (
-                            <button
-                              className="text-button voice-recording"
-                              type="button"
-                              onClick={stopVoiceRecording}
-                            >
-                              <span aria-hidden="true">■</span> {t("stopRecording")}
-                            </button>
-                          ) : (
-                            <button
-                              className="text-button"
-                              type="button"
-                              disabled={recordingNoteId !== null}
-                              onClick={() => void startVoiceRecording(note.id)}
-                            >
-                              <span aria-hidden="true">●</span> {t("recordVoiceNote")}
-                            </button>
-                          )}
-                        </div>
-                        {recordingNoteId === note.id && (
-                          <p className="voice-recording-status" role="status">{t("recordingVoiceNote")}</p>
-                        )}
-                        {(note.audio?.length ?? 0) > 0 && (
-                          <ul className="voice-note-list">
-                            {note.audio?.map((audio) => (
-                              <li key={audio.id}>
-                                {voiceUrls[audio.id] ? (
-                                  <audio controls preload="metadata" src={voiceUrls[audio.id]}>
-                                    {t("voiceNoteUnsupported")}
-                                  </audio>
-                                ) : (
-                                  <span>{Math.ceil(audio.durationSeconds / 60)} min</span>
-                                )}
-                                <button
-                                  className="icon-button"
-                                  type="button"
-                                  aria-label={t("deleteVoiceNote")}
-                                  onClick={() => removeVoiceNote(note.id, audio.id)}
-                                >
-                                  ×
-                                </button>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
-                      </section>
-                    </article>
-                  ))}
-                </div>
-              ) : (
-                <div className="empty-state page-empty">
-                  <span className="empty-spark" aria-hidden="true">▤</span>
-                  <strong>{t("noteEmpty")}</strong>
-                  <button className="text-button" type="button" onClick={createNote}>{t("newNote")} ＋</button>
-                </div>
-              )}
-            </section>
-          )}
-
-          {page === "assistant" && assistantView === "plans" && (
-            <section className="content-page assistant-page">
-              <div className="page-heading">
-                <div>
-                  <span className="eyebrow">{t("assistantChat")}</span>
-                  <h1>{t("assistantPlans")}</h1>
-                  <p>{t("plannerIntro")}</p>
-                </div>
-              </div>
-              <div className="assistant-view-switch" role="group" aria-label={t("assistantChat")}>
-                <button
-                  type="button"
-                  aria-pressed={false}
-                  onClick={() => setAssistantView("chat")}
-                >
-                  {t("assistantTab")}
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={true}
-                  className="active"
-                  onClick={() => setAssistantView("plans")}
-                >
-                  {t("assistantPlans")}
-                </button>
-              </div>
-              <div className="assistant-view-panel">
-              <div className="planner-layout">
-                <section className="panel planner-panel">
-                  <div className="planner-icon" aria-hidden="true">✳</div>
-                  <span className="eyebrow">{t("planner")}</span>
-                  <form onSubmit={buildPlan}>
-                    <label htmlFor="goal-input">{t("goalLabel")}</label>
-                    <textarea
-                      id="goal-input"
-                      value={goal}
-                      onChange={(event) => setGoal(event.target.value)}
-                      placeholder={t("goalPlaceholder")}
-                      maxLength={200}
-                      required
-                    />
-                    <button className="primary-button" type="submit" disabled={!goal.trim()}>
-                      {t("makePlan")} <span aria-hidden="true">↗</span>
+                      {t("add")}
                     </button>
                   </form>
-                  <div className="assistant-disclosure">
-                    <span aria-hidden="true">ⓘ</span>
-                    <p>{t("assistantNote")}</p>
-                  </div>
                 </section>
-                <section className="plans-column">
-                  <h2>{t("pastPlans")}</h2>
-                  {data.plans.length ? (
-                    data.plans.map((plan) => (
-                      <article className="plan-card" key={plan.id}>
-                        <div className="plan-card-heading">
-                          <span className="plan-bullet" aria-hidden="true">✳</span>
-                          <h3>{plan.goal}</h3>
-                          <button
-                            className="icon-button"
-                            type="button"
-                            aria-label={t("deletePlan")}
-                            onClick={() =>
-                              setData((current) => ({
-                                ...current,
-                                plans: current.plans.filter((item) => item.id !== plan.id),
-                              }))
-                            }
-                          >
-                            ×
-                          </button>
-                        </div>
-                        <p className="plan-steps-label">{t("planSteps")}</p>
-                        {plan.researchSummary && (
-                          <div className="plan-research">
-                            <p className="plan-steps-label">{t("planResearchLabel")}</p>
-                            <p>{plan.researchSummary}</p>
-                          </div>
-                        )}
-                        <ol className="plan-steps">
-                          {plan.steps.map((step, index) => (
-                            <li key={`${plan.id}-${index}`}>
-                              <span className="step-number">{index + 1}</span>
-                              {step}
-                            </li>
-                          ))}
-                        </ol>
-                        {plan.sources?.length ? (
-                          <ul className="plan-sources" aria-label={t("assistantSources")}>
-                            {plan.sources.map((source) => (
-                              <li key={source.url}>
-                                <a href={source.url} target="_blank" rel="noreferrer">{source.title}</a>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : null}
-                        <button className="text-button plan-add-button" type="button" onClick={() => addPlanToTasks(plan)}>
-                          <span aria-hidden="true">＋</span>{t("addPlanTasks")}
-                        </button>
-                      </article>
-                    ))
-                  ) : (
-                    <div className="empty-state plan-empty">
-                      <span className="empty-spark" aria-hidden="true">✳</span>
-                      <p>{t("noPlans")}</p>
-                    </div>
-                  )}
-                </section>
-              </div>
-              </div>
-            </section>
-          )}
+              )}
 
-          {page === "assistant" && assistantView === "chat" && (
-            <section className="content-page assistant-page">
-              <div className="page-heading">
-                <div>
-                  <span className="eyebrow">{t("assistantChat")}</span>
-                  <h1>{userName ? t("welcomeWithName").replace("{name}", userName) : t("assistantChat")}</h1>
-                  <p>{t("assistantChatSub")}</p>
-                </div>
-                {user && (
-                  <span className="workspace-badge">
-                    <span aria-hidden="true">◉</span>{t("cloudWorkspace")}
-                  </span>
-                )}
-              </div>
-              <div className="assistant-view-switch" role="group" aria-label={t("assistantChat")}>
-                <button
-                  type="button"
-                  aria-pressed={true}
-                  className="active"
-                  onClick={() => setAssistantView("chat")}
-                >
-                  {t("assistantTab")}
-                </button>
-                <button
-                  type="button"
-                  aria-pressed={false}
-                  onClick={() => setAssistantView("plans")}
-                >
-                  {t("assistantPlans")}
-                  {data.plans.length > 0 && <span>{data.plans.length}</span>}
-                </button>
-              </div>
-              <div className="assistant-view-panel">
-              <div className="assistant-conversation-toolbar">
-                <button className="primary-button" type="button" onClick={startNewConversation}>
-                  <span aria-hidden="true">＋</span>{t("newConversation")}
-                </button>
-                <div className="assistant-mode-picker" role="radiogroup" aria-label={t("assistantMode")}>
-                  {ASSISTANT_MODES.map((item) => (
-                    <button
-                      key={item.id}
-                      type="button"
-                      role="radio"
-                      aria-checked={modeIdOf(chatMode) === item.id}
-                      className={`assistant-mode-chip${modeIdOf(chatMode) === item.id ? " active" : ""}`}
-                      onClick={() => changeChatMode(item.id)}
-                    >
-                      <span aria-hidden="true">{item.icon}</span>
-                      {t(modeLabelKeys[item.id])}
+              {page === "notes" && (
+                <section className="content-page">
+                  <div className="page-heading page-heading-action">
+                    <div>
+                      <span className="eyebrow">{t("notes")}</span>
+                      <h1>{t("notesIntro")}</h1>
+                      <p>{t("saveNoteHint")}</p>
+                    </div>
+                    <button className="primary-button" type="button" onClick={createNote}>
+                      <span aria-hidden="true">＋</span>
+                      {t("newNote")}
                     </button>
-                  ))}
-                </div>
-                <p>{t(modeHintKeys[modeIdOf(chatMode)])}</p>
-              </div>
-              <div className="assistant-chat-layout">
-                <aside className="assistant-history">
-                  <h2>{t("conversationHistory")}</h2>
-                  {conversationStore.conversations.length ? (
-                    <ul>
-                      {recentConversations(conversationStore.conversations)
-                        .map((conversation) => (
-                          <li key={conversation.id}>
+                  </div>
+                  {data.notes.length ? (
+                    <div className="notes-grid">
+                      {data.notes.map((note, index) => (
+                        <article className={`note-card note-card-${index % 3}`} key={note.id}>
+                          <div className="note-card-top">
+                            <span className="note-mark" aria-hidden="true">
+                              ✳
+                            </span>
                             <button
-                              className={`assistant-history-item${conversation.id === activeConversation?.id ? " active" : ""}`}
+                              className="icon-button"
                               type="button"
-                              aria-current={conversation.id === activeConversation?.id ? "true" : undefined}
-                              onClick={() => selectConversation(conversation)}
-                            >
-                              <span>{conversation.title || t(modeLabelKeys[modeIdOf(conversation.mode)])}</span>
-                              <small>
-                                {t(modeLabelKeys[modeIdOf(conversation.mode)])} · {formatConversationTime(conversation.updatedAt, lang)}
-                              </small>
-                            </button>
-                            <button
-                              className="assistant-history-delete"
-                              type="button"
-                              aria-label={`${t("deleteConversation")}: ${conversation.title || t("assistantChat")}`}
-                              onClick={() => void deleteConversation(conversation.id)}
+                              aria-label={t("deleteNote")}
+                              onClick={() => {
+                                void Promise.all(
+                                  (note.audio ?? []).map((audio) => deleteVoiceRecording(audio.id))
+                                ).catch((error: unknown) => {
+                                  console.error("TimeX could not delete voice notes.", error);
+                                });
+                                setData((current) => ({
+                                  ...current,
+                                  notes: current.notes.filter((item) => item.id !== note.id),
+                                }));
+                              }}
                             >
                               ×
                             </button>
-                          </li>
-                        ))}
-                    </ul>
+                          </div>
+                          <label className="visually-hidden" htmlFor={`note-title-${note.id}`}>
+                            {t("noteTitle")}
+                          </label>
+                          <input
+                            id={`note-title-${note.id}`}
+                            className="note-title-input"
+                            value={note.title}
+                            placeholder={t("noteTitle")}
+                            maxLength={100}
+                            onChange={(event) => updateNote(note.id, { title: event.target.value })}
+                          />
+                          <label className="visually-hidden" htmlFor={`note-body-${note.id}`}>
+                            {t("noteBody")}
+                          </label>
+                          <textarea
+                            id={`note-body-${note.id}`}
+                            value={note.body}
+                            placeholder={t("noteBody")}
+                            maxLength={3000}
+                            onChange={(event) => updateNote(note.id, { body: event.target.value })}
+                          />
+                          <section className="voice-notes" aria-label={t("voiceNotes")}>
+                            <div className="voice-notes-heading">
+                              <span>{t("voiceNotes")}</span>
+                              {recordingNoteId === note.id ? (
+                                <button
+                                  className="text-button voice-recording"
+                                  type="button"
+                                  onClick={stopVoiceRecording}
+                                >
+                                  <span aria-hidden="true">■</span> {t("stopRecording")}
+                                </button>
+                              ) : (
+                                <button
+                                  className="text-button"
+                                  type="button"
+                                  disabled={recordingNoteId !== null}
+                                  onClick={() => void startVoiceRecording(note.id)}
+                                >
+                                  <span aria-hidden="true">●</span> {t("recordVoiceNote")}
+                                </button>
+                              )}
+                            </div>
+                            {recordingNoteId === note.id && (
+                              <p className="voice-recording-status" role="status">
+                                {t("recordingVoiceNote")}
+                              </p>
+                            )}
+                            {(note.audio?.length ?? 0) > 0 && (
+                              <ul className="voice-note-list">
+                                {note.audio?.map((audio) => (
+                                  <li key={audio.id}>
+                                    {voiceUrls[audio.id] ? (
+                                      <audio controls preload="metadata" src={voiceUrls[audio.id]}>
+                                        {t("voiceNoteUnsupported")}
+                                      </audio>
+                                    ) : (
+                                      <span>{Math.ceil(audio.durationSeconds / 60)} min</span>
+                                    )}
+                                    <button
+                                      className="icon-button"
+                                      type="button"
+                                      aria-label={t("deleteVoiceNote")}
+                                      onClick={() => removeVoiceNote(note.id, audio.id)}
+                                    >
+                                      ×
+                                    </button>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </section>
+                        </article>
+                      ))}
+                    </div>
                   ) : (
-                    <p>{t("emptyConversationHistory")}</p>
+                    <div className="empty-state page-empty">
+                      <span className="empty-spark" aria-hidden="true">
+                        ▤
+                      </span>
+                      <strong>{t("noteEmpty")}</strong>
+                      <button className="text-button" type="button" onClick={createNote}>
+                        {t("newNote")} ＋
+                      </button>
+                    </div>
                   )}
-                  <p className="assistant-history-note">
-                    {t("historyLimitNote").replace("{count}", String(MAX_CONVERSATIONS))}
-                  </p>
-                </aside>
-                <section className="chat-panel">
-                <div className="chat-header">
-                  <span className="chat-avatar" aria-hidden="true">✳</span>
-                  <div>
-                    <h2>{t("assistantChat")}</h2>
-                    <p>{t(modeLabelKeys[modeIdOf(chatMode)])}</p>
+                </section>
+              )}
+
+              {page === "assistant" && assistantView === "plans" && (
+                <section className="content-page assistant-page">
+                  <div className="page-heading">
+                    <div>
+                      <span className="eyebrow">{t("assistantChat")}</span>
+                      <h1>{t("assistantPlans")}</h1>
+                      <p>{t("plannerIntro")}</p>
+                    </div>
                   </div>
-                  <span className={`chat-connection${supabase && user ? " connected" : ""}`}>
-                    {supabase && user ? t("cloudWorkspace") : t("localAssistantLabel")}
-                  </span>
-                </div>
-                <details className="chat-privacy">
-                  <summary><span aria-hidden="true">ⓘ</span>{t("privacy")}</summary>
-                  <p>{t("assistantPrivacy")}</p>
-                </details>
-                <div className="chat-transcript" aria-live="polite">
-                  {chatMessages.length === 0 && (
-                    <>
-                      <article className="chat-message assistant-message">
-                        <span className="message-avatar" aria-hidden="true">✳</span>
-                        <p>{t("greetingName").replace("{name}", userName || (isArabic ? "صديقي" : "friend"))}</p>
-                      </article>
-                      <div className="chat-starters">
-                        <p>{t("chatStartersTitle")}</p>
-                        {CHAT_STARTERS[lang][modeIdOf(chatMode)].map((starter) => (
+                  <div
+                    className="assistant-view-switch"
+                    role="group"
+                    aria-label={t("assistantChat")}
+                  >
+                    <button
+                      type="button"
+                      aria-pressed={false}
+                      onClick={() => setAssistantView("chat")}
+                    >
+                      {t("assistantTab")}
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={true}
+                      className="active"
+                      onClick={() => setAssistantView("plans")}
+                    >
+                      {t("assistantPlans")}
+                    </button>
+                  </div>
+                  <div className="assistant-view-panel">
+                    <div className="planner-layout">
+                      <section className="panel planner-panel">
+                        <div className="planner-icon" aria-hidden="true">
+                          ✳
+                        </div>
+                        <span className="eyebrow">{t("planner")}</span>
+                        <form onSubmit={buildPlan}>
+                          <label htmlFor="goal-input">{t("goalLabel")}</label>
+                          <textarea
+                            id="goal-input"
+                            value={goal}
+                            onChange={(event) => setGoal(event.target.value)}
+                            placeholder={t("goalPlaceholder")}
+                            maxLength={200}
+                            required
+                          />
+                          <button className="primary-button" type="submit" disabled={!goal.trim()}>
+                            {t("makePlan")} <span aria-hidden="true">↗</span>
+                          </button>
+                        </form>
+                        <div className="assistant-disclosure">
+                          <span aria-hidden="true">ⓘ</span>
+                          <p>{t("assistantNote")}</p>
+                        </div>
+                      </section>
+                      <section className="plans-column">
+                        <h2>{t("pastPlans")}</h2>
+                        {data.plans.length ? (
+                          data.plans.map((plan) => (
+                            <article className="plan-card" key={plan.id}>
+                              <div className="plan-card-heading">
+                                <span className="plan-bullet" aria-hidden="true">
+                                  ✳
+                                </span>
+                                <h3>{plan.goal}</h3>
+                                <button
+                                  className="icon-button"
+                                  type="button"
+                                  aria-label={t("deletePlan")}
+                                  onClick={() =>
+                                    setData((current) => ({
+                                      ...current,
+                                      plans: current.plans.filter((item) => item.id !== plan.id),
+                                    }))
+                                  }
+                                >
+                                  ×
+                                </button>
+                              </div>
+                              <p className="plan-steps-label">{t("planSteps")}</p>
+                              {plan.researchSummary && (
+                                <div className="plan-research">
+                                  <p className="plan-steps-label">{t("planResearchLabel")}</p>
+                                  <p>{plan.researchSummary}</p>
+                                </div>
+                              )}
+                              <ol className="plan-steps">
+                                {plan.steps.map((step, index) => (
+                                  <li key={`${plan.id}-${index}`}>
+                                    <span className="step-number">{index + 1}</span>
+                                    {step}
+                                  </li>
+                                ))}
+                              </ol>
+                              {plan.sources?.length ? (
+                                <ul className="plan-sources" aria-label={t("assistantSources")}>
+                                  {plan.sources.map((source) => (
+                                    <li key={source.url}>
+                                      <a href={source.url} target="_blank" rel="noreferrer">
+                                        {source.title}
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : null}
+                              <button
+                                className="text-button plan-add-button"
+                                type="button"
+                                onClick={() => addPlanToTasks(plan)}
+                              >
+                                <span aria-hidden="true">＋</span>
+                                {t("addPlanTasks")}
+                              </button>
+                            </article>
+                          ))
+                        ) : (
+                          <div className="empty-state plan-empty">
+                            <span className="empty-spark" aria-hidden="true">
+                              ✳
+                            </span>
+                            <p>{t("noPlans")}</p>
+                          </div>
+                        )}
+                      </section>
+                    </div>
+                  </div>
+                </section>
+              )}
+
+              {page === "assistant" && assistantView === "chat" && (
+                <section className="content-page assistant-page">
+                  <div className="page-heading">
+                    <div>
+                      <span className="eyebrow">{t("assistantChat")}</span>
+                      <h1>
+                        {userName
+                          ? t("welcomeWithName").replace("{name}", userName)
+                          : t("assistantChat")}
+                      </h1>
+                      <p>{t("assistantChatSub")}</p>
+                    </div>
+                    {user && (
+                      <span className="workspace-badge">
+                        <span aria-hidden="true">◉</span>
+                        {t("cloudWorkspace")}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    className="assistant-view-switch"
+                    role="group"
+                    aria-label={t("assistantChat")}
+                  >
+                    <button
+                      type="button"
+                      aria-pressed={true}
+                      className="active"
+                      onClick={() => setAssistantView("chat")}
+                    >
+                      {t("assistantTab")}
+                    </button>
+                    <button
+                      type="button"
+                      aria-pressed={false}
+                      onClick={() => setAssistantView("plans")}
+                    >
+                      {t("assistantPlans")}
+                      {data.plans.length > 0 && <span>{data.plans.length}</span>}
+                    </button>
+                  </div>
+                  <div className="assistant-view-panel">
+                    <div className="assistant-conversation-toolbar">
+                      <button
+                        className="primary-button"
+                        type="button"
+                        onClick={startNewConversation}
+                      >
+                        <span aria-hidden="true">＋</span>
+                        {t("newConversation")}
+                      </button>
+                      <div
+                        className="assistant-mode-picker"
+                        role="radiogroup"
+                        aria-label={t("assistantMode")}
+                      >
+                        {ASSISTANT_MODES.map((item) => (
                           <button
-                            key={starter}
+                            key={item.id}
                             type="button"
-                            className="chat-starter"
-                            onClick={() => setChatInput(starter)}
+                            role="radio"
+                            aria-checked={modeIdOf(chatMode) === item.id}
+                            className={`assistant-mode-chip${modeIdOf(chatMode) === item.id ? " active" : ""}`}
+                            onClick={() => changeChatMode(item.id)}
                           >
-                            {starter}
+                            <span aria-hidden="true">{item.icon}</span>
+                            {t(modeLabelKeys[item.id])}
                           </button>
                         ))}
                       </div>
-                    </>
-                  )}
-                  {chatMessages.map((message) => (
-                    <article
-                      className={`chat-message ${message.role === "user" ? "user-message" : "assistant-message"}`}
-                      key={message.id}
-                    >
-                      {message.role === "assistant" && (
-                        <span className="message-avatar" aria-hidden="true">✳</span>
-                      )}
-                      <p>{message.content}</p>
-                      {message.sources?.length ? (
-                        <ul className="assistant-sources" aria-label={t("assistantSources")}>
-                          {message.sources.map((source) => (
-                            <li key={source.url}>
-                              <a href={source.url} target="_blank" rel="noreferrer">
-                                {source.title}
-                              </a>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                      {message.role === "assistant" && (
-                        <div className="chat-message-actions">
-                          <button type="button" onClick={() => void copyAssistantMessage(message.content)}>
-                            {t("copyMessage")}
-                          </button>
-                          <button type="button" onClick={() => saveMessageAsNote(message.content)}>
-                            {t("saveAsNote")}
-                          </button>
-                        </div>
-                      )}
-                    </article>
-                  ))}
-                  {chatPending && (
-                    <div className="chat-typing" role="status">
-                      <span />
-                      <span />
-                      <span />
+                      <p>{t(modeHintKeys[modeIdOf(chatMode)])}</p>
                     </div>
-                  )}
-                  <div ref={chatEndRef} />
-                </div>
-                {chatError && <p className="chat-error" role="alert">{chatError}</p>}
-                {supabase && !user && (
-                  <div className="chat-access-notice">
-                    <span aria-hidden="true">ⓘ</span>
-                    <p>{t("signInForChat")}</p>
-                    <button
-                      className="text-button"
-                      type="button"
-                      onClick={() => {
-                        setAuthError("");
-                        setAuthNotice("");
-                        setShowAccount(true);
-                      }}
-                    >
-                      {t("signIn")}
-                    </button>
+                    <div className="assistant-chat-layout">
+                      <aside className="assistant-history">
+                        <h2>{t("conversationHistory")}</h2>
+                        {conversationStore.conversations.length ? (
+                          <ul>
+                            {recentConversations(conversationStore.conversations).map(
+                              (conversation) => (
+                                <li key={conversation.id}>
+                                  <button
+                                    className={`assistant-history-item${conversation.id === activeConversation?.id ? " active" : ""}`}
+                                    type="button"
+                                    aria-current={
+                                      conversation.id === activeConversation?.id
+                                        ? "true"
+                                        : undefined
+                                    }
+                                    onClick={() => selectConversation(conversation)}
+                                  >
+                                    <span>
+                                      {conversation.title ||
+                                        t(modeLabelKeys[modeIdOf(conversation.mode)])}
+                                    </span>
+                                    <small>
+                                      {t(modeLabelKeys[modeIdOf(conversation.mode)])} ·{" "}
+                                      {formatConversationTime(conversation.updatedAt, lang)}
+                                    </small>
+                                  </button>
+                                  <button
+                                    className="assistant-history-delete"
+                                    type="button"
+                                    aria-label={`${t("deleteConversation")}: ${conversation.title || t("assistantChat")}`}
+                                    onClick={() => void deleteConversation(conversation.id)}
+                                  >
+                                    ×
+                                  </button>
+                                </li>
+                              )
+                            )}
+                          </ul>
+                        ) : (
+                          <p>{t("emptyConversationHistory")}</p>
+                        )}
+                        <p className="assistant-history-note">
+                          {t("historyLimitNote").replace("{count}", String(MAX_CONVERSATIONS))}
+                        </p>
+                      </aside>
+                      <section className="chat-panel">
+                        <div className="chat-header">
+                          <span className="chat-avatar" aria-hidden="true">
+                            ✳
+                          </span>
+                          <div>
+                            <h2>{t("assistantChat")}</h2>
+                            <p>{t(modeLabelKeys[modeIdOf(chatMode)])}</p>
+                          </div>
+                          <span
+                            className={`chat-connection${supabase && user ? " connected" : ""}`}
+                          >
+                            {supabase && user ? t("cloudWorkspace") : t("localAssistantLabel")}
+                          </span>
+                        </div>
+                        <details className="chat-privacy">
+                          <summary>
+                            <span aria-hidden="true">ⓘ</span>
+                            {t("privacy")}
+                          </summary>
+                          <p>{t("assistantPrivacy")}</p>
+                        </details>
+                        <div className="chat-transcript" aria-live="polite">
+                          {chatMessages.length === 0 && (
+                            <>
+                              <article className="chat-message assistant-message">
+                                <span className="message-avatar" aria-hidden="true">
+                                  ✳
+                                </span>
+                                <p>
+                                  {t("greetingName").replace(
+                                    "{name}",
+                                    userName || (isArabic ? "صديقي" : "friend")
+                                  )}
+                                </p>
+                              </article>
+                              <div className="chat-starters">
+                                <p>{t("chatStartersTitle")}</p>
+                                {CHAT_STARTERS[lang][modeIdOf(chatMode)].map((starter) => (
+                                  <button
+                                    key={starter}
+                                    type="button"
+                                    className="chat-starter"
+                                    onClick={() => setChatInput(starter)}
+                                  >
+                                    {starter}
+                                  </button>
+                                ))}
+                              </div>
+                            </>
+                          )}
+                          {chatMessages.map((message) => (
+                            <article
+                              className={`chat-message ${message.role === "user" ? "user-message" : "assistant-message"}`}
+                              key={message.id}
+                            >
+                              {message.role === "assistant" && (
+                                <span className="message-avatar" aria-hidden="true">
+                                  ✳
+                                </span>
+                              )}
+                              <p>{message.content}</p>
+                              {message.sources?.length ? (
+                                <ul
+                                  className="assistant-sources"
+                                  aria-label={t("assistantSources")}
+                                >
+                                  {message.sources.map((source) => (
+                                    <li key={source.url}>
+                                      <a href={source.url} target="_blank" rel="noreferrer">
+                                        {source.title}
+                                      </a>
+                                    </li>
+                                  ))}
+                                </ul>
+                              ) : null}
+                              {message.role === "assistant" && (
+                                <div className="chat-message-actions">
+                                  <button
+                                    type="button"
+                                    onClick={() => void copyAssistantMessage(message.content)}
+                                  >
+                                    {t("copyMessage")}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => saveMessageAsNote(message.content)}
+                                  >
+                                    {t("saveAsNote")}
+                                  </button>
+                                </div>
+                              )}
+                            </article>
+                          ))}
+                          {chatPending && (
+                            <div className="chat-typing" role="status">
+                              <span />
+                              <span />
+                              <span />
+                            </div>
+                          )}
+                          <div ref={chatEndRef} />
+                        </div>
+                        {chatError && (
+                          <p className="chat-error" role="alert">
+                            {chatError}
+                          </p>
+                        )}
+                        {supabase && !user && (
+                          <div className="chat-access-notice">
+                            <span aria-hidden="true">ⓘ</span>
+                            <p>{t("signInForChat")}</p>
+                            <button
+                              className="text-button"
+                              type="button"
+                              onClick={() => {
+                                setAuthError("");
+                                setAuthNotice("");
+                                setShowAccount(true);
+                              }}
+                            >
+                              {t("signIn")}
+                            </button>
+                          </div>
+                        )}
+                        {chatNotice && (
+                          <p className="auth-feedback" role="status">
+                            {chatNotice}
+                          </p>
+                        )}
+                        <form className="chat-compose" onSubmit={sendAssistantMessage}>
+                          <label className="visually-hidden" htmlFor="assistant-message">
+                            {t("assistantChatPlaceholder")}
+                          </label>
+                          <textarea
+                            id="assistant-message"
+                            rows={1}
+                            value={chatInput}
+                            onChange={(event) => setChatInput(event.target.value)}
+                            onKeyDown={(event) => {
+                              if (
+                                event.key === "Enter" &&
+                                !event.shiftKey &&
+                                !event.nativeEvent.isComposing
+                              ) {
+                                event.preventDefault();
+                                event.currentTarget.form?.requestSubmit();
+                              }
+                            }}
+                            placeholder={t("assistantChatPlaceholder")}
+                            maxLength={4000}
+                            disabled={chatPending}
+                          />
+                          <button
+                            className="primary-button chat-send"
+                            type="submit"
+                            aria-label={t("sendMessage")}
+                            disabled={chatPending || !chatInput.trim()}
+                          >
+                            <span aria-hidden="true">➤</span>
+                          </button>
+                        </form>
+                        <p className="chat-compose-hint">{t("messageDraftHint")}</p>
+                      </section>
+                    </div>
                   </div>
-                )}
-                {chatNotice && <p className="auth-feedback" role="status">{chatNotice}</p>}
-                <form className="chat-compose" onSubmit={sendAssistantMessage}>
-                  <label className="visually-hidden" htmlFor="assistant-message">{t("assistantChatPlaceholder")}</label>
-                  <textarea
-                    id="assistant-message"
-                    rows={1}
-                    value={chatInput}
-                    onChange={(event) => setChatInput(event.target.value)}
-                    onKeyDown={(event) => {
-                      if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
-                        event.preventDefault();
-                        event.currentTarget.form?.requestSubmit();
-                      }
-                    }}
-                    placeholder={t("assistantChatPlaceholder")}
-                    maxLength={4000}
-                    disabled={chatPending}
-                  />
-                  <button
-                    className="primary-button chat-send"
-                    type="submit"
-                    aria-label={t("sendMessage")}
-                    disabled={chatPending || !chatInput.trim()}
-                  >
-                    <span aria-hidden="true">➤</span>
-                  </button>
-                </form>
-                <p className="chat-compose-hint">{t("messageDraftHint")}</p>
                 </section>
-              </div>
-              </div>
-            </section>
-          )}
+              )}
             </>
           )}
         </div>
@@ -3282,9 +3521,9 @@ function App() {
             type="button"
             aria-current={page === item.id ? "page" : undefined}
             onClick={() => {
-                if (item.id === "assistant" && blockGuest()) return;
-                setPage(item.id);
-              }}
+              if (item.id === "assistant" && blockGuest()) return;
+              setPage(item.id);
+            }}
           >
             <span aria-hidden="true">{item.icon}</span>
             <span>{t(item.label)}</span>
@@ -3314,7 +3553,9 @@ function App() {
             >
               ×
             </button>
-            <span className="install-modal-icon settings-modal-icon" aria-hidden="true">⚙</span>
+            <span className="install-modal-icon settings-modal-icon" aria-hidden="true">
+              ⚙
+            </span>
             <h2 id="settings-modal-title">{t("settingsTitle")}</h2>
             <section className="settings-group" aria-labelledby="settings-appearance-title">
               <h3 id="settings-appearance-title">{t("themeSelection")}</h3>
@@ -3329,7 +3570,11 @@ function App() {
                   >
                     <span className={`theme-swatch theme-swatch-${theme}`} aria-hidden="true" />
                     <span>{t(themeKey(theme))}</span>
-                    {data.theme === theme && <span className="theme-option-check" aria-hidden="true">✓</span>}
+                    {data.theme === theme && (
+                      <span className="theme-option-check" aria-hidden="true">
+                        ✓
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -3431,7 +3676,9 @@ function App() {
             >
               ×
             </button>
-            <span className="install-modal-icon" aria-hidden="true">t.</span>
+            <span className="install-modal-icon" aria-hidden="true">
+              t.
+            </span>
             <h2 id="install-modal-title">{t("installTitle")}</h2>
             <p>{t("installHelp")}</p>
             <ul>
@@ -3452,8 +3699,15 @@ function App() {
 
       {showWelcomeGate && (
         <div className="install-modal-backdrop">
-          <section className="install-modal account-modal" role="dialog" aria-modal="true" aria-labelledby="welcome-gate-title">
-            <span className="install-modal-icon" aria-hidden="true">t.</span>
+          <section
+            className="install-modal account-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="welcome-gate-title"
+          >
+            <span className="install-modal-icon" aria-hidden="true">
+              t.
+            </span>
             <h2 id="welcome-gate-title">{t("guestGateTitle")}</h2>
             <p>{t("guestGateBody")}</p>
             <button
@@ -3500,13 +3754,20 @@ function App() {
             >
               ×
             </button>
-            <span className="install-modal-icon" aria-hidden="true">{userName ? userName[0].toUpperCase() : "t."}</span>
-            <h2 id="account-modal-title">{user ? (userName || t("accountStatus")) : t("account")}</h2>
+            <span className="install-modal-icon" aria-hidden="true">
+              {userName ? userName[0].toUpperCase() : "t."}
+            </span>
+            <h2 id="account-modal-title">{user ? userName || t("accountStatus") : t("account")}</h2>
             {user ? (
               <div className="account-profile">
                 <p>{user.email}</p>
                 <p>{t("accountHelp")}</p>
-                <button className="primary-button install-modal-done" type="button" disabled={authPending} onClick={() => void signOut()}>
+                <button
+                  className="primary-button install-modal-done"
+                  type="button"
+                  disabled={authPending}
+                  onClick={() => void signOut()}
+                >
                   {authPending ? "…" : t("signOut")}
                 </button>
               </div>
@@ -3584,22 +3845,54 @@ function App() {
                     maxLength={72}
                     required
                   />
-                  {authError && <p className="auth-feedback auth-error" role="alert">{authError}</p>}
-                  {authNotice && <p className="auth-feedback" role="status">{authNotice}</p>}
-                  <button className="primary-button auth-submit" type="submit" disabled={authPending}>
+                  {authError && (
+                    <p className="auth-feedback auth-error" role="alert">
+                      {authError}
+                    </p>
+                  )}
+                  {authNotice && (
+                    <p className="auth-feedback" role="status">
+                      {authNotice}
+                    </p>
+                  )}
+                  <button
+                    className="primary-button auth-submit"
+                    type="submit"
+                    disabled={authPending}
+                  >
                     {authPending ? "…" : authMode === "sign-up" ? t("createAccount") : t("signIn")}
                   </button>
                 </form>
-                <div className="auth-provider-divider"><span>{isArabic ? "أو" : "or"}</span></div>
+                <div className="auth-provider-divider">
+                  <span>{isArabic ? "أو" : "or"}</span>
+                </div>
                 <div className="auth-provider-buttons">
-                  <button className="auth-provider" type="button" disabled={authPending} onClick={() => void signInWithProvider("google")}>
-                    <span aria-hidden="true">G</span>{t("continueGoogle")}
+                  <button
+                    className="auth-provider"
+                    type="button"
+                    disabled={authPending}
+                    onClick={() => void signInWithProvider("google")}
+                  >
+                    <span aria-hidden="true">G</span>
+                    {t("continueGoogle")}
                   </button>
-                  <button className="auth-provider" type="button" disabled={authPending} onClick={() => void signInWithProvider("github")}>
-                    <span aria-hidden="true">GH</span>{t("continueGithub")}
+                  <button
+                    className="auth-provider"
+                    type="button"
+                    disabled={authPending}
+                    onClick={() => void signInWithProvider("github")}
+                  >
+                    <span aria-hidden="true">GH</span>
+                    {t("continueGithub")}
                   </button>
-                  <button className="auth-provider" type="button" disabled={authPending} onClick={() => void signInWithProvider("x")}>
-                    <span aria-hidden="true">X</span>{t("continueX")}
+                  <button
+                    className="auth-provider"
+                    type="button"
+                    disabled={authPending}
+                    onClick={() => void signInWithProvider("x")}
+                  >
+                    <span aria-hidden="true">X</span>
+                    {t("continueX")}
                   </button>
                 </div>
               </>
@@ -3611,16 +3904,24 @@ function App() {
       {storageFailed && (
         <div className="storage-alert" role="alert">
           <span>{t("storageWarning")}</span>
-          <button type="button" aria-label={t("dismiss")} onClick={() => setStorageFailed(false)}>×</button>
+          <button type="button" aria-label={t("dismiss")} onClick={() => setStorageFailed(false)}>
+            ×
+          </button>
         </div>
       )}
       {cloudSyncFailed && (
         <div className="storage-alert" role="alert">
           <span>{t("cloudSyncError")}</span>
-          <button type="button" aria-label={t("dismiss")} onClick={() => setCloudSyncFailed(false)}>×</button>
+          <button type="button" aria-label={t("dismiss")} onClick={() => setCloudSyncFailed(false)}>
+            ×
+          </button>
         </div>
       )}
-      {toast && <div className="toast" role="status">{toast}</div>}
+      {toast && (
+        <div className="toast" role="status">
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

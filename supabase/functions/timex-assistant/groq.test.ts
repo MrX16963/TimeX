@@ -1,10 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  describeGroqError,
-  GROQ_CHAT_COMPLETIONS_URL,
-  GROQ_MODEL,
-  requestGroq,
-} from "./groq";
+import { describeGroqError, GROQ_CHAT_COMPLETIONS_URL, GROQ_MODEL, requestGroq } from "./groq";
 
 describe("Groq conversation request", () => {
   afterEach(() => vi.unstubAllGlobals());
@@ -43,8 +38,8 @@ describe("Groq conversation request", () => {
       describeGroqError(
         new Response(JSON.stringify({ error: { message: "Invalid API key", code: "bad_key" } }), {
           status: 401,
-        }),
-      ),
+        })
+      )
     ).resolves.toBe("Invalid API key (code bad_key)");
 
     await expect(
@@ -52,8 +47,8 @@ describe("Groq conversation request", () => {
         new Response("<html>Forbidden</html>", {
           status: 403,
           headers: { "content-type": "text/html" },
-        }),
-      ),
+        })
+      )
     ).resolves.toContain("HTML access-denied page");
   });
 });

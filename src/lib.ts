@@ -100,7 +100,7 @@ export function layoutCalendarTasks(tasks: Task[]): CalendarTaskLayout[] {
   const scheduled = tasks
     .filter(
       (task): task is Task & Required<Pick<Task, "scheduledDate" | "startTime" | "endTime">> =>
-        Boolean(task.scheduledDate && task.startTime && task.endTime),
+        Boolean(task.scheduledDate && task.startTime && task.endTime)
     )
     .map((task) => {
       const [startHour, startMinute] = task.startTime.split(":").map(Number);
@@ -114,7 +114,7 @@ export function layoutCalendarTasks(tasks: Task[]): CalendarTaskLayout[] {
     })
     .sort((a, b) => a.startMinutes - b.startMinutes || a.endMinutes - b.endMinutes);
 
-  const groups: typeof scheduled[] = [];
+  const groups: (typeof scheduled)[] = [];
   let currentGroup: typeof scheduled = [];
   let groupEnd = -1;
   for (const appointment of scheduled) {
@@ -205,7 +205,9 @@ export function buildPlanSteps(goal: string, language: "ar" | "en" = "en"): stri
       "Review energy and consistency weekly, then adjust gradually",
     ];
   }
-  if (/\b(job|career|resume|interview|project|website|app|launch|build|create)\b/i.test(cleanedGoal)) {
+  if (
+    /\b(job|career|resume|interview|project|website|app|launch|build|create)\b/i.test(cleanedGoal)
+  ) {
     return [
       `Define a visible result that means “${cleanedGoal}” is done`,
       "Gather requirements and choose the smallest useful first version",
@@ -274,8 +276,7 @@ function isTask(value: unknown): value is Task {
           task.reminderMinutes === null ||
           [5, 10, 15, 30, 60].includes(task.reminderMinutes)) &&
         (task.reminderSentAt === undefined ||
-          (typeof task.reminderSentAt === "number" &&
-            Number.isFinite(task.reminderSentAt)))))
+          (typeof task.reminderSentAt === "number" && Number.isFinite(task.reminderSentAt)))))
   );
 }
 
@@ -295,8 +296,7 @@ function isNote(value: unknown): value is Note {
     typeof note.body === "string" &&
     typeof note.updatedAt === "number" &&
     Number.isFinite(note.updatedAt) &&
-    (note.audio === undefined ||
-      (Array.isArray(note.audio) && note.audio.every(isVoiceNote)))
+    (note.audio === undefined || (Array.isArray(note.audio) && note.audio.every(isVoiceNote)))
   );
 }
 
@@ -345,7 +345,7 @@ function isPlan(value: unknown): value is Plan {
             source &&
             typeof source.title === "string" &&
             typeof source.url === "string" &&
-            source.url.startsWith("https://"),
+            source.url.startsWith("https://")
         ))) &&
     typeof plan.createdAt === "number" &&
     Number.isFinite(plan.createdAt)

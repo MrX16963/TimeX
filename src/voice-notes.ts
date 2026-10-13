@@ -9,7 +9,8 @@ type StoredRecording = {
 function openDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DATABASE_NAME, 1);
-    request.onerror = () => reject(request.error ?? new Error("Could not open voice-note storage."));
+    request.onerror = () =>
+      reject(request.error ?? new Error("Could not open voice-note storage."));
     request.onupgradeneeded = () => {
       if (!request.result.objectStoreNames.contains(STORE_NAME)) {
         request.result.createObjectStore(STORE_NAME, { keyPath: "id" });
@@ -25,7 +26,8 @@ export async function saveVoiceRecording(id: string, blob: Blob): Promise<void> 
     const transaction = database.transaction(STORE_NAME, "readwrite");
     transaction.objectStore(STORE_NAME).put({ id, blob } satisfies StoredRecording);
     transaction.oncomplete = () => resolve();
-    transaction.onerror = () => reject(transaction.error ?? new Error("Could not save voice note."));
+    transaction.onerror = () =>
+      reject(transaction.error ?? new Error("Could not save voice note."));
   });
   database.close();
 }
@@ -47,7 +49,8 @@ export async function deleteVoiceRecording(id: string): Promise<void> {
     const transaction = database.transaction(STORE_NAME, "readwrite");
     transaction.objectStore(STORE_NAME).delete(id);
     transaction.oncomplete = () => resolve();
-    transaction.onerror = () => reject(transaction.error ?? new Error("Could not delete voice note."));
+    transaction.onerror = () =>
+      reject(transaction.error ?? new Error("Could not delete voice note."));
   });
   database.close();
 }

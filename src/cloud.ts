@@ -75,7 +75,7 @@ function isChatMessage(value: unknown): value is ChatMessage {
             source &&
             typeof source.title === "string" &&
             typeof source.url === "string" &&
-            source.url.startsWith("https://"),
+            source.url.startsWith("https://")
         )))
   );
 }

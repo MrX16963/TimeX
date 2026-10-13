@@ -49,7 +49,7 @@ export function fetchGemini(
   model: string,
   systemInstruction: string,
   contents: GeminiContent[],
-  tools?: Array<Record<string, unknown>>,
+  tools?: Array<Record<string, unknown>>
 ): Promise<Response> {
   return fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`,
@@ -63,15 +63,19 @@ export function fetchGemini(
         systemInstruction: { parts: [{ text: systemInstruction }] },
         contents,
         ...(tools ? { tools } : {}),
-        generationConfig: { temperature: 0.5, maxOutputTokens: 4096, ...(model.includes("flash") ? { thinkingConfig: { thinkingBudget: 0 } } : {}) },
+        generationConfig: {
+          temperature: 0.5,
+          maxOutputTokens: 4096,
+          ...(model.includes("flash") ? { thinkingConfig: { thinkingBudget: 0 } } : {}),
+        },
       }),
-    },
+    }
   );
 }
 
 export function needsWebSearch(message: string): boolean {
   return /ابحث|بحث|دور على|دوّر على|على الانترنت|على الإنترنت|مصادر|مصدر|رابط|آخر الأخبار|اخر الاخبار|السعر الحالي|حاليًا|حالياً|google|search|look up|find sources|current|latest|news|weather|price today|source|sources/i.test(
-    message,
+    message
   );
 }
 

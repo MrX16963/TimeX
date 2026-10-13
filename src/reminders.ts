@@ -5,7 +5,13 @@ import type { Language, Task } from "./lib";
 export type ReminderPermission = "granted" | "denied" | "unsupported";
 type RemindableTask = Pick<
   Task,
-  "id" | "title" | "completed" | "scheduledDate" | "startTime" | "reminderMinutes" | "reminderSentAt"
+  | "id"
+  | "title"
+  | "completed"
+  | "scheduledDate"
+  | "startTime"
+  | "reminderMinutes"
+  | "reminderSentAt"
 >;
 
 const notificationChannelId = "timex-task-reminders";
@@ -44,7 +50,7 @@ export async function requestReminderPermission(): Promise<ReminderPermission> {
 
 export async function syncNativeReminders(
   tasks: RemindableTask[],
-  language: Language,
+  language: Language
 ): Promise<void> {
   if (!Capacitor.isNativePlatform()) return;
   const permission = await LocalNotifications.checkPermissions();
@@ -61,7 +67,7 @@ export async function syncNativeReminders(
 
   const pending = await LocalNotifications.getPending();
   const appNotifications = pending.notifications.filter(
-    (notification) => typeof notification.extra?.timexTaskId === "string",
+    (notification) => typeof notification.extra?.timexTaskId === "string"
   );
   if (appNotifications.length) {
     await LocalNotifications.cancel({
@@ -75,16 +81,16 @@ export async function syncNativeReminders(
     .flatMap((task) => {
       const at = getReminderTime(task);
       if (!at || at.getTime() <= now) return [];
-      return [{
-        id: notificationIdForTask(task.id),
-        title: language === "ar" ? "تذكير من TimeX" : "TimeX reminder",
-        body: language === "ar"
-          ? `حان وقت مهمتك: ${task.title}`
-          : `It's time for: ${task.title}`,
-        schedule: { at, allowWhileIdle: true },
-        channelId: notificationChannelId,
-        extra: { timexTaskId: task.id },
-      }];
+      return [
+        {
+          id: notificationIdForTask(task.id),
+          title: language === "ar" ? "تذكير من TimeX" : "TimeX reminder",
+          body: language === "ar" ? `حان وقت مهمتك: ${task.title}` : `It's time for: ${task.title}`,
+          schedule: { at, allowWhileIdle: true },
+          channelId: notificationChannelId,
+          extra: { timexTaskId: task.id },
+        },
+      ];
     });
 
   if (notifications.length) await LocalNotifications.schedule({ notifications });
@@ -93,7 +99,7 @@ export async function syncNativeReminders(
 export function scheduleBrowserReminders(
   tasks: RemindableTask[],
   language: Language,
-  onReminder: (taskId: string) => void,
+  onReminder: (taskId: string) => void
 ): () => void {
   if (typeof Notification === "undefined" || Notification.permission !== "granted") {
     return () => undefined;
@@ -111,22 +117,25 @@ export function scheduleBrowserReminders(
         timers.push(window.setTimeout(schedule, browserTimerLimit));
         return;
       }
-      timers.push(window.setTimeout(() => {
-        try {
-          new Notification(
-            language === "ar" ? "تذكير من TimeX" : "TimeX reminder",
-            {
-              body: language === "ar"
-                ? `حان وقت مهمتك: ${task.title}`
-                : `It's time for: ${task.title}`,
-              tag: `timex-task-${task.id}`,
-            },
-          );
-          onReminder(task.id);
-        } catch (error) {
-          console.error("TimeX could not display a task reminder.", error);
-        }
-      }, Math.max(0, remaining)));
+      timers.push(
+        window.setTimeout(
+          () => {
+            try {
+              new Notification(language === "ar" ? "تذكير من TimeX" : "TimeX reminder", {
+                body:
+                  language === "ar"
+                    ? `حان وقت مهمتك: ${task.title}`
+                    : `It's time for: ${task.title}`,
+                tag: `timex-task-${task.id}`,
+              });
+              onReminder(task.id);
+            } catch (error) {
+              console.error("TimeX could not display a task reminder.", error);
+            }
+          },
+          Math.max(0, remaining)
+        )
+      );
     };
     schedule();
   }

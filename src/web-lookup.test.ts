@@ -24,7 +24,9 @@ describe("web lookup", () => {
             : {
                 title: "Pomodoro Technique",
                 extract: "A time management method.",
-                content_urls: { desktop: { page: "https://en.wikipedia.org/wiki/Pomodoro_Technique" } },
+                content_urls: {
+                  desktop: { page: "https://en.wikipedia.org/wiki/Pomodoro_Technique" },
+                },
               },
       };
     });

@@ -33,15 +33,28 @@ import {
   syncNativeReminders,
 } from "./reminders";
 import { isResearchRequest, respondAsMrX } from "./mrx-assistant";
+import { lookupWeb } from "./web-lookup";
 import {
   createConversation,
   createConversationStore,
   saveConversationMessages,
-  isChatMode,
+  latestSearchContext,
+  MAX_CONVERSATIONS,
+  normalizeChatMode,
+  recentConversations,
+  toCloudMode,
   type AssistantConversation,
   type ChatMode,
   type ConversationStore,
 } from "./assistant-conversations";
+import {
+  ASSISTANT_MODES,
+  CHAT_STARTERS,
+  formatConversationTime,
+  isConnectedMode,
+  modeIdOf,
+  type AssistantModeId,
+} from "./assistant-ui";
 import { isDoubleBackPress } from "./back-navigation";
 import { deleteVoiceRecording, readVoiceRecording, saveVoiceRecording } from "./voice-notes";
 
@@ -219,8 +232,24 @@ const englishCopy = {
     emptyConversationHistory: "Your saved conversations will appear here.",
     deleteConversation: "Delete conversation",
     chatMode: "Conversation",
-    geminiMode: "Groq conversation",
-    geminiModeHint: "Natural conversation using the Groq service.",
+    geminiMode: "Quick chat (Groq)",
+    geminiModeHint: "Fast general answers and a personal assistant, powered by Groq.",
+    searchMode: "MrX Search",
+    searchModeHint: "Facts, analysis, and sorted details. Wikipedia sources are attached when found.",
+    plannerMode: "MrX Planner",
+    plannerModeHint: "Combines your goals, tasks, and earlier research into a clear schedule.",
+    modeOffline: "Offline MrX",
+    historyLimitNote: "Last {count} chats are kept on this device.",
+    chatStartersTitle: "Try one of these",
+    copyMessage: "Copy",
+    copiedMessage: "Copied",
+    saveAsNote: "Save as note",
+    savedAsNote: "Saved to notes",
+    messageDraftHint: "Enter to send · Shift+Enter for a new line",
+    modeLabelGroq: "Quick chat",
+    modeLabelSearch: "Search",
+    modeLabelPlanner: "Planner",
+    modeLabelOffline: "Offline",
     planMode: "Plan mode",
     advancedPlanMode: "Advanced plan mode",
     chatModeHint: "Ask, reflect, or request a web search.",
@@ -420,8 +449,24 @@ const arabicCopy = {
     emptyConversationHistory: "ستظهر محادثاتك المحفوظة هنا.",
     deleteConversation: "حذف المحادثة",
     chatMode: "محادثة",
-    geminiMode: "محادثة Groq",
-    geminiModeHint: "محادثة طبيعية عبر خدمة Groq.",
+    geminiMode: "محادثة سريعة (Groq)",
+    geminiModeHint: "إجابات عامة سريعة ومساعد شخصي بواسطة Groq.",
+    searchMode: "بحث MrX",
+    searchModeHint: "حقائق وتحليل وتفاصيل مصنّفة، مع إرفاق مصادر ويكيبيديا عند توفرها.",
+    plannerMode: "مخطط MrX",
+    plannerModeHint: "يدمج أهدافك ومهامك ونتائج البحث السابقة في جدول واضح.",
+    modeOffline: "MrX دون اتصال",
+    historyLimitNote: "يُحفظ آخر {count} محادثة على هذا الجهاز.",
+    chatStartersTitle: "جرّب أحد هذه الأمثلة",
+    copyMessage: "نسخ",
+    copiedMessage: "تم النسخ",
+    saveAsNote: "حفظ كملاحظة",
+    savedAsNote: "حُفظت في الملاحظات",
+    messageDraftHint: "Enter للإرسال · Shift+Enter لسطر جديد",
+    modeLabelGroq: "سريعة",
+    modeLabelSearch: "بحث",
+    modeLabelPlanner: "مخطط",
+    modeLabelOffline: "محلي",
     planMode: "نمط الخطة",
     advancedPlanMode: "نمط الخطة المتقدمة",
     chatModeHint: "اسأل أو ناقش موضوعًا أو اطلب البحث على الويب.",
@@ -453,6 +498,18 @@ const copy = {
 } satisfies Record<Language, Record<string, string>>;
 
 type CopyKey = keyof typeof copy.en;
+const modeLabelKeys: Record<AssistantModeId, CopyKey> = {
+  groq: "modeLabelGroq",
+  mrx_search: "modeLabelSearch",
+  mrx_planner: "modeLabelPlanner",
+  chat: "modeLabelOffline",
+};
+const modeHintKeys: Record<AssistantModeId, CopyKey> = {
+  groq: "geminiModeHint",
+  mrx_search: "searchModeHint",
+  mrx_planner: "plannerModeHint",
+  chat: "chatModeHint",
+};
 type Page = "today" | "calendar" | "matrix" | "notes" | "assistant";
 type AuthMode = "sign-in" | "sign-up";
 
@@ -839,7 +896,7 @@ function App() {
           .select("id, title, mode, created_at, updated_at")
           .eq("user_id", user.id)
           .order("updated_at", { ascending: false })
-          .limit(50),
+          .limit(MAX_CONVERSATIONS),
       ]);
       const conversationIds = (conversationsResult.data ?? []).map((item) => item.id);
       const messagesResult = conversationIds.length
@@ -886,6 +943,9 @@ function App() {
         conversationStorageKey(user.id),
         chatStorageKey(user.id),
       );
+      const localModes = new Map(
+        localStore.conversations.map((conversation) => [conversation.id, conversation.mode]),
+      );
       const cloudConversations = conversationsResult.error
         ? []
         : (conversationsResult.data ?? []).map((item) => {
@@ -898,7 +958,7 @@ function App() {
             return {
               id: item.id,
               title: item.title,
-              mode: isChatMode(item.mode) ? item.mode : "chat" as const,
+              mode: localModes.get(item.id) ?? normalizeChatMode(item.mode),
               messages,
               createdAt: item.created_at,
               updatedAt: item.updated_at,
@@ -1088,7 +1148,7 @@ function App() {
             id: conversation.id,
             user_id: user.id,
             title: conversation.title.slice(0, 100),
-            mode: conversation.mode,
+            mode: toCloudMode(conversation.mode),
             created_at: conversation.createdAt,
             updated_at: conversation.updatedAt,
           },
@@ -1647,7 +1707,7 @@ function App() {
         id: conversation.id,
         user_id: userId,
         title: conversation.title.slice(0, 100),
-        mode: conversation.mode,
+        mode: toCloudMode(conversation.mode),
         created_at: conversation.createdAt,
         updated_at: conversation.updatedAt,
       }, { onConflict: "id" });
@@ -1686,7 +1746,7 @@ function App() {
       const active = current.conversations.find((item) => item.id === current.activeId);
       if (!active) {
         const created = update(createConversation());
-        return { activeId: created.id, conversations: [created, ...current.conversations].slice(0, 50) };
+        return { activeId: created.id, conversations: [created, ...current.conversations].slice(0, MAX_CONVERSATIONS) };
       }
       const updated = update(active);
       return {
@@ -1697,10 +1757,10 @@ function App() {
   }
 
   function startNewConversation() {
-    const fresh = createConversation();
+    const fresh = createConversation(normalizeChatMode(chatMode));
     setConversationStore((current) => ({
       activeId: fresh.id,
-      conversations: [fresh, ...current.conversations].slice(0, 50),
+      conversations: [fresh, ...current.conversations].slice(0, MAX_CONVERSATIONS),
     }));
     setChatInput("");
     setChatError("");
@@ -1761,7 +1821,7 @@ function App() {
       conversations: [
         savedConversation,
         ...current.conversations.filter((item) => item.id !== activeConversationId),
-      ].slice(0, 50),
+      ].slice(0, MAX_CONVERSATIONS),
     }));
     setChatInput("");
     setChatError("");
@@ -1779,10 +1839,21 @@ function App() {
       const useConnectedAssistant = Boolean(
         user &&
         supabase &&
-        (chatMode === "advanced-plan" || chatMode === "chat" || chatMode === "gemini" || chatMode === "deepseek"),
+        (isConnectedMode(chatMode) || chatMode === "advanced-plan"),
       );
       if (useConnectedAssistant && user && supabase) {
         try {
+          let contextData = "";
+          let webSources: AssistantResponse["sources"] = [];
+          if (chatMode === "mrx_search") {
+            const lookup = await lookupWeb(content, lang).catch(() => null);
+            if (lookup) {
+              contextData = `${lookup.title}: ${lookup.summary}`;
+              webSources = [{ title: lookup.title, url: lookup.url }];
+            }
+          } else if (chatMode === "mrx_planner") {
+            contextData = latestSearchContext(conversationStore.conversations, activeConversationId);
+          }
           const { data: assistantData, error } = await supabase.functions.invoke<AssistantResponse>(
             "timex-assistant",
             {
@@ -1793,7 +1864,9 @@ function App() {
                 })),
                 language: lang,
                 mode: chatMode,
+                clientVersion: __APP_VERSION__,
                 userName,
+                ...(contextData ? { contextData } : {}),
                 tasks: data.tasks
                   .filter((task) => !task.completed)
                   .slice(0, 30)
@@ -1829,11 +1902,16 @@ function App() {
           ) {
             throw new Error("The configured assistant returned an invalid response.");
           }
-          response = assistantData;
+          response = webSources?.length && !assistantData.sources?.length
+            ? { ...assistantData, sources: webSources }
+            : assistantData;
         } catch (error) {
           console.error("TimeX could not reach the configured assistant; using MrX locally.", error);
-          setChatNotice(t("assistantLocalFallback"));
-          if (serviceDetail) setChatNotice(` (${serviceDetail})`);
+          setChatNotice(
+            serviceDetail
+              ? `${t("assistantLocalFallback")} (${serviceDetail})`
+              : t("assistantLocalFallback"),
+          );
         }
       }
 
@@ -1873,6 +1951,22 @@ function App() {
     } finally {
       setChatPending(false);
     }
+  }
+
+  async function copyAssistantMessage(text: string) {
+    try {
+      await navigator.clipboard.writeText(text);
+      setChatNotice(t("copiedMessage"));
+    } catch {
+      setChatError(t("assistantChatError"));
+    }
+  }
+
+  function saveMessageAsNote(text: string) {
+    applyAssistantActions([
+      { type: "note", title: text.split("\n")[0].slice(0, 100), body: text },
+    ]);
+    setChatNotice(t("savedAsNote"));
   }
 
   function applyAssistantActions(actions: AssistantAction[]) {
@@ -2991,36 +3085,29 @@ function App() {
                 <button className="primary-button" type="button" onClick={startNewConversation}>
                   <span aria-hidden="true">＋</span>{t("newConversation")}
                 </button>
-                <label>
-                  <span className="visually-hidden">{t("assistantMode")}</span>
-                  <select
-                    value={chatMode}
-                    onChange={(event) => changeChatMode(event.target.value as ChatMode)}
-                    aria-label={t("assistantMode")}
-                  >
-                    <option value="chat">{t("chatMode")}</option>
-                    <option value="gemini">{t("geminiMode")}</option>
-                    <option value="plan">{t("planMode")}</option>
-                    <option value="advanced-plan">{t("advancedPlanMode")}</option>
-                  </select>
-                </label>
-                <p>
-                  {chatMode === "advanced-plan"
-                    ? t("advancedPlanModeHint")
-                    : chatMode === "gemini" || chatMode === "deepseek"
-                      ? t("geminiModeHint")
-                    : chatMode === "plan"
-                      ? t("planModeHint")
-                      : t("chatModeHint")}
-                </p>
+                <div className="assistant-mode-picker" role="radiogroup" aria-label={t("assistantMode")}>
+                  {ASSISTANT_MODES.map((item) => (
+                    <button
+                      key={item.id}
+                      type="button"
+                      role="radio"
+                      aria-checked={modeIdOf(chatMode) === item.id}
+                      className={`assistant-mode-chip${modeIdOf(chatMode) === item.id ? " active" : ""}`}
+                      onClick={() => changeChatMode(item.id)}
+                    >
+                      <span aria-hidden="true">{item.icon}</span>
+                      {t(modeLabelKeys[item.id])}
+                    </button>
+                  ))}
+                </div>
+                <p>{t(modeHintKeys[modeIdOf(chatMode)])}</p>
               </div>
               <div className="assistant-chat-layout">
                 <aside className="assistant-history">
                   <h2>{t("conversationHistory")}</h2>
                   {conversationStore.conversations.length ? (
                     <ul>
-                      {[...conversationStore.conversations]
-                        .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
+                      {recentConversations(conversationStore.conversations)
                         .map((conversation) => (
                           <li key={conversation.id}>
                             <button
@@ -3029,8 +3116,10 @@ function App() {
                               aria-current={conversation.id === activeConversation?.id ? "true" : undefined}
                               onClick={() => selectConversation(conversation)}
                             >
-                              <span>{conversation.title || t(conversation.mode === "advanced-plan" ? "advancedPlanMode" : conversation.mode === "gemini" || conversation.mode === "deepseek" ? "geminiMode" : conversation.mode === "plan" ? "planMode" : "chatMode")}</span>
-                              <small>{conversation.messages.length}</small>
+                              <span>{conversation.title || t(modeLabelKeys[modeIdOf(conversation.mode)])}</span>
+                              <small>
+                                {t(modeLabelKeys[modeIdOf(conversation.mode)])} · {formatConversationTime(conversation.updatedAt, lang)}
+                              </small>
                             </button>
                             <button
                               className="assistant-history-delete"
@@ -3046,13 +3135,16 @@ function App() {
                   ) : (
                     <p>{t("emptyConversationHistory")}</p>
                   )}
+                  <p className="assistant-history-note">
+                    {t("historyLimitNote").replace("{count}", String(MAX_CONVERSATIONS))}
+                  </p>
                 </aside>
                 <section className="chat-panel">
                 <div className="chat-header">
                   <span className="chat-avatar" aria-hidden="true">✳</span>
                   <div>
                     <h2>{t("assistantChat")}</h2>
-                    <p>{t(chatMode === "advanced-plan" ? "advancedPlanMode" : chatMode === "plan" ? "planMode" : "chatMode")}</p>
+                    <p>{t(modeLabelKeys[modeIdOf(chatMode)])}</p>
                   </div>
                   <span className={`chat-connection${supabase && user ? " connected" : ""}`}>
                     {supabase && user ? t("cloudWorkspace") : t("localAssistantLabel")}
@@ -3064,10 +3156,25 @@ function App() {
                 </details>
                 <div className="chat-transcript" aria-live="polite">
                   {chatMessages.length === 0 && (
-                    <article className="chat-message assistant-message">
-                      <span className="message-avatar" aria-hidden="true">✳</span>
-                      <p>{t("greetingName").replace("{name}", userName || (isArabic ? "صديقي" : "friend"))}</p>
-                    </article>
+                    <>
+                      <article className="chat-message assistant-message">
+                        <span className="message-avatar" aria-hidden="true">✳</span>
+                        <p>{t("greetingName").replace("{name}", userName || (isArabic ? "صديقي" : "friend"))}</p>
+                      </article>
+                      <div className="chat-starters">
+                        <p>{t("chatStartersTitle")}</p>
+                        {CHAT_STARTERS[lang][modeIdOf(chatMode)].map((starter) => (
+                          <button
+                            key={starter}
+                            type="button"
+                            className="chat-starter"
+                            onClick={() => setChatInput(starter)}
+                          >
+                            {starter}
+                          </button>
+                        ))}
+                      </div>
+                    </>
                   )}
                   {chatMessages.map((message) => (
                     <article
@@ -3089,6 +3196,16 @@ function App() {
                           ))}
                         </ul>
                       ) : null}
+                      {message.role === "assistant" && (
+                        <div className="chat-message-actions">
+                          <button type="button" onClick={() => void copyAssistantMessage(message.content)}>
+                            {t("copyMessage")}
+                          </button>
+                          <button type="button" onClick={() => saveMessageAsNote(message.content)}>
+                            {t("saveAsNote")}
+                          </button>
+                        </div>
+                      )}
                     </article>
                   ))}
                   {chatPending && (
@@ -3121,10 +3238,17 @@ function App() {
                 {chatNotice && <p className="auth-feedback" role="status">{chatNotice}</p>}
                 <form className="chat-compose" onSubmit={sendAssistantMessage}>
                   <label className="visually-hidden" htmlFor="assistant-message">{t("assistantChatPlaceholder")}</label>
-                  <input
+                  <textarea
                     id="assistant-message"
+                    rows={1}
                     value={chatInput}
                     onChange={(event) => setChatInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" && !event.shiftKey && !event.nativeEvent.isComposing) {
+                        event.preventDefault();
+                        event.currentTarget.form?.requestSubmit();
+                      }
+                    }}
                     placeholder={t("assistantChatPlaceholder")}
                     maxLength={4000}
                     disabled={chatPending}
@@ -3138,7 +3262,7 @@ function App() {
                     <span aria-hidden="true">➤</span>
                   </button>
                 </form>
-                </section>
+                <p className="chat-compose-hint">{t("messageDraftHint")}</p>
               </div>
               </div>
             </section>

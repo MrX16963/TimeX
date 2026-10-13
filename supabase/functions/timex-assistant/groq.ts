@@ -10,6 +10,7 @@ export type GroqMessage = {
 export async function requestGroq(
   apiKey: string,
   messages: GroqMessage[],
+  temperature = 0.7,
 ): Promise<Response> {
   return fetch(GROQ_CHAT_COMPLETIONS_URL, {
     method: "POST",
@@ -20,7 +21,7 @@ export async function requestGroq(
     body: JSON.stringify({
       model: GROQ_MODEL,
       messages,
-      temperature: 0.7,
+      temperature,
     }),
   });
 }

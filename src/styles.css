@@ -5312,3 +5312,14 @@ html[dir="rtl"] .chat-send {
     font-size: 18px;
   }
 }
+
+.assistant-mode-picker { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+.assistant-mode-chip { display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.45rem 0.8rem; border: 1px solid var(--line, #d9d9e3); border-radius: 999px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.assistant-mode-chip.active { background: var(--accent, #5b5bd6); border-color: transparent; color: #fff; }
+.assistant-history-note, .chat-compose-hint { margin: 0.5rem 0 0; font-size: 0.78rem; opacity: 0.7; }
+.chat-starters { display: grid; gap: 0.5rem; margin-block: 0.75rem; }
+.chat-starters p { margin: 0; font-size: 0.85rem; opacity: 0.75; }
+.chat-starter { text-align: start; padding: 0.6rem 0.85rem; border: 1px solid var(--line, #d9d9e3); border-radius: 12px; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.chat-message-actions { display: flex; gap: 0.5rem; margin-top: 0.4rem; }
+.chat-message-actions button { padding: 0.2rem 0.6rem; border: 1px solid var(--line, #d9d9e3); border-radius: 8px; background: transparent; color: inherit; font-size: 0.78rem; cursor: pointer; }
+.chat-compose textarea { flex: 1; min-height: 2.75rem; max-height: 9rem; resize: none; padding: 0.7rem 0.9rem; border: 1px solid var(--line, #d9d9e3); border-radius: 14px; background: transparent; color: inherit; font: inherit; }

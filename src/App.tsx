@@ -14,7 +14,6 @@ import {
 } from "./cloud";
 import {
   buildPlanSteps,
-  DEFAULT_DATA,
   getCalendarWeek,
   getQuadrant,
   layoutCalendarTasks,
@@ -34,6 +33,19 @@ import {
 } from "./reminders";
 import { respondAsMrX } from "./mrx-assistant";
 import { isDoubleBackPress } from "./back-navigation";
+import {
+  accountStorageKey,
+  chatStorageKey,
+  dateFromKey,
+  detectMessageLanguage,
+  getContrastTextColor,
+  getDisplayName,
+  getLocalDateKey,
+  loadData,
+  loadDataForKey,
+  makeId,
+  shiftDate,
+} from "./app-utils";
 
 const englishCopy = {
     appName: "TimeX",
@@ -366,76 +378,6 @@ type TaskSchedule = Required<
 >;
 
 const themeOrder: Exclude<Theme, "custom">[] = ["light", "midnight", "sage", "lavender"];
-
-function makeId(): string {
-  return typeof crypto.randomUUID === "function"
-    ? crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
-}
-
-function getContrastTextColor(hex: string): string {
-  const channels = [1, 3, 5].map((offset) => parseInt(hex.slice(offset, offset + 2), 16) / 255);
-  const luminance = channels
-    .map((channel) => channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4)
-    .reduce((sum, channel, index) => sum + channel * [0.2126, 0.7152, 0.0722][index], 0);
-  return (luminance + 0.05) / 0.05 >= 1.05 / (luminance + 0.05) ? "#08090b" : "#ffffff";
-}
-
-function getLocalDateKey(date: Date): string {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  return `${year}-${month}-${day}`;
-}
-
-function shiftDate(dateKey: string, amount: number): string {
-  const [year, month, day] = dateKey.split("-").map(Number);
-  const date = new Date(year, month - 1, day, 12);
-  date.setDate(date.getDate() + amount);
-  return getLocalDateKey(date);
-}
-
-function dateFromKey(dateKey: string): Date {
-  const [year, month, day] = dateKey.split("-").map(Number);
-  return new Date(year, month - 1, day, 12);
-}
-
-function loadData(): AppData {
-  return loadDataForKey("timex-data");
-}
-
-function loadDataForKey(key: string): AppData {
-  try {
-    return readAppData(window.localStorage.getItem(key));
-  } catch {
-    return DEFAULT_DATA;
-  }
-}
-
-function accountStorageKey(userId: string | undefined): string {
-  return userId ? `timex-data:${userId}` : "timex-data";
-}
-
-function chatStorageKey(userId: string | undefined): string {
-  return userId ? `timex-chat:${userId}` : "timex-chat";
-}
-
-function getDisplayName(user: User | null): string {
-  if (!user) return "";
-  const name = user.user_metadata?.display_name || user.user_metadata?.full_name;
-  return typeof name === "string" && name.trim()
-    ? name.trim().split(/\s+/)[0]
-    : user.email?.split("@")[0] || "";
-}
-
-function detectMessageLanguage(message: string, fallback: Language): Language {
-  const trimmed = message.trim();
-  if (!trimmed) return fallback;
-  const arabicCount = (trimmed.match(/[\u0600-\u06FF]/g) ?? []).length;
-  const latinCount = (trimmed.match(/[A-Za-z]/g) ?? []).length;
-  if (arabicCount === latinCount) return fallback;
-  return arabicCount > latinCount ? "ar" : "en";
-}
 
 function App() {
   const [data, setData] = useState<AppData>(loadData);

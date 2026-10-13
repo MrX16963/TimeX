@@ -2,14 +2,7 @@ import type { ChatMessage } from "./cloud";
 import { readChatMessages } from "./cloud";
 
 export type ChatMode =
-  | "chat"
-  | "groq"
-  | "mrx_search"
-  | "mrx_planner"
-  | "plan"
-  | "advanced-plan"
-  | "gemini"
-  | "deepseek";
+  "chat" | "groq" | "mrx_search" | "mrx_planner" | "plan" | "advanced-plan" | "gemini" | "deepseek";
 
 export type AssistantConversation = {
   id: string;
@@ -54,7 +47,7 @@ export function toCloudMode(mode: ChatMode): ChatMode {
 }
 
 export function recentConversations(
-  conversations: AssistantConversation[],
+  conversations: AssistantConversation[]
 ): AssistantConversation[] {
   return [...conversations]
     .sort((left, right) => right.updatedAt.localeCompare(left.updatedAt))
@@ -63,7 +56,7 @@ export function recentConversations(
 
 export function latestSearchContext(
   conversations: AssistantConversation[],
-  excludeId?: string,
+  excludeId?: string
 ): string {
   for (const conversation of recentConversations(conversations)) {
     if (conversation.id === excludeId || conversation.mode !== "mrx_search") continue;
@@ -78,10 +71,7 @@ export function latestSearchContext(
   return "";
 }
 
-export function createConversationStore(
-  key: string,
-  legacyKey?: string,
-): ConversationStore {
+export function createConversationStore(key: string, legacyKey?: string): ConversationStore {
   try {
     const saved = window.localStorage.getItem(key);
     if (saved) {
@@ -90,7 +80,7 @@ export function createConversationStore(
         const conversations = recentConversations(
           parsed.conversations
             .filter(isConversation)
-            .map((item) => ({ ...item, mode: normalizeChatMode(item.mode) })),
+            .map((item) => ({ ...item, mode: normalizeChatMode(item.mode) }))
         );
         if (conversations.length) {
           const activeId = conversations.some((item) => item.id === parsed.activeId)
@@ -113,7 +103,7 @@ export function createConversationStore(
 
 export function saveConversationMessages(
   conversation: AssistantConversation,
-  messages: ChatMessage[],
+  messages: ChatMessage[]
 ): AssistantConversation {
   const boundedMessages = messages.slice(-MAX_MESSAGES_PER_CONVERSATION);
   return {
@@ -125,9 +115,16 @@ export function saveConversationMessages(
 }
 
 export function isChatMode(value: unknown): value is ChatMode {
-  return value === "chat" || value === "plan" || value === "advanced-plan" ||
-    value === "gemini" || value === "deepseek" || value === "groq" ||
-    value === "mrx_search" || value === "mrx_planner";
+  return (
+    value === "chat" ||
+    value === "plan" ||
+    value === "advanced-plan" ||
+    value === "gemini" ||
+    value === "deepseek" ||
+    value === "groq" ||
+    value === "mrx_search" ||
+    value === "mrx_planner"
+  );
 }
 
 function isConversationStore(value: unknown): value is ConversationStore {
@@ -165,7 +162,7 @@ function isChatMessage(value: unknown): value is ChatMessage {
             source &&
             typeof source.title === "string" &&
             typeof source.url === "string" &&
-            source.url.startsWith("https://"),
+            source.url.startsWith("https://")
         )))
   );
 }

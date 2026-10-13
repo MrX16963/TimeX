@@ -1,5 +1,4 @@
-export const GROQ_CHAT_COMPLETIONS_URL =
-  "https://api.groq.com/openai/v1/chat/completions";
+export const GROQ_CHAT_COMPLETIONS_URL = "https://api.groq.com/openai/v1/chat/completions";
 export const GROQ_MODEL = "openai/gpt-oss-20b";
 
 export type GroqMessage = {
@@ -10,7 +9,7 @@ export type GroqMessage = {
 export async function requestGroq(
   apiKey: string,
   messages: GroqMessage[],
-  temperature = 0.7,
+  temperature = 0.7
 ): Promise<Response> {
   return fetch(GROQ_CHAT_COMPLETIONS_URL, {
     method: "POST",

@@ -1,9 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import {
-  getReminderTime,
-  notificationIdForTask,
-  scheduleBrowserReminders,
-} from "./reminders";
+import { getReminderTime, notificationIdForTask, scheduleBrowserReminders } from "./reminders";
 
 describe("scheduled task reminders", () => {
   afterEach(() => {
@@ -35,7 +31,7 @@ describe("scheduled task reminders", () => {
         scheduledDate: "2026-10-02",
         startTime: "09:30",
         reminderMinutes: null,
-      }),
+      })
     ).toBeNull();
   });
 
@@ -52,24 +48,29 @@ describe("scheduled task reminders", () => {
     vi.setSystemTime(new Date(2026, 9, 2, 9, 14, 59));
     vi.stubGlobal("window", globalThis);
     const NotificationMock = vi.fn();
-    vi.stubGlobal("Notification", Object.assign(
-      function (title: string, options: NotificationOptions) {
-        NotificationMock(title, options);
-      },
-      { permission: "granted" },
-    ));
+    vi.stubGlobal(
+      "Notification",
+      Object.assign(
+        function (title: string, options: NotificationOptions) {
+          NotificationMock(title, options);
+        },
+        { permission: "granted" }
+      )
+    );
     const onReminder = vi.fn();
     const stop = scheduleBrowserReminders(
-      [{
-        id: "task-3",
-        title: "Doctor",
-        completed: false,
-        scheduledDate: "2026-10-02",
-        startTime: "09:30",
-        reminderMinutes: 15,
-      }],
+      [
+        {
+          id: "task-3",
+          title: "Doctor",
+          completed: false,
+          scheduledDate: "2026-10-02",
+          startTime: "09:30",
+          reminderMinutes: 15,
+        },
+      ],
       "en",
-      onReminder,
+      onReminder
     );
 
     vi.advanceTimersByTime(1000);

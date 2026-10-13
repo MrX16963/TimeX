@@ -56,11 +56,13 @@ describe("layoutCalendarTasks", () => {
       },
     ];
 
-    expect(layoutCalendarTasks(tasks).map(({ task, column, columns }) => ({
-      id: task.id,
-      column,
-      columns,
-    }))).toEqual([
+    expect(
+      layoutCalendarTasks(tasks).map(({ task, column, columns }) => ({
+        id: task.id,
+        column,
+        columns,
+      }))
+    ).toEqual([
       { id: "first", column: 0, columns: 2 },
       { id: "overlap", column: 1, columns: 2 },
       { id: "next", column: 0, columns: 1 },
@@ -119,26 +121,28 @@ describe("readAppData", () => {
           theme: "sage",
           accentColor: "#3a9c78",
           language: "en",
-        }),
-      ),
+        })
+      )
     ).toMatchObject({ points: 40, theme: "sage", accentColor: "#3a9c78", language: "en" });
   });
 
   it("persists a personal accent color and safely rejects malformed colors", () => {
-    expect(
-      readAppData(JSON.stringify({ theme: "custom", accentColor: "#FF8A42" })),
-    ).toMatchObject({ theme: "custom", accentColor: "#FF8A42" });
-    expect(
-      readAppData(JSON.stringify({ theme: "custom", accentColor: "red" })).accentColor,
-    ).toBe(DEFAULT_DATA.accentColor);
+    expect(readAppData(JSON.stringify({ theme: "custom", accentColor: "#FF8A42" }))).toMatchObject({
+      theme: "custom",
+      accentColor: "#FF8A42",
+    });
+    expect(readAppData(JSON.stringify({ theme: "custom", accentColor: "red" })).accentColor).toBe(
+      DEFAULT_DATA.accentColor
+    );
   });
 
   it("preserves valid Pomodoro durations and rejects unsafe values", () => {
     expect(
-      readAppData(JSON.stringify({ pomodoro: { workMinutes: 50, breakMinutes: 10 } })).pomodoro,
+      readAppData(JSON.stringify({ pomodoro: { workMinutes: 50, breakMinutes: 10 } })).pomodoro
     ).toEqual({ workMinutes: 50, breakMinutes: 10 });
-    expect(readAppData(JSON.stringify({ pomodoro: { workMinutes: 0, breakMinutes: 90 } })).pomodoro)
-      .toEqual(DEFAULT_DATA.pomodoro);
+    expect(
+      readAppData(JSON.stringify({ pomodoro: { workMinutes: 0, breakMinutes: 90 } })).pomodoro
+    ).toEqual(DEFAULT_DATA.pomodoro);
   });
 
   it("preserves scheduled task dates, times, and reminder settings", () => {
@@ -173,25 +177,29 @@ describe("readAppData", () => {
 
   it("ignores malformed records in persisted collections", () => {
     expect(
-      readAppData(JSON.stringify({ tasks: [null, { title: "missing fields" }] })).tasks,
+      readAppData(JSON.stringify({ tasks: [null, { title: "missing fields" }] })).tasks
     ).toEqual([]);
   });
 
   it("drops scheduled tasks with invalid date or time ranges", () => {
-    const data = readAppData(JSON.stringify({
-      tasks: [{
-        id: "invalid-time",
-        title: "Broken appointment",
-        important: false,
-        urgent: false,
-        completed: false,
-        createdAt: 1,
-        scheduledDate: "2026-02-31",
-        startTime: "25:70",
-        endTime: "09:00",
-        reminderMinutes: 10,
-      }],
-    }));
+    const data = readAppData(
+      JSON.stringify({
+        tasks: [
+          {
+            id: "invalid-time",
+            title: "Broken appointment",
+            important: false,
+            urgent: false,
+            completed: false,
+            createdAt: 1,
+            scheduledDate: "2026-02-31",
+            startTime: "25:70",
+            endTime: "09:00",
+            reminderMinutes: 10,
+          },
+        ],
+      })
+    );
 
     expect(data.tasks).toEqual([]);
   });
@@ -209,12 +217,20 @@ describe("readAppData", () => {
       endTime: "10:00",
     };
 
-    expect(readAppData(JSON.stringify({
-      tasks: [{ ...baseTask, reminderMinutes: 60, color: "#ab42ef" }],
-    })).tasks).toHaveLength(1);
-    expect(readAppData(JSON.stringify({
-      tasks: [{ ...baseTask, reminderMinutes: 10, color: "blue" }],
-    })).tasks).toEqual([]);
+    expect(
+      readAppData(
+        JSON.stringify({
+          tasks: [{ ...baseTask, reminderMinutes: 60, color: "#ab42ef" }],
+        })
+      ).tasks
+    ).toHaveLength(1);
+    expect(
+      readAppData(
+        JSON.stringify({
+          tasks: [{ ...baseTask, reminderMinutes: 10, color: "blue" }],
+        })
+      ).tasks
+    ).toEqual([]);
   });
 
   it("preserves safe research summaries and HTTPS citations on saved plans", () => {
@@ -229,10 +245,12 @@ describe("readAppData", () => {
     const data = readAppData(JSON.stringify({ ...DEFAULT_DATA, plans: [savedPlan] }));
     expect(data.plans).toEqual([savedPlan]);
 
-    const unsafe = readAppData(JSON.stringify({
-      ...DEFAULT_DATA,
-      plans: [{ ...savedPlan, sources: [{ title: "Unsafe", url: "javascript:alert(1)" }] }],
-    }));
+    const unsafe = readAppData(
+      JSON.stringify({
+        ...DEFAULT_DATA,
+        plans: [{ ...savedPlan, sources: [{ title: "Unsafe", url: "javascript:alert(1)" }] }],
+      })
+    );
     expect(unsafe.plans).toEqual([]);
   });
 });

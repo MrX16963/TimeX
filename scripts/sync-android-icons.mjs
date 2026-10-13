@@ -7,7 +7,7 @@ const resourceRoot = path.join(root, "android", "app", "src", "main", "res");
 const icon = path.join(root, "public", "icons", "icon-512.png");
 const directories = await readdir(resourceRoot, { withFileTypes: true });
 const mipmapDirectories = directories.filter(
-  (entry) => entry.isDirectory() && entry.name.startsWith("mipmap-"),
+  (entry) => entry.isDirectory() && entry.name.startsWith("mipmap-")
 );
 
 if (mipmapDirectories.length === 0) {

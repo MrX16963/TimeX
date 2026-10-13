@@ -36,10 +36,11 @@ describe("assistant conversation history", () => {
       configurable: true,
       value: {
         localStorage: {
-          getItem: () => JSON.stringify({
-            activeId: "missing",
-            conversations: [conversation, { ...conversation, mode: "unknown" }],
-          }),
+          getItem: () =>
+            JSON.stringify({
+              activeId: "missing",
+              conversations: [conversation, { ...conversation, mode: "unknown" }],
+            }),
         },
       },
     });
@@ -61,8 +62,7 @@ describe("assistant conversation history", () => {
       configurable: true,
       value: {
         localStorage: {
-          getItem: (key: string) =>
-            key === "old-chat" ? JSON.stringify([legacyMessage]) : null,
+          getItem: (key: string) => (key === "old-chat" ? JSON.stringify([legacyMessage]) : null),
         },
       },
     });
@@ -128,17 +128,26 @@ describe("assistant conversation history", () => {
       title: "Pomodoro research",
       updatedAt: "2026-10-02T10:00:00.000Z",
       messages: [
-        { id: "1", role: "user" as const, content: "Pomodoro?", created_at: "2026-10-02T10:00:00.000Z" },
-        { id: "2", role: "assistant" as const, content: "25-minute focus blocks.", created_at: "2026-10-02T10:00:01.000Z" },
+        {
+          id: "1",
+          role: "user" as const,
+          content: "Pomodoro?",
+          created_at: "2026-10-02T10:00:00.000Z",
+        },
+        {
+          id: "2",
+          role: "assistant" as const,
+          content: "25-minute focus blocks.",
+          created_at: "2026-10-02T10:00:01.000Z",
+        },
       ],
     };
     const planner = createConversation("mrx_planner");
 
     expect(latestSearchContext([planner, search], planner.id)).toBe(
-      "Topic: Pomodoro research\n25-minute focus blocks.",
+      "Topic: Pomodoro research\n25-minute focus blocks."
     );
     expect(latestSearchContext([planner], planner.id)).toBe("");
     expect(latestSearchContext([search], search.id)).toBe("");
   });
 });
-

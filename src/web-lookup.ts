@@ -6,7 +6,10 @@ export type LookupResult = {
   url: string;
 };
 
-type Fetcher = (input: string, init?: { signal?: AbortSignal }) => Promise<{
+type Fetcher = (
+  input: string,
+  init?: { signal?: AbortSignal }
+) => Promise<{
   ok: boolean;
   json: () => Promise<unknown>;
 }>;
@@ -21,23 +24,27 @@ export function extractTopic(message: string): string {
     if (next === topic) break;
     topic = next;
   }
-  return topic.replace(/^(?:ال)?(?:موضوع|مفهوم)\s+/u, "").slice(0, 120).trim();
+  return topic
+    .replace(/^(?:ال)?(?:موضوع|مفهوم)\s+/u, "")
+    .slice(0, 120)
+    .trim();
 }
 
 export function isInformationQuestion(message: string): boolean {
   const text = message.trim();
   if (text.length < 4 || text.length > 200) return false;
-  return /^(ابحث|بحث|دور|دوّر|ما\s|ماذا|من\s|متى|أين|اين|كم\s|شو\s|مين|what|who|when|where|how many|tell me about|search|look up)/iu.test(text);
+  return /^(ابحث|بحث|دور|دوّر|ما\s|ماذا|من\s|متى|أين|اين|كم\s|شو\s|مين|what|who|when|where|how many|tell me about|search|look up)/iu.test(
+    text
+  );
 }
 
 async function lookupOn(
   lang: "ar" | "en",
   topic: string,
   doFetch: Fetcher,
-  signal: AbortSignal,
+  signal: AbortSignal
 ): Promise<LookupResult | null> {
-  const searchUrl =
-    `https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srlimit=1&format=json&origin=*&srsearch=${encodeURIComponent(topic)}`;
+  const searchUrl = `https://${lang}.wikipedia.org/w/api.php?action=query&list=search&srlimit=1&format=json&origin=*&srsearch=${encodeURIComponent(topic)}`;
   const searchResponse = await doFetch(searchUrl, { signal });
   if (!searchResponse.ok) return null;
   const searchData = (await searchResponse.json()) as {
@@ -47,7 +54,7 @@ async function lookupOn(
   if (!title) return null;
   const summaryResponse = await doFetch(
     `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`,
-    { signal },
+    { signal }
   );
   if (!summaryResponse.ok) return null;
   const data = (await summaryResponse.json()) as {
@@ -64,7 +71,7 @@ async function lookupOn(
 export async function lookupWeb(
   message: string,
   language: Language,
-  doFetch: Fetcher = (input, init) => fetch(input, init),
+  doFetch: Fetcher = (input, init) => fetch(input, init)
 ): Promise<LookupResult | null> {
   const topic = extractTopic(message);
   if (!topic) return null;

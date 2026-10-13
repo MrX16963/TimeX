@@ -70,7 +70,12 @@
 }
 
 .marketing-site .site-hero-visual::before {
-  background: radial-gradient(circle, rgba(76, 79, 86, 0.38), rgba(37, 39, 44, 0.2) 61%, transparent 71%);
+  background: radial-gradient(
+    circle,
+    rgba(76, 79, 86, 0.38),
+    rgba(37, 39, 44, 0.2) 61%,
+    transparent 71%
+  );
 }
 
 .marketing-site .site-orbit {
@@ -80,7 +85,9 @@
 .marketing-site .preview-window {
   border-color: #36383e;
   background: #141518;
-  box-shadow: 0 29px 80px rgba(0, 0, 0, 0.4), 0 5px 18px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 29px 80px rgba(0, 0, 0, 0.4),
+    0 5px 18px rgba(0, 0, 0, 0.25);
 }
 
 .marketing-site .preview-topbar,

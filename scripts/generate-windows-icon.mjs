@@ -9,7 +9,7 @@ const entries = await Promise.all(
   sizes.map(async (size) => ({
     size,
     data: await readFile(path.join(iconDirectory, `icon-${size}.png`)),
-  })),
+  }))
 );
 
 const directorySize = 6 + entries.length * 16;
@@ -32,6 +32,6 @@ const directory = entries.map(({ size, data }) => {
 await mkdir(iconDirectory, { recursive: true });
 await writeFile(
   path.join(iconDirectory, "timex.ico"),
-  Buffer.concat([header, ...directory, ...entries.map(({ data }) => data)]),
+  Buffer.concat([header, ...directory, ...entries.map(({ data }) => data)])
 );
 console.log("Generated a multi-resolution Windows application icon.");

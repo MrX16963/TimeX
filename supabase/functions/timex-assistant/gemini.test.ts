@@ -39,7 +39,7 @@ describe("Gemini Google Search integration", () => {
       "gemini-2.5-flash",
       "You are MrX.",
       [{ role: "user", parts: [{ text: "Find sources" }] }],
-      [{ google_search: {} }],
+      [{ google_search: {} }]
     );
 
     const [url, init] = fetchStub.mock.calls[0] as [string, RequestInit];

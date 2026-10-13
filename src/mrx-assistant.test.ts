@@ -66,7 +66,14 @@ describe("MrX local planning assistant", () => {
     const response = await respondAsMrX("What should I do first?", "en", {
       tasks: [
         { ...openTask, id: "important", title: "Plan next month", urgent: false },
-        { ...openTask, id: "due", title: "Submit application", important: false, urgent: false, scheduledDate: "2026-10-01" },
+        {
+          ...openTask,
+          id: "due",
+          title: "Submit application",
+          important: false,
+          urgent: false,
+          scheduledDate: "2026-10-01",
+        },
       ],
     });
 
@@ -76,7 +83,10 @@ describe("MrX local planning assistant", () => {
 
   it("offers a small, prioritized first step when the user feels overwhelmed", async () => {
     const response = await respondAsMrX("I feel overwhelmed", "en", {
-      tasks: [openTask, { ...openTask, id: "later", title: "Organize files", important: false, urgent: false }],
+      tasks: [
+        openTask,
+        { ...openTask, id: "later", title: "Organize files", important: false, urgent: false },
+      ],
     });
 
     expect(response.reply).toContain("10 minutes");
@@ -96,13 +106,13 @@ describe("MrX local planning assistant", () => {
       "Create a plan to study programming",
       "en",
       { tasks: [] },
-      "plan",
+      "plan"
     );
     const advancedPlan = await respondAsMrX(
       "Create a plan to study programming",
       "en",
       { tasks: [], researchUnavailable: true },
-      "advanced-plan",
+      "advanced-plan"
     );
 
     expect(normalPlan.reply).not.toContain("Google Search");
@@ -119,12 +129,14 @@ describe("MrX local planning assistant", () => {
   it("continues a conversation by explaining a step from the latest saved plan", async () => {
     const response = await respondAsMrX("Explain the second step", "en", {
       tasks: [],
-      plans: [{
-        id: "plan-1",
-        goal: "Prepare for exams",
-        steps: ["List the topics", "Schedule study sessions"],
-        createdAt: 1,
-      }],
+      plans: [
+        {
+          id: "plan-1",
+          goal: "Prepare for exams",
+          steps: ["List the topics", "Schedule study sessions"],
+          createdAt: 1,
+        },
+      ],
     });
 
     expect(response.reply).toContain("Schedule study sessions");

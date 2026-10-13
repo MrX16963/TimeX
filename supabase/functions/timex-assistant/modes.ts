@@ -67,7 +67,10 @@ export function sanitizeContextData(value: unknown): string {
       text = "";
     }
   }
-  return text.replace(/<\/?context>/gi, "").trim().slice(0, MAX_CONTEXT_CHARS);
+  return text
+    .replace(/<\/?context>/gi, "")
+    .trim()
+    .slice(0, MAX_CONTEXT_CHARS);
 }
 
 export function buildSystemPrompt(mode: GroqAssistantMode, options: PromptOptions): string {
@@ -84,7 +87,7 @@ export function buildSystemPrompt(mode: GroqAssistantMode, options: PromptOption
     parts.push(
       tasks.length
         ? `Open tasks (data): ${JSON.stringify(tasks)}`
-        : "The user shared no open tasks.",
+        : "The user shared no open tasks."
     );
   }
   const context = sanitizeContextData(options.contextData);

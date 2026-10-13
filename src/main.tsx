@@ -27,5 +27,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
     ) : (
       <LandingPage />
     )}
-  </React.StrictMode>,
+  </React.StrictMode>
 );

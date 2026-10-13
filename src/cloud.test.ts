@@ -22,7 +22,8 @@ describe("assistant conversation storage", () => {
       configurable: true,
       value: {
         localStorage: {
-          getItem: (key: string) => key === "timex-chat:user-1" ? JSON.stringify([message]) : null,
+          getItem: (key: string) =>
+            key === "timex-chat:user-1" ? JSON.stringify([message]) : null,
         },
       },
     });
@@ -36,10 +37,11 @@ describe("assistant conversation storage", () => {
       configurable: true,
       value: {
         localStorage: {
-          getItem: () => JSON.stringify([
-            { role: "system", content: "bad" },
-            { id: "valid", role: "user", content: "Hello", created_at: "2026-10-01" },
-          ]),
+          getItem: () =>
+            JSON.stringify([
+              { role: "system", content: "bad" },
+              { id: "valid", role: "user", content: "Hello", created_at: "2026-10-01" },
+            ]),
         },
       },
     });

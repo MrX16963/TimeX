@@ -2689,22 +2689,22 @@ select {
 }
 
 .workspace-loading {
-  display: grid;
-  min-height: min(520px, calc(100dvh - 180px));
-  place-content: center;
-  justify-items: center;
-  gap: 11px;
+  display: flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
   color: var(--muted);
 }
 
 .workspace-loading p {
   margin: 0;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .workspace-loading-spinner {
-  width: 27px;
-  height: 27px;
+  width: 16px;
+  height: 16px;
   border: 2px solid var(--line);
   border-block-start-color: var(--accent);
   border-radius: 50%;

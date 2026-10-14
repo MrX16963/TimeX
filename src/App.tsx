@@ -2964,7 +2964,7 @@ function App() {
           )}
 
           {page === "assistant" && assistantView === "plans" && (
-            <section className="content-page assistant-page assistant-page-chat">
+            <section className="content-page assistant-page">
               <div className="page-heading">
                 <div>
                   <span className="eyebrow">{t("assistantChat")}</span>
@@ -3077,7 +3077,7 @@ function App() {
           )}
 
           {page === "assistant" && assistantView === "chat" && (
-            <section className="content-page assistant-page">
+            <section className="content-page assistant-page assistant-page-chat">
               <div className="page-heading">
                 <div>
                   <span className="eyebrow">{t("assistantChat")}</span>
